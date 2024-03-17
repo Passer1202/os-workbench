@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
   }
 
   int cnt=p-procs;
-  printf("%d\n",cnt);
+  //printf("%d\n",cnt);
 
   for(int i=0;i<cnt;i++){
     procs[i].child=malloc(sizeof(pid_t)*cnt);
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
-
+  printf("\n");
   return 0;
 }
 
