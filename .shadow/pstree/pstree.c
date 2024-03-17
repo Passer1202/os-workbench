@@ -1,3 +1,4 @@
+
 #include <string.h>
 #include <dirent.h>
 #include <stdio.h>
@@ -41,9 +42,9 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
     printf("%*s",len,"");
     printf(" +--");
   }
-  printf("%s",p->name);
+  //printf("%s",p->name);
   if(pf){
-    printf("(%d)",p->pid);
+    //printf("(%d)",p->pid);
   }
 
   for(int i=0;i<p->child_cnt;i++){
