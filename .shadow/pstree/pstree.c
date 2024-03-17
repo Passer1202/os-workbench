@@ -4,12 +4,10 @@
 #include <unistd.h>
 #include <getopt.h>
 
-const struct option opt_table[]={
-  {"numeric-sort",no_argument,NULL,'n'},
-  {"show-pids",no_argument,NULL,'p'},
-  {"version",no_argument,NULL,'V'},
-  {0,0,NULL,0},
-};
+struct option opt_table[] = {{"show-pids", no_argument, &pf, 1},
+                                  {"numeric-sort", no_argument, &nf, 1},
+                                  {"version", no_argument, &vf, 1},
+                                  {0, 0, 0, 0}};
 
 int nf;
 int pf;
@@ -37,7 +35,7 @@ int main(int argc, char *argv[]) {
     case 0:
       break;
     default:
-      printf("pstree: invalid option -- '%c'\n", opt);
+      printf("pstree: invalid option -- '%s'\n", argv[optind-1]);
     }
   }
 
