@@ -34,13 +34,13 @@ const char* base_path="/proc";
 DIR* dir;
 
 void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
-  if(0){
+  if(d>0){
     int len=(d-1)*4;
     printf("\n%*s |\n",len,"");
     printf("%*s",len,"");
     printf(" +--");
   }
-  printf("%s",p->name);
+  printf("%s\n",p->name);
   if(pf){
     printf("(%d)",p->pid);
   }
