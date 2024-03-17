@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <dirent.h>
 #include <stdio.h>
@@ -9,10 +8,9 @@
 #include <stdlib.h>
 
 typedef struct proc {
-  // Add necessary members here
-  
-  char name[1024];
+
   pid_t pid;
+  char name[1024];
   pid_t* child;
   int child_cnt;
   
@@ -29,6 +27,9 @@ const struct option opt_table[]={
 int nf;//nflag
 int pf;//pflag
 int vf;//vflag
+
+int opt;
+
 
 int pid_max;
 
@@ -48,12 +49,12 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
   }
 
   for(int i=0;i<p->child_cnt;i++){
-    proc* _child=procs;
-    while(_child!=NULL){
-      if(_child->pid==p->child[i])break;
-      _child++;
+    proc* maybe_child=procs;
+    while(maybe_child!=NULL&&(maybe_child->pid!=p->child[i])){
+      maybe_child++;
     }
-    MY_OUT_PUT(_child,procs,d+1,pf);
+
+    MY_OUT_PUT(maybe_child,procs,d+1,pf);
   }
 
 }
@@ -61,7 +62,7 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
 
 int main(int argc, char *argv[]) {
 
-  int opt;
+ 
   while((opt=getopt_long(argc,argv,"-npV",opt_table,NULL))!=-1){
     switch (opt)
     {
