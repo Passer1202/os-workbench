@@ -26,6 +26,8 @@ int nf;//nflag
 int pf;//pflag
 int vf;//vflag
 
+int pid_max;
+
 const char* base_path="/proc";
 DIR* dir;
 
@@ -45,6 +47,18 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  if(vf){
+    printf("pstree from lhj-221240073\n");
+  }
+
+  FILE* f=fopen("/proc/sys/kernel/pid_max","r");
+  if(f==NULL){
+    printf("pstree: cannot open file /proc/sys/kernel/pid_max: No such file or directory\n");
+    return -1;
+  }
+  fscanf(f,"%d",&pid_max);
+  fclose(f);
+
   //打开目录
   
   if((dir=opendir(base_path))==NULL){
@@ -54,7 +68,6 @@ int main(int argc, char *argv[]) {
 
 
   //保存
-  extern int pid_max;
   proc* procs=malloc(sizeof(proc)*(pid_max+1));//进程数组
   pid_t* ppids=malloc(sizeof(pid_t)*pid_max);//父进程的pid
 
