@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
     case 0:break;
     default:
       printf("pstree: invalid option -- '%s'\n", argv[optind-1]);
+      return 1;
     }
   }
 
