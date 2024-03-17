@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
         while(fscanf(fp,"%s",buf)!=EOF){
           if(strcmp(buf,"Name:")==0){
             fscanf(fp,"%s",p->name);
-            printf("%s",p->name);
+            printf("%s",buf);
           }
           if(strcmp(buf,"PPid:")==0){
             fscanf(fp,"%d",&ppids[p-procs]);
