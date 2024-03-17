@@ -165,10 +165,10 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-   for (int i = 0; i < proc_count; ++i) {
-      printf("%d-%d\n",i,procs[i].child_num);
+   for (int i = 0; i < cnt; ++i) {
+      printf("%d-%d\n",i,procs[i].child_cnt);
   }
-  
+
   
   for(int i=0;i<cnt;i++){
     if(ppids[i]==0) MY_OUT_PUT(&procs[i],procs,0,pf);
