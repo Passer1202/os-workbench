@@ -36,9 +36,6 @@ int main(int argc, char *argv[]) {
       break;
     case 0:
       break;
-    case '?':
-      printf("pstree: invalid option -- '%c'\n",optopt);
-      break;
     default:
       printf("pstree: invalid option -- '%c'\n",optopt);
     }
