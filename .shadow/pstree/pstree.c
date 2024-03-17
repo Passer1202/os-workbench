@@ -34,7 +34,7 @@ const char* base_path="/proc";
 DIR* dir;
 
 void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
-  if(0){
+  if(d>0){
     int len=(d-1)*4;
     printf("\n%*s |\n",len,"");
     printf("%*s",len,"");
@@ -135,6 +135,7 @@ int main(int argc, char *argv[]) {
           }
           if(strcmp(buf,"PPid:")==0){
             fscanf(fp,"%d",&ppids[p-procs]);
+            printf("%d\n",ppids[p-procs]);
           }
         }
         fclose(fp);
@@ -162,7 +163,7 @@ int main(int argc, char *argv[]) {
   }
   
   for(int i=0;i<cnt;i++){
-    if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
+    //if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
