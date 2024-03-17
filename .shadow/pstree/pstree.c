@@ -3,15 +3,16 @@
 #include <assert.h>
 #include <unistd.h>
 #include <getopt.h>
+int nf;
+int pf;
+int vf;
+
 
 struct option opt_table[] = {{"show-pids", no_argument, &pf, 1},
                                   {"numeric-sort", no_argument, &nf, 1},
                                   {"version", no_argument, &vf, 1},
                                   {0, 0, 0, 0}};
 
-int nf;
-int pf;
-int vf;
 
 int main(int argc, char *argv[]) {
   //for (int i = 0; i < argc; i++) {
