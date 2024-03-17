@@ -1,156 +1,179 @@
+#include <string.h>
+#include <dirent.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <string.h>
 #include <getopt.h>
+#include <sys/types.h>
+#include <stdlib.h>
 
-typedef struct {
-	char name[1024];
-	pid_t pid;
-	pid_t* children;
-	int child_num;
+typedef struct proc {
+  // Add necessary members here
+  pid_t pid;
+  char* name;
+  char* child;
+  int child_cnt;
+  
 } proc;
 
-void PrintTree(proc* p, proc* procs, int depth, int pflag) {
-	if (depth > 0) {
-		printf("\n%*s |\n", (depth - 1) * 4, "");
-		printf("%*s", (depth - 1) * 4, "");
-		printf(" +--");
-	}
-	printf("%s", p->name);
-	if (pflag) {
-		printf("(%d)", p->pid);
-	}
-	for (int i = 0; i < p->child_num; ++i) {
-		proc* tmp = procs;
-		while (tmp != NULL) {
-			if (tmp->pid == p->children[i]) {
-				break;
-			}
-			++tmp;
-		}
-		PrintTree(tmp, procs, depth + 1, pflag);
-	}
+
+const struct option opt_table[]={
+  {"numeric-sort",no_argument,NULL,'n'},
+  {"show-pids",no_argument,NULL,'p'},
+  {"version",no_argument,NULL,'V'},
+  {0,0,NULL,0},
+};
+
+int nf;//nflag
+int pf;//pflag
+int vf;//vflag
+
+int pid_max;
+
+const char* base_path="/proc";
+DIR* dir;
+
+void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
+  if(d>0){
+    int len=(d-1)*4;
+    printf("\n%*s |\n",len,"");
+    printf("%*s",len,"");
+    printf(" +--");
+  }
+  printf("%s",p->name);
+  if(pf){
+    printf("(%d)",p->pid);
+  }
+
+  for(int i=0;i<p->child_cnt;i++){
+    proc* _child=procs;
+    while(_child!=NULL&&(_child->pid!=p->child[i])){
+      _child++;
+    }
+    MY_OUT_PUT(_child,procs,d+1,pf);
+  }
+
 }
+
 
 int main(int argc, char *argv[]) {
-  // Get the arguments.
-  char c;
-  int nflag = 0, pflag = 0, vflag = 0;
-  struct option long_options[] = {
-	{"show-pids", no_argument, &pflag, 1},
-	{"numeric-sort", no_argument, &nflag, 1},
-	{"version", no_argument, &vflag, 1},
-	{0, 0, 0, 0}
-  };
 
-    while ((c = getopt_long(argc, argv, "npV", long_options, NULL)) != -1) {
-        switch (c) {     
-            case 'n':
-	  	nflag = 1;
-	  	break;
-	    case 'p':
-	  	pflag = 1;
-		break;
-	    case 'V':
-		vflag = 1;
-		break;
-            case 0:
-                break;
-            case '?':
-                printf("Unknown option: %s\n", argv[optind-1]);
-                return 1;
-            default:
-                printf("Unexpected option: %c\n", c);
-                return 1;
-        }
+  int opt;
+  while((opt=getopt_long(argc,argv,"-npV",opt_table,NULL))!=-1){
+    switch (opt)
+    {
+    case 'n':nf=1;break;
+    case 'p':pf=1;break;
+    case 'V':vf=1;break;
+    case 0:break;
+    default:
+      printf("pstree: invalid option -- '%s'\n", argv[optind-1]);
     }
-
-  if (vflag) {
-  	printf("A simple pstree by CY\n");
-	return 0;
   }
 
-  // Read max pid.
-  FILE* pid_max_f = fopen("/proc/sys/kernel/pid_max", "r");
-  if (pid_max_f == NULL) {
-  	perror("No pid_max");
-	return -1;
-  }
-  int pid_max;
-  fscanf(pid_max_f, "%d", &pid_max);
-  fclose(pid_max_f);
-
-  char* base_path = "/proc";
-  struct dirent* dent;
-  DIR* srcdir = opendir(base_path);
-  if (srcdir == NULL) {
-  	perror("Open fail");
-	return -1;
+  if(vf){
+    printf("pstree from lhj-221240073\n");
   }
 
-  // Proc array.
-  proc* procs;
-  procs = malloc(sizeof(proc) * (pid_max + 1));
-  pid_t* ppids;
-  ppids = malloc(sizeof(pid_t) * pid_max);
-  proc* p = procs;
+  FILE* f=fopen("/proc/sys/kernel/pid_max","r");
+  if(f==NULL){
+    printf("pstree: cannot open file /proc/sys/kernel/pid_max: No such file or directory\n");
+    return -1;
+  }
+  fscanf(f,"%d",&pid_max);
+  fclose(f);
+
+  //打开目录
   
-  // Read proc directory.
-  while ((dent = readdir(srcdir)) != NULL) {
-	if (dent->d_name[0] < '0' || dent->d_name[0] > '9') {
-		continue;
-	}
-	// Save the pids.
-	p->pid = atoi(dent->d_name);
-	
-	// Read the stat to get name and ppid.
-	char path[13 + strlen(dent->d_name) + 1], buf[1024];
-	memset(path, 0, sizeof(path));
-	strcat(path, base_path);
-	strcat(path, "/");
-	strcat(path, dent->d_name);
-	strcat(path, "/status");
-	FILE* f = fopen(path, "r");
-	while ((fscanf(f, "%s", buf) != EOF)) {
-		if (strcmp(buf, "Name:") == 0) {
-			fscanf(f, "%s", p->name);
-		}
-		if (strcmp(buf, "PPid:") == 0) {
-			fscanf(f, "%d", &ppids[p - procs]);
-		}
-	}
-	fclose(f);
-	++p;
-  }
-  int proc_count = p - procs;
-  printf("Total proc: %d\n", proc_count);
-
-  // Build the tree.
-  for (int i = 0; i < proc_count; ++i) {
-  	procs[i].children = malloc(sizeof(pid_t) * proc_count);
-	procs[i].child_num = 0;
+  if((dir=opendir(base_path))==NULL){
+    printf("pstree: cannot open directory /proc: No such file or directory\n");
+    return -1;
   }
 
-  for (int i = 0; i < proc_count; ++i) {
-	for (int j = 0; j < proc_count; ++j) {
-		if (ppids[j] == procs[i].pid) {
-			procs[i].children[procs[i].child_num++] = procs[j].pid;
-		}
-	}
+
+  //保存
+  proc* procs=malloc(sizeof(proc)*(pid_max+1));//进程数组
+  pid_t* ppids=malloc(sizeof(pid_t)*pid_max);//父进程的pid
+
+  struct dirent* ent;
+  proc* p=procs;//当前进程指针
+
+  while((ent=readdir(dir))!=NULL){
+      //筛选出为数字的目录
+      if(ent->d_name[0]>='0'&&ent->d_name[0]<='9'){
+        p->pid=atoi(ent->d_name);
+        //p->name=ent->d_name;
+        
+        //todo:
+
+        char* path;
+        int len=strlen(base_path)+strlen(ent->d_name)+7+2;
+        path=malloc(len);
+        memset(path,0,len);
+
+        strcat(path,base_path);
+        strcat(path,"/");
+        strcat(path,ent->d_name);
+        strcat(path,"/status");
+
+        printf("%s\n",path);
+
+        FILE* fp=fopen(path,"r");
+
+        if(fp==NULL){
+          printf("pstree: cannot open file %s: No such file or directory\n",path);
+          return -1;
+        }
+
+        char buf[1024];
+
+        while(fscanf(fp,"%s",buf)!=EOF){
+          if(strcmp(buf,"Name:")==0){
+            fscanf(fp,"%s",p->name);
+
+          }
+          if(strcmp(buf,"PPid:")==0){
+            fscanf(fp,"%d",&ppids[p-procs]);
+          }
+        }
+        fclose(fp);
+        free(path);
+    }
+    p++;
   }
 
-  for (int i = 0; i < proc_count; ++i) {
-	  if (ppids[i] == 0) {
-	  	PrintTree(&procs[i], procs, 0, pflag);
-	  }
-  }
-  printf("\n");
+  int cnt=p-procs;
 
-  closedir(srcdir);
+  for(int i=0;i<cnt;i++){
+    procs[i].child=malloc(sizeof(pid_t)*cnt);
+    procs[i].child_cnt=0;
+  }
+
+  //建树
+  for(int i=0;i<cnt;i++){
+    for(int j=0;j<cnt;j++){
+      if(procs[i].pid==ppids[j]){
+        int num=procs[i].child_cnt;
+        procs[i].child[num]=procs[j].pid;
+        procs[i].child_cnt++;
+      }
+    }
+  }
+  
+  for(int i=0;i<cnt;i++){
+    //if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
+  }
+  
+  //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
+
   return 0;
 }
+
+
+
+
+  //for (int i = 0; i < argc; i++) {
+  //  assert(argv[i]);
+  //  printf("argv[%d] = %s\n", i, argv[i]);
+  //}
+  //assert(!argv[argc]);
