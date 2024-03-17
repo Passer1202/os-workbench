@@ -14,7 +14,6 @@ typedef struct proc {
   
 } proc;
 
-extern int pid_max;
 
 const struct option opt_table[]={
   {"numeric-sort",no_argument,NULL,'n'},
@@ -55,7 +54,7 @@ int main(int argc, char *argv[]) {
 
 
   //保存
-
+  extern int pid_max;
   proc* procs=malloc(sizeof(proc)*(pid_max+1));//进程数组
   pid_t* ppids=malloc(sizeof(pid_t)*pid_max);//父进程的pid
 
