@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         strcat(path,ent->d_name);
         strcat(path,"/status");
 
-        //printf("%s\n",path);
+        printf("%s\n",path);
 
         FILE* fp=fopen(path,"r");
 
@@ -130,7 +130,6 @@ int main(int argc, char *argv[]) {
         while(fscanf(fp,"%s",buf)!=EOF){
           if(strcmp(buf,"Name:")==0){
             fscanf(fp,"%s",p->name);
-            printf("%s\n",p->name);
           }
           if(strcmp(buf,"PPid:")==0){
             fscanf(fp,"%d",&ppids[p-procs]);
