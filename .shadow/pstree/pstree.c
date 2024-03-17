@@ -115,7 +115,9 @@ int main(int argc, char *argv[]) {
 	strcat(path, "/");
 	strcat(path, dent->d_name);
 	strcat(path, "/status");
+
   printf("%s\n",path);
+  
 	FILE* f = fopen(path, "r");
 	while ((fscanf(f, "%s", buf) != EOF)) {
 		if (strcmp(buf, "Name:") == 0) {
