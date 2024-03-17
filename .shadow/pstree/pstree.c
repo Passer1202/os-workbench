@@ -9,8 +9,9 @@
 
 typedef struct proc {
   // Add necessary members here
-  pid_t pid;
+  
   char name[1024];
+  pid_t pid;
   char* child;
   int child_cnt;
   
@@ -108,10 +109,9 @@ int main(int argc, char *argv[]) {
         
         //todo:
 
-        char* path;
-        int len=strlen(base_path)+strlen(ent->d_name)+7+2;
-        path=malloc(len);
-        memset(path,0,len);
+        char path[13+strlen(ent->d_name)+1];
+
+        memset(path,0,sizeof(path));
 
         strcat(path,base_path);
         strcat(path,"/");
@@ -140,7 +140,7 @@ int main(int argc, char *argv[]) {
           }
         }
         fclose(fp);
-        free(path);
+        //free(path);
         p++;
     }
     
@@ -164,9 +164,6 @@ int main(int argc, char *argv[]) {
         //printf("ljy\n");
       }
     }
-  }
-   for (int i = 0; i < cnt; ++i) {
-      printf("%d-%d\n",i,procs[i].child_cnt);
   }
 
   
