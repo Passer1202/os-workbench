@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   //}
   //assert(!argv[argc]);
   int opt;
-  while(opt=getopt_long(argc,argv,"-npV",opt_table,NULL)!=-1){
+  while((opt=getopt_long(argc,argv,"-npV",opt_table,NULL))!=-1){
     switch (opt)
     {
     case 'n':
@@ -45,6 +45,6 @@ int main(int argc, char *argv[]) {
   }
 
   printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
-  
+
   return 0;
 }
