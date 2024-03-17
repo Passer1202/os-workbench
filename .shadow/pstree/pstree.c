@@ -13,7 +13,7 @@ typedef struct proc {
   
   char name[1024];
   pid_t pid;
-  char* child;
+  pid_t* child;
   int child_cnt;
   
 } proc;
@@ -48,12 +48,12 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
   }
 
   for(int i=0;i<p->child_cnt;i++){
-    proc* pchild=procs;
-    while(pchild!=NULL){
-      if(pchild->pid==p->child[i])break;
-      pchild++;
+    proc* _child=procs;
+    while(_child!=NULL){
+      if(_child->pid==p->child[i])break;
+      _child++;
     }
-    MY_OUT_PUT(pchild,procs,d+1,pf);
+    MY_OUT_PUT(_child,procs,d+1,pf);
   }
 
 }
