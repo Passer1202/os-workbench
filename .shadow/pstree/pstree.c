@@ -1,4 +1,3 @@
-
 #include <string.h>
 #include <dirent.h>
 #include <stdio.h>
@@ -10,9 +9,8 @@
 
 typedef struct proc {
   // Add necessary members here
-  
-  char name[1024];
   pid_t pid;
+  char* name;
   pid_t* child;
   int child_cnt;
   
@@ -49,8 +47,7 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
 
   for(int i=0;i<p->child_cnt;i++){
     proc* _child=procs;
-    while(_child!=NULL){
-      if(_child->pid==p->child[i])break;
+    while(_child!=NULL&&(_child->pid!=p->child[i])){
       _child++;
     }
     MY_OUT_PUT(_child,procs,d+1,pf);
@@ -76,7 +73,6 @@ int main(int argc, char *argv[]) {
 
   if(vf){
     printf("pstree from lhj-221240073\n");
-    return 0;
   }
 
   FILE* f=fopen("/proc/sys/kernel/pid_max","r");
@@ -110,16 +106,17 @@ int main(int argc, char *argv[]) {
         
         //todo:
 
-        char path[13+strlen(ent->d_name)+1];
-
-        memset(path,0,sizeof(path));
+        char* path;
+        int len=strlen(base_path)+strlen(ent->d_name)+7+2;
+        path=malloc(len);
+        memset(path,0,len);
 
         strcat(path,base_path);
         strcat(path,"/");
         strcat(path,ent->d_name);
         strcat(path,"/status");
 
-        //printf("%s\n",path);
+        printf("%s\n",path);
 
         FILE* fp=fopen(path,"r");
 
@@ -133,22 +130,19 @@ int main(int argc, char *argv[]) {
         while(fscanf(fp,"%s",buf)!=EOF){
           if(strcmp(buf,"Name:")==0){
             fscanf(fp,"%s",p->name);
-            //printf("%s\n",p->name);
+
           }
           if(strcmp(buf,"PPid:")==0){
             fscanf(fp,"%d",&ppids[p-procs]);
-            //printf("%d\n",ppids[p-procs]);
           }
         }
         fclose(fp);
-        //free(path);
-        p++;
+        free(path);
     }
-    
+    p++;
   }
 
   int cnt=p-procs;
-  printf("%d\n",cnt);
 
   for(int i=0;i<cnt;i++){
     procs[i].child=malloc(sizeof(pid_t)*cnt);
@@ -162,14 +156,12 @@ int main(int argc, char *argv[]) {
         int num=procs[i].child_cnt;
         procs[i].child[num]=procs[j].pid;
         procs[i].child_cnt++;
-        //printf("ljy\n");
       }
     }
   }
-
   
   for(int i=0;i<cnt;i++){
-    if(ppids[i]==0) MY_OUT_PUT(&procs[i],procs,0,pf);
+    //if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
