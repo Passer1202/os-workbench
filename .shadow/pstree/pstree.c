@@ -1,6 +1,8 @@
+
 #include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
+#include <getopt.h>
 
 const struct option opt_table[]={
   {"numeric-sort",no_argument,NULL,'n'},
@@ -9,6 +11,8 @@ const struct option opt_table[]={
   {0,0,NULL,0},
 };
 
+
+getopt_long(argc,argv,"-npV",opt_table,NULL);
 
 int main(int argc, char *argv[]) {
   for (int i = 0; i < argc; i++) {
