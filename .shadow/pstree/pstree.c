@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
   }
   
   for(int i=0;i<cnt;i++){
-    if(ppids[i]==0) MY_OUT_PUT(&procs[i],procs,0,pf);
+    if(ppids[i]==0) printf("%s\n",procs[i].name);//MY_OUT_PUT(&procs[i],procs,0,pf);
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
