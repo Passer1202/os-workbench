@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
         int num=procs[i].child_cnt;
         procs[i].child[num]=procs[j].pid;
         procs[i].child_cnt++;
-        printf("ljy\n");
+        //printf("ljy\n");
       }
     }
   }
