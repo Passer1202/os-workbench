@@ -42,18 +42,18 @@ void MY_OUT_PUT(proc* p,proc* procs,int d,int pf){
     printf("%*s",len,"");
     printf(" +--");
   }
-  //printf("%s",p->name);
+  printf("%s",p->name);
   if(pf){
-    //printf("(%d)",p->pid);
+    printf("(%d)",p->pid);
   }
 
   for(int i=0;i<p->child_cnt;i++){
-    proc* _child=procs;
-    while(_child!=NULL){
-      if(_child->pid==p->child[i])break;
-      _child++;
+    proc* pchild=procs;
+    while(pchild!=NULL){
+      if(pchild->pid==p->child[i])break;
+      pchild++;
     }
-    MY_OUT_PUT(_child,procs,d+1,pf);
+    MY_OUT_PUT(pchild,procs,d+1,pf);
   }
 
 }
