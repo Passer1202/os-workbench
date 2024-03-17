@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
 	strcat(path, "/status");
 
   printf("%s\n",path);
-  
+  return 0;
 	FILE* f = fopen(path, "r");
 	while ((fscanf(f, "%s", buf) != EOF)) {
 		if (strcmp(buf, "Name:") == 0) {
