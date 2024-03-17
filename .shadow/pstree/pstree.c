@@ -117,7 +117,7 @@ int main(int argc, char *argv[]) {
         strcat(path,ent->d_name);
         strcat(path,"/status");
 
-        printf("%s\n",path);
+        //printf("%s\n",path);
 
         FILE* fp=fopen(path,"r");
 
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
   }
   
   for(int i=0;i<cnt;i++){
-    //if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
+    if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
