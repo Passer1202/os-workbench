@@ -159,9 +159,9 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  for(int i=0;i<cnt;i++){
-    if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
-  }
+  //for(int i=0;i<cnt;i++){
+  //  if(!ppids[i]) MY_OUT_PUT(&procs[i],procs,0,pf);
+  //}
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
 
