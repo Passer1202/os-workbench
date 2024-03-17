@@ -131,11 +131,11 @@ int main(int argc, char *argv[]) {
         while(fscanf(fp,"%s",buf)!=EOF){
           if(strcmp(buf,"Name:")==0){
             fscanf(fp,"%s",p->name);
-            printf("%s\n",p->name);
+            //printf("%s\n",p->name);
           }
           if(strcmp(buf,"PPid:")==0){
             fscanf(fp,"%d",&ppids[p-procs]);
-            printf("%d\n",ppids[p-procs]);
+            //printf("%d\n",ppids[p-procs]);
           }
         }
         fclose(fp);
