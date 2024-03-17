@@ -145,9 +145,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (int i = 0; i < proc_count; ++i) {
-      if (ppids[i] == 0) {
-          //PrintTree(&procs[i], procs, 0, pflag);
-      }
+      printf("%d-%d\n",i,procs[i].child_num);
   }
   printf("\n");
 
