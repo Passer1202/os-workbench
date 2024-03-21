@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
   }
 
   if(vf){
-    printf("pstree from lhj-221240073\n");
+    fprintf(stderr,"pstree from lhj-221240073\n");
     return 0;
   }
 
