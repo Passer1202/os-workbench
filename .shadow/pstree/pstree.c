@@ -14,6 +14,7 @@ typedef struct proc {
   char name[1024];
   pid_t* child;
   int child_cnt;
+  pid_t ppid;
   
 } proc;
 
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
 
   //保存
   proc* procs=malloc(sizeof(proc)*(pid_max+1));//进程数组
-  pid_t* ppids=malloc(sizeof(pid_t)*pid_max);//父进程的pid
+  //pid_t* ppids=malloc(sizeof(pid_t)*pid_max);//父进程的pid
 
   struct dirent* ent;
   proc* p=procs;//当前进程指针
@@ -144,7 +145,7 @@ int main(int argc, char *argv[]) {
             //printf("%s\n",p->name);
           }
           if(strcmp(buf,"PPid:")==0){
-            fscanf(fp,"%d",&ppids[p-procs]);
+            fscanf(fp,"%d",&procs[p-procs].ppid);
             //printf("%d\n",ppids[p-procs]);
           }
         }
@@ -173,7 +174,7 @@ int main(int argc, char *argv[]) {
   //建树
   for(int i=0;i<cnt;i++){
     for(int j=0;j<cnt;j++){
-      if(procs[i].pid==ppids[j]){
+      if(procs[i].pid==procs[j].ppid){
         int num=procs[i].child_cnt;
         procs[i].child[num]=procs[j].pid;
         procs[i].child_cnt++;
@@ -184,7 +185,7 @@ int main(int argc, char *argv[]) {
 
   
   for(int i=0;i<cnt;i++){
-    if(ppids[i]==0){printf("%s\n",procs[i].name);}//MY_OUT_PUT(&procs[i],procs,0,pf);}
+    if(procs[i].ppid==0){printf("%s\n",procs[i].name);}//MY_OUT_PUT(&procs[i],procs,0,pf);}
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
