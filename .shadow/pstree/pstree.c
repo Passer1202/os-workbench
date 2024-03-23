@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         strcat(path,base_path);
         strcat(path,"/");
         strcat(path,ent->d_name);
-        strcat(path,"/stat");
+        strcat(path,"/status");
 
         //printf("%s\n",path);
 
