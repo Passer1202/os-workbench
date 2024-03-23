@@ -150,14 +150,27 @@ int main(int argc, char *argv[]) {
     }
     
   }
+  
 
   int cnt=p-procs;
   //printf("%d\n",cnt);
+  if(!nf){
+    for(int i=0;i<cnt;i++){
+      for(int j=0;j<cnt-1;j++){
+        if(strcmp(procs[j].name,procs[j+1].name)>0){
+          proc temp=procs[j];
+          procs[j]=procs[j+1];
+          procs[j+1]=temp;
+        }
+      }
+    }
+  }
 
   for(int i=0;i<cnt;i++){
     procs[i].child=malloc(sizeof(pid_t)*cnt);
     procs[i].child_cnt=0;
   }
+
 
   //建树
   for(int i=0;i<cnt;i++){
