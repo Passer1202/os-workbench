@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
   //printf("%d\n",cnt);
 
   if(!nf){
-    sort(procs,procs+cnt,rule);
+    qsort(procs,procs+cnt,rule);
   }
 
   
