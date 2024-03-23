@@ -6,7 +6,7 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include<stdbool.h>
+//#include<stdbool.h>
 
 typedef struct proc {
 
@@ -17,8 +17,8 @@ typedef struct proc {
   
 } proc;
 
-bool rule(proc a,proc b){
-  return strcmp(a.name,b.name)<0;
+int rule(proc a,proc b){
+  return (int)strcmp(a.name,b.name);
 }
 
 const struct option opt_table[]={
