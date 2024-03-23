@@ -18,7 +18,7 @@ typedef struct proc {
 } proc;
 
 int rule(proc a,proc b){
-  return (int)strcmp(a.name,b.name);
+  return (int*)strcmp(a.name,b.name);
 }
 
 const struct option opt_table[]={
