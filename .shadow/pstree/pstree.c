@@ -154,17 +154,6 @@ int main(int argc, char *argv[]) {
 
   int cnt=p-procs;
   //printf("%d\n",cnt);
-  if(!nf){
-    for(int i=0;i<cnt;i++){
-      for(int j=0;j<cnt-1;j++){
-        if(strcmp(procs[j].name,procs[j+1].name)>0){
-          proc temp=procs[j];
-          procs[j]=procs[j+1];
-          procs[j+1]=temp;
-        }
-      }
-    }
-  }
 
   for(int i=0;i<cnt;i++){
     procs[i].child=malloc(sizeof(pid_t)*cnt);
@@ -186,7 +175,7 @@ int main(int argc, char *argv[]) {
 
   
   for(int i=0;i<cnt;i++){
-    if(ppids[i]==0){ MY_OUT_PUT(&procs[i],procs,0,pf);break;}
+    if(ppids[i]==0&&procs[i].pid==1){ MY_OUT_PUT(&procs[i],procs,0,pf);break;}
   }
   
   //printf("nf=%d, pf=%d, vf=%d\n", nf, pf, vf);
