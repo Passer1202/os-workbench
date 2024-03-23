@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <sys/types.h>
 #include <stdlib.h>
+#include<stdbool.h>
 
 typedef struct proc {
 
@@ -16,6 +17,9 @@ typedef struct proc {
   
 } proc;
 
+bool rule(proc a,proc b){
+  return strcmp(a.name,b.name)<0;
+}
 
 const struct option opt_table[]={
   {"numeric-sort",no_argument,NULL,'n'},
@@ -156,17 +160,10 @@ int main(int argc, char *argv[]) {
   //printf("%d\n",cnt);
 
   if(!nf){
-    for(int i=0;i<cnt;i++){
-      for(int j=i+1;j<cnt;j++){
-        if(strcmp(procs[i].name,procs[j].name)>0){
-          proc temp=procs[i];
-          procs[i]=procs[j];
-          procs[j]=temp;
-        }
-      }
-    }
+    sort(procs,procs+cnt,rule);
   }
 
+  
   for(int i=0;i<cnt;i++){
     procs[i].child=malloc(sizeof(pid_t)*cnt);
     procs[i].child_cnt=0;
