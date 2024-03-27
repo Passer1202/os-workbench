@@ -45,8 +45,21 @@ void splash() {
 
   for (int x = 0; x * SIDE <= w; x ++) {
     for (int y = 0; y * SIDE <= h; y++) {
-      if ((x & 1) ^ (y & 1)) {
-        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffffff); // white
+      //if ((x % 10==0) ^ (y & 1)) {
+      //  draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffffff); // white
+      //}
+      int xcolor=x%10;
+      switch(xcolor){
+      	case 0:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffffff);
+      	case 1:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfffacd);
+      	case 2:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfff5ee);
+      	case 3:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x87ceeb);
+      	case 4:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffc0cb);
+      	case 5:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xa020f0);
+      	case 6:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x00ff00);
+      	case 7:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xff6a6a);
+      	case 8:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x90ee90);
+      	case 9:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfdf5e6);
       }
     }
   }
