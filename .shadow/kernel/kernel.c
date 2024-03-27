@@ -48,9 +48,9 @@ void splash() {
   for (int x = 0; x * SIDE <= w; x ++) {
     for (int y = 0; y * SIDE <= h; y++) {
       if(w<=800&&h<=600){
-        //int cx=800/w;
-        //int cy=600/h;
-        int index=(x*SIDE/w)*800+((y*SIDE)/h)*600*800;
+        int cx=800/w;
+        int cy=600/h;
+        int index=x*SIDE*cx+(y*SIDE)*cy*800;
         uint32_t color=__1111_rgb[index*3+0]<<16|__1111_rgb[index*3+1]<<8|__1111_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
       }
