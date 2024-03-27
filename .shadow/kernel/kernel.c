@@ -7,8 +7,8 @@
 
 #define SIDE 1
 
-const int mypicw=320;
-const int mypich=297;
+const int mypicw=800;
+const int mypich=600;
 
 static int w, h;  // Screen size
 #define KEYNAME(key) \
@@ -50,11 +50,13 @@ void splash() {
   
   for (int x = 0; x * SIDE <= w; x ++) {
     for (int y = 0; y * SIDE <= h; y++) {
-    
+      
+        //int cx=mypicw/w;
+        //int cy=mypich/h;
         int index=x*SIDE*mypicw/w+(y*SIDE)*mypich/h*mypicw;
         uint32_t color=__1111_rgb[index*3+0]<<16|__1111_rgb[index*3+1]<<8|__1111_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
-     
+      
       //assert(w<=800&&h<=600);
         
  
