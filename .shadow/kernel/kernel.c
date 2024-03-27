@@ -3,12 +3,12 @@
 #include <klib.h>
 #include <klib-macros.h>
 //#include "mypic.h"
-//#include "mybaoer.h"
-#include "nazi.h"
+#include "mybaoer.h"
+//#include "nazi.h"
 #define SIDE 1
 
-const int mypicw=720;
-const int mypich=1520;
+const int mypicw=320;
+const int mypich=297;
 
 static int w, h;  // Screen size
 #define KEYNAME(key) \
@@ -54,7 +54,7 @@ void splash() {
         //int cx=mypicw/w;
         //int cy=mypich/h;
         int index=x*SIDE*mypicw/w+(y*SIDE)*mypich/h*mypicw;
-        uint32_t color=nazi_rgb[index*3+0]<<16|nazi_rgb[index*3+1]<<8|nazi_rgb[index*3+2];
+        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
       
       //assert(w<=800&&h<=600);
