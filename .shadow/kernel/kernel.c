@@ -76,8 +76,8 @@ void splash() {
       else{
         puts("3\n");
         int cx=w/mypicw;
-        //int cy=h/mypich;
-        int index=x*SIDE/cx+(y*SIDE*297/h)*mypicw;
+        int cy=h/mypich;
+        int index=x*SIDE/cx+(y*SIDE/cy)*mypicw;
         uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color);
       }
