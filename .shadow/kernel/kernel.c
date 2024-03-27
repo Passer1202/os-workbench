@@ -2,8 +2,8 @@
 #include <amdev.h>
 #include <klib.h>
 #include <klib-macros.h>
-//#include "mypic.h"
-#include "mybaoer.h"
+#include "mypic.h"
+//#include "mybaoer.h"
 
 #define SIDE 1
 
@@ -52,7 +52,7 @@ void splash() {
     for (int y = 0; y * SIDE <= h; y++) {
     
         int index=x*SIDE*mypicw/w+(y*SIDE)*mypich/h*mypicw;
-        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
+        uint32_t color=__1111_rgb[index*3+0]<<16|__1111_rgb[index*3+1]<<8|__1111_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
      
       //assert(w<=800&&h<=600);
