@@ -50,37 +50,11 @@ void splash() {
   
   for (int x = 0; x * SIDE <= w; x ++) {
     for (int y = 0; y * SIDE <= h; y++) {
-      if(w<=mypicw&&h<=mypich){
-        int cx=mypicw/w;
-        int cy=mypich/h;
-        int index=x*SIDE*cx+(y*SIDE)*cy*mypicw;
+    
+        int index=x*SIDE*mypicw/w+(y*SIDE)*mypich/h*mypicw;
         uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
-      }
-      else if(w>mypicw&&h<=mypich){
-        //puts("1\n");
-        int cx=w/mypicw;
-        int cy=mypich/h;
-        int index=x*SIDE/cx+(y*SIDE)*cy*mypicw;
-        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
-        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color);
-      }
-      else if(w<=mypicw&&h>mypich){
-        //puts("2\n");
-        int cx=mypicw/w;
-        int cy=h/mypich;
-        int index=x*SIDE*cx+(y*SIDE/cy)*mypicw;
-        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
-        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color);
-      }
-      else{
-        puts("3\n");
-        int cx=w/mypicw;
-        int cy=h/mypich;
-        int index=x*SIDE/cx+(y*SIDE/cy)*mypicw;
-        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
-        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color);
-      }
+     
       //assert(w<=800&&h<=600);
         
  
