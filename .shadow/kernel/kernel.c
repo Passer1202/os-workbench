@@ -4,7 +4,7 @@
 #include <klib-macros.h>
 #include "mypic.h"
 
-#define SIDE 2
+#define SIDE 1
 
 static int w, h;  // Screen size
 #define KEYNAME(key) \
