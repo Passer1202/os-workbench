@@ -58,6 +58,7 @@ void splash() {
         draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
       }
       else if(w>mypicw&&h<=mypich){
+        puts("1\n");
         int cx=w/mypicw;
         int cy=mypich/h;
         int index=x*SIDE/cx+(y*SIDE)*cy*mypicw;
