@@ -77,6 +77,7 @@ int main(const char *args) {
 
   puts("Press any key to see its key code...\n");
   while (1) {
+    //if(key_names[event.keycode]==)
     print_key();
   }
   return 0;
