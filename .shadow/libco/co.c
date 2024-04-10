@@ -101,7 +101,7 @@ void co_yield() {
     }
 
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
-    assert(0);
+
     if(choice->status==CO_NEW){
         //较为复杂的情况
         co_now=choice;
@@ -131,6 +131,7 @@ void co_yield() {
             co_now=choice->waiter;
             longjmp(co_now->context,1);
         }
+        assert(0);
         co_yield();
     }
     else{
