@@ -60,7 +60,7 @@ void co_wait(struct co *co) {
 
     assert(co);
     //assert(0);
-    assert(0);
+    //assert(0);
     co_now->status=CO_WAITING;
     co->waiter=co_now;                  
 
@@ -149,6 +149,7 @@ __attribute__((constructor)) void init(){
     struct co* main=(struct co*)malloc(sizeof(struct co));
     
     strcpy(main->name,"main");
+    co_now=main;
     main->status=CO_RUNNING;
     main->waiter=NULL;
 
