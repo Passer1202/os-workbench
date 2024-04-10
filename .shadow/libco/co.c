@@ -59,7 +59,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 void co_wait(struct co *co) {
 
     assert(co);
-    assert(0);
+    //assert(0);
 
     co_now->status=CO_WAITING;
     co->waiter=co_now;                  
@@ -86,6 +86,7 @@ void co_wait(struct co *co) {
 }
 
 void co_yield() {
+    assert(0);
     int val=setjmp(co_now->context);
     if(val!=0) return;                  //maybe wrong?
 
