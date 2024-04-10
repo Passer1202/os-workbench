@@ -80,13 +80,13 @@ void co_wait(struct co *co) {
     }
     co_pointers[index+1]=NULL;
     total--;
-
+    assert(0);
     free(co);
 
 }
 
 void co_yield() {
-    assert(0);
+    
     int val=setjmp(co_now->context);
     if(val!=0) return;                  //maybe wrong?
 
