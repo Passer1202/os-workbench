@@ -10,6 +10,8 @@
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
+#define NAME_SIZE 64
+
 
 enum co_status {
     CO_NEW = 1,                         // 新创建，还未执行过
@@ -19,7 +21,7 @@ enum co_status {
 };
 
 struct co {
-    char *name;
+    char name[NAME_SIZE];               // 名字
     void (*func)(void *);               // co_start 指定的入口地址和参数
     void *arg;
 
