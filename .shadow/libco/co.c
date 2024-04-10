@@ -6,7 +6,7 @@
 #include <assert.h>
 
 //每个协程的堆栈使用不超过 64 KiB
-#define STACK_SIZE 32/sizeof(uint8_t)*1024
+#define STACK_SIZE 64*1024
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
@@ -52,7 +52,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 
     //记录co_new指针
     co_pointers[total++]=co_new;
-
+    assert(0);
     return co_new;
 }
 
