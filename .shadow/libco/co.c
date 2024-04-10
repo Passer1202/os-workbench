@@ -60,10 +60,10 @@ void co_wait(struct co *co) {
 
     assert(co);
     //assert(0);
-
+    assert(0);
     co_now->status=CO_WAITING;
     co->waiter=co_now;                  
-    assert(0);
+
     //等待co所指协程完成
     while(co->status!=CO_DEAD){
         co_yield();                     //必须yiele(),否则co永远不可能完成
