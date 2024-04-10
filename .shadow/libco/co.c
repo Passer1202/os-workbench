@@ -80,7 +80,7 @@ void co_wait(struct co *co) {
     }
     co_pointers[index]=NULL;
     total--;
-    assert(total>=0);
+    assert(total>0);
     free(co);
 
 }
