@@ -2,8 +2,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <setjmp.h>
+#include <string.h>
+#include <assert.h>
 
+//每个协程的堆栈使用不超过 64 KiB
 #define STACK_SIZE 64*1024
+//任意时刻系统中的协程数量不会超过 128 个
+#define CO_SIZE 128
+
 
 enum co_status {
     CO_NEW = 1,                         // 新创建，还未执行过
@@ -24,8 +30,28 @@ struct co {
                                         // 协程的堆栈,16字节对齐
 };
 
+struct co *co_pointers[CO_SIZE];         //存放所有协程的指针
+struct co *co_now;                      //当前携程的指针
+
+int total;                              //当前携程总数
+
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
-    return NULL;
+    
+    assert(total<CO_SIZE);
+    //开辟空间
+    struct co* co_new=(struct co*)malloc(sizeof(struct co));
+    
+    //初始化
+    co_new->func=func;
+    co_new->arg=arg;
+    strcpy(co_new->name,name);
+    co_new->status=CO_NEW;
+    co_new->waiter=NULL;
+
+    //记录co_new指针
+    co_pointers[total++]=co_new;
+
+    return co_new;
 }
 
 void co_wait(struct co *co) {
