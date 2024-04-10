@@ -94,12 +94,12 @@ void co_yield() {
     
 
     //有可能死循环？总有一个线程还活着
-    while(!(choice->status==CO_NEW||choice==CO_RUNNING)){
+    while(!(choice->status==CO_NEW||choice->status==CO_RUNNING)){
         index=rand()%total;
         choice=co_pointers[index];
     }
 
-    assert(choice->status==CO_NEW||choice==CO_RUNNING);
+    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
 
     if(choice->status==CO_NEW){
         //较为复杂的情况
@@ -128,13 +128,13 @@ void co_yield() {
         choice->status=CO_DEAD;
         if(choice->waiter!=NULL){
             co_now=choice->waiter;
-            longjmp(co_now,1);
+            longjmp(co_now->context,1);
         }
         co_yield();
     }
     else{
         co_now=choice;
-        longjmp(co_now,1);
+        longjmp(co_now->context,1);
     }
 
 
