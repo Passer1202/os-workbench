@@ -125,13 +125,12 @@ void co_yield() {
         #endif
         );
 
-
+        assert(0);
         choice->status=CO_DEAD;
         if(choice->waiter!=NULL){
             co_now=choice->waiter;
             longjmp(co_now->context,1);
         }
-        assert(0);
         co_yield();
     }
     else{
