@@ -6,7 +6,7 @@
 #include <assert.h>
 
 //每个协程的堆栈使用不超过 64 KiB
-#define STACK_SIZE 128*1024
+#define STACK_SIZE 64*1024
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
@@ -58,7 +58,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 
 void co_wait(struct co *co) {
 
-    assert(co);
+    assert(co!=NULL);
     //assert(0);
     //assert(0);
     co_now->status=CO_WAITING;
@@ -68,6 +68,7 @@ void co_wait(struct co *co) {
     while(co->status!=CO_DEAD){
         co_yield();                     //必须yiele(),否则co永远不可能完成
     }
+    free(co);
     //co所指协程完成后，我们需要删除掉它
     int index=0;
     while(index<total&&co_pointers[index]!=co){
@@ -80,7 +81,7 @@ void co_wait(struct co *co) {
     co_pointers[index]=NULL;
     total--;
     assert(total>=0);
-    free(co);
+    
 
 }
 
