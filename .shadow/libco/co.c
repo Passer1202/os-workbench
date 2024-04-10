@@ -68,7 +68,7 @@ void co_wait(struct co *co) {
     while(co->status!=CO_DEAD){
         co_yield();                     //必须yiele(),否则co永远不可能完成
     }
-    
+    assert(0);
     //co所指协程完成后，我们需要删除掉它
     int index=0;
     while(index<total&&co_pointers[index]!=co){
@@ -80,7 +80,6 @@ void co_wait(struct co *co) {
     }
     co_pointers[index+1]=NULL;
     total--;
-    assert(0);
     free(co);
 
 }
