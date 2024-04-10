@@ -10,7 +10,7 @@
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
-#define NAME_SIZE 64
+#define NAME_SIZE 32
 
 
 enum co_status {
@@ -87,7 +87,8 @@ void co_wait(struct co *co) {
 void co_yield() {
     
     int val=setjmp(co_now->context);
-    if(val==0){
+    if(val!=0) return;                  //maybe wrong?
+
     //现在需要获取一个线程来执行
     int index=rand()%total;
     struct co* choice=co_pointers[index];
@@ -135,7 +136,6 @@ void co_yield() {
     else{
         co_now=choice;
         longjmp(co_now->context,1);
-    }
     }
     
 }
