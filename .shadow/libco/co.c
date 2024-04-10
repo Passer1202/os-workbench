@@ -6,7 +6,7 @@
 #include <assert.h>
 
 //每个协程的堆栈使用不超过 64 KiB
-#define STACK_SIZE 8*1024
+#define STACK_SIZE 128*1024
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
