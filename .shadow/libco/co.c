@@ -119,7 +119,7 @@ void co_yield() {
           :
           : "b"((uintptr_t)(choice->stack+sizeof(choice->stack)- 8)),
             "d"(choice->func),
-            "a"((uintptr_t)(next->arg))
+            "a"((uintptr_t)(choice->arg))
           : "memory"
         #endif
         );
