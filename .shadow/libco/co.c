@@ -78,7 +78,7 @@ void co_wait(struct co *co) {
         co_pointers[index]=co_pointers[index+1];
         index++;
     }
-    co_pointers[index+1]=NULL;
+    co_pointers[index]=NULL;
     total--;
     assert(total>=0);
     free(co);
