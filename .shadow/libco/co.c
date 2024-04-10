@@ -101,7 +101,7 @@ void co_yield() {
     }
 
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
-
+    assert(0);
     if(choice->status==CO_NEW){
         //较为复杂的情况
         co_now=choice;
