@@ -52,13 +52,14 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 
     //记录co_new指针
     co_pointers[total++]=co_new;
-    assert(0);
+
     return co_new;
 }
 
 void co_wait(struct co *co) {
 
     assert(co);
+    assert(0);
 
     co_now->status=CO_WAITING;
     co->waiter=co_now;                  
