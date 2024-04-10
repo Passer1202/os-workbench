@@ -10,7 +10,7 @@
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
-#define NAME_SIZE 1024
+#define NAME_SIZE 64
 
 
 enum co_status {
@@ -68,7 +68,7 @@ void co_wait(struct co *co) {
     while(co->status!=CO_DEAD){
         co_yield();                     //必须yiele(),否则co永远不可能完成
     }
-    
+    assert(0);
     //co所指协程完成后，我们需要删除掉它
     int index=0;
     while(index<total&&co_pointers[index]!=co){
