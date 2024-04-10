@@ -32,7 +32,7 @@ struct co {
                                         // 协程的堆栈,16字节对齐
 };
 
-struct co *co_pointers[CO_SIZE];         //存放所有协程的指针
+struct co *co_pointers[CO_SIZE];        //存放所有协程的指针
 struct co *co_now;                      //当前携程的指针
 
 int total;                              //当前携程总数
@@ -57,7 +57,102 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
+
+    assert(co);
+
+    co_now->status=CO_WAITING;
+    co->waiter=co_now;                  
+
+    //等待co所指协程完成
+    while(co->status!=CO_DEAD){
+        co_yield();                     //必须yiele(),否则co永远不可能完成
+    }
+    
+    //co所指协程完成后，我们需要删除掉它
+    int index=0;
+    while(index<total&&co_pointers[index]!=co){
+        index++;
+    }
+    while(index+1<total){
+        co_pointers[index]=co_pointers[index+1];
+        index++;
+    }
+    co_pointers[index+1]=NULL;
+    total--;
+
+    free(co);
+
 }
 
 void co_yield() {
+    int val=setjmp(co_now->context);
+    if(val!=0) return;                  //maybe wrong?
+
+    //现在需要获取一个线程来执行
+    int index=rand()%total;
+    struct co* choice=co_pointers[index];
+    
+
+    //有可能死循环？总有一个线程还活着
+    while(!(choice->status==CO_NEW||choice==CO_RUNNING)){
+        index=rand()%total;
+        choice=co_pointers[index];
+    }
+
+    assert(choice->status==CO_NEW||choice==CO_RUNNING);
+
+    if(choice->status==CO_NEW){
+        //较为复杂的情况
+        co_now=choice;
+        choice->status=CO_RUNNING;
+
+        asm volatile (
+        #if __x86_64__
+        "movq %0, %%rsp; movq %2, %%rdi; call *%1"
+          :
+          : "b"((uintptr_t)(choice->stack+sizeof(choice->stack))),
+            "d"(choice->func),
+            "a"((uintptr_t)choice->arg)    //(uintptr_t)
+          : "memory"
+        #else
+        "movl %0, %%esp; movl %2, 4(%0); call *%1"
+          :
+          : "b"((uintptr_t)(choice->stack+sizeof(choice->stack)- 8)),
+            "d"(choice->func),
+            "a"((uintptr_t)(next->arg))
+          : "memory"
+        #endif
+        );
+
+
+        choice->status=CO_DEAD;
+        if(choice->waiter!=NULL){
+            co_now=choice->waiter;
+            longjmp(co_now,1);
+        }
+        co_yield();
+    }
+    else{
+        co_now=choice;
+        longjmp(co_now,1);
+    }
+
+
+
+}
+
+__attribute__((constructor)) void init(){
+    
+    total=0;
+
+    struct co* main=(struct co*)malloc(sizeof(struct co));
+    
+    strcpy(main->name,"main");
+    main->status=CO_RUNNING;
+    main->waiter=NULL;
+
+    memset(co_pointers,0,sizeof(co_pointers));
+
+    co_pointers[total++]=main;
+
 }
