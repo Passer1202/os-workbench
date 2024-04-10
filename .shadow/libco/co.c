@@ -80,6 +80,7 @@ void co_wait(struct co *co) {
     }
     co_pointers[index+1]=NULL;
     total--;
+    assert(total>=0);
     free(co);
 
 }
@@ -126,12 +127,11 @@ void co_yield() {
         );
 
         choice->status=CO_DEAD;
-        assert(0);
         if(choice->waiter!=NULL){
-            assert(0);
             co_now=choice->waiter;
             longjmp(co_now->context,1);
         }
+
         co_yield();
     }
     else{
