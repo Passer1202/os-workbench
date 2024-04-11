@@ -142,7 +142,7 @@ void co_yield() {
         longjmp(co_now->context, 1);
       }
       co_yield();
-    } else  (choice->status == CO_RUNNING) {
+    } else{
       longjmp(choice->context, 1);
     } 
 
