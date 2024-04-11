@@ -111,7 +111,7 @@ void co_wait(struct co *co) {
 void co_yield() {
     
     int val=setjmp(co_now->context);
-    if(val!=0) return;                  //maybe wrong?
+    if(val==0) {               //maybe wrong?
 
     //现在需要获取一个线程来执行
     //int index=rand()%total;
@@ -160,6 +160,10 @@ void co_yield() {
     }
     else{
         longjmp(co_now->context,1);
+    }
+    }
+    else{
+        
     }
     
 }
