@@ -1,36 +1,42 @@
 #include "co.h"
 #include <stdlib.h>
-#include <string.h>
-#include <setjmp.h>
 #include <stdint.h>
+#include <setjmp.h>
+#include <string.h>
 #include <assert.h>
 
-#define STACK_SIZE 64 * 1024
+//每个协程的堆栈使用不超过 64 KiB
+#define STACK_SIZE 64*1024
+//任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
+#define NAME_SIZE 64
+
+
 enum co_status {
-  CO_NEW = 1, // 新创建，还未执行过
-  CO_RUNNING, // 已经执行过
-  CO_WAITING, // 在 co_wait 上等待
-  CO_DEAD,    // 已经结束，但还未释放资源
+    CO_NEW = 1,                         // 新创建，还未执行过
+    CO_RUNNING,                         // 已经执行过
+    CO_WAITING,                         // 在 co_wait 上等待
+    CO_DEAD,                            // 已经结束，但还未释放资源
 };
 
 struct co {
-  char name[64];
-  void (*func)(void *); // co_start 指定的入口地址和参数
-  void *arg;
+    char name[NAME_SIZE];               // 名字
+    void (*func)(void *);               // co_start 指定的入口地址和参数
+    void *arg;
 
-  enum co_status status;  // 协程的状态
-  struct co *    waiter;  // 是否有其他协程在等待当前协程
-  jmp_buf        context; // 寄存器现场 (setjmp.h)
-  uint8_t        stack[STACK_SIZE]__attribute__((aligned(16))); // 协程的堆栈
+    enum co_status status;              // 协程的状态
+    struct co *    waiter;              // 是否有其他协程在等待当前协程
+    jmp_buf        context;             // 寄存器现场
+    uint8_t        stack[STACK_SIZE]__attribute__((aligned(16)));   
+                                        // 协程的堆栈,16字节对齐
 };
 
-struct co *co_now; // 当前运行的协程
-struct co *co_pointers[CO_SIZE]; // 所有协程的数组
-int total; // 当前协程数
+struct co *co_pointers[CO_SIZE];        //存放所有协程的指针
+struct co *co_now;                      //当前携程的指针
 
-// 随机挑选出一个协程
+int total;                              //当前携程总数
+
 struct co *get_next_co() {
   int count = 0;
   for (int i = 0; i < total; ++i) {
@@ -53,38 +59,52 @@ struct co *get_next_co() {
 }
 
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
-  struct co* res = (struct co*)malloc(sizeof(struct co));
-  strcpy(res->name, name);
-  res->func = func;
-  res->arg = arg;
-  res->status = CO_NEW;
-  res->waiter = NULL;
-  assert(total < CO_SIZE);
-  co_pointers[total++] = res;
+    
+    assert(total<CO_SIZE);
+    //开辟空间
+    struct co* co_new=(struct co*)malloc(sizeof(struct co));
+    
+    //初始化
+    strcpy(co_new->name,name);
+    co_new->func=func;
+    co_new->arg=arg;
 
-  return res;
+    co_new->status=CO_NEW;
+    co_new->waiter=NULL;
+
+    //记录co_new指针
+    co_pointers[total++]=co_new;
+
+    return co_new;
 }
 
 void co_wait(struct co *co) {
-  assert(co != NULL);
-  co->waiter = co_now;
-  co_now->status = CO_WAITING;
-  while (co->status != CO_DEAD) {
-    co_yield();
-  }
-  free(co);
-  int id = 0;
-  for (id = 0; id < total; ++id) {
-    if (co_pointers[id] == co) {
-      break;
+
+    assert(co!=NULL);
+    //assert(0);
+    //assert(0);
+    co_now->status=CO_WAITING;
+    co->waiter=co_now;                  
+
+    //等待co所指协程完成
+    while(co->status!=CO_DEAD){
+        co_yield();                     //必须yiele(),否则co永远不可能完成
     }
-  }
-  while (id < total - 1) {
-    co_pointers[id] = co_pointers[id+1];
-    ++id;
-  }
-  --total;
-  co_pointers[total] = NULL;
+    //co所指协程完成后，我们需要删除掉它
+    int index=0;
+    while(index<total&&co_pointers[index]!=co){
+        index++;
+    }
+    assert(index>=total||co_pointers[index]==co);
+    while(index+1<total){
+        co_pointers[index]=co_pointers[index+1];
+        index++;
+    }
+    co_pointers[index]=NULL;
+    total--;
+    assert(total>=0);
+    free(co);
+
 }
 
 void co_yield() {
@@ -139,13 +159,19 @@ void co_yield() {
   }
 }
 
-__attribute__((constructor)) void init() {
-  struct co* main = (struct co*)malloc(sizeof(struct co));
-  strcpy(main->name, "main");
-  main->status = CO_RUNNING;
-  main->waiter = NULL;
-  co_now = main;
-  total= 1;
-  memset(co_pointers, 0, sizeof(co_pointers));
-  co_pointers[0] = main;
+__attribute__((constructor)) void init(){
+    
+    total=0;
+
+    struct co* main=(struct co*)malloc(sizeof(struct co));
+    
+    strcpy(main->name,"main");
+    co_now=main;
+    main->status=CO_RUNNING;
+    main->waiter=NULL;
+
+    memset(co_pointers,0,sizeof(co_pointers));
+
+    co_pointers[total++]=main;
+
 }
