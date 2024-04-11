@@ -101,12 +101,13 @@ void co_yield() {
         index=rand()%total;
         choice=co_pointers[index];
     }
-    assert(0);
+    //assert(0);
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
-    
+    co_now=choice;
+
     if(choice->status==CO_NEW){
         //较为复杂的情况
-        co_now=choice;
+        
         choice->status=CO_RUNNING;
 
         asm volatile (
@@ -136,7 +137,6 @@ void co_yield() {
         co_yield();
     }
     else{
-        co_now=choice;
         longjmp(co_now->context,1);
     }
     
