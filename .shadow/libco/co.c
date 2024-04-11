@@ -112,7 +112,7 @@ void co_yield() {
       #if __x86_64__
                 "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
                 :
-                : "b"((choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((choice->arg))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((choice->arg))
                 : "memory"
       #else
                 "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
@@ -125,7 +125,7 @@ void co_yield() {
       #if __x86_64__
                 "movq (%0), %%rdi"
                 :
-                : "b"((choice->stack + sizeof(choice->stack)))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack)))
                 : "memory"
       #else
                 "movl 0x8(%0), %%esp; movl 0x4(%0), %%ecx"
@@ -147,7 +147,7 @@ void co_yield() {
     } 
 
     //else {
-   // assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
+    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     //}
 
 }
