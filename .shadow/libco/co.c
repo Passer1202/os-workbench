@@ -92,6 +92,7 @@ void co_yield() {
   int val = setjmp(co_now->context);
   if (val != 0) return;
     //现在需要获取一个线程来执行
+
     int index=rand()%total;
     struct co* choice=co_pointers[index];
     
@@ -143,7 +144,7 @@ void co_yield() {
       }
       co_yield();
     } else if (choice->status == CO_RUNNING) {
-      longjmp(choice->context, 1);
+      longjmp(co_now->context, 1);
     } else {
       assert(0);
     }
