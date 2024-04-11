@@ -120,7 +120,7 @@ void co_yield() {
                 : "memory" 
       #endif
       );
-
+      printf("ok");
       asm volatile(
       #if __x86_64__
                 "movq (%0), %%rdi"
