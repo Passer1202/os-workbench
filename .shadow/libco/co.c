@@ -89,10 +89,11 @@ void co_wait(struct co *co) {
 }
 
 void co_yield() {
-  int val = setjmp(co_now->context);
-  if (val != 0) return;
-    //现在需要获取一个线程来执行
+    
+    int val=setjmp(co_now->context);
+    if(val!=0) return;                  //maybe wrong?
 
+    //现在需要获取一个线程来执行
     int index=rand()%total;
     struct co* choice=co_pointers[index];
     
@@ -104,23 +105,26 @@ void co_yield() {
     }
     //assert(0);
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
-    co_now = choice;
-    if (choice->status == CO_NEW) {
-      choice->status = CO_RUNNING;
+    co_now=choice;
+    
+    if(choice->status==CO_NEW){
+        //较为复杂的情况
+        
+        choice->status=CO_RUNNING;
 
-      asm volatile(
-      #if __x86_64__
-                "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
-                :
-                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
-                : "memory"
-      #else
-                "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
-                :
-                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
-                : "memory" 
-      #endif
-      );
+         asm volatile(
+        #if __x86_64__
+                    "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
+                    :
+                    : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
+                    : "memory"
+        #else
+                    "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
+                    :
+                    : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
+                    : "memory" 
+        #endif
+        );
 
       asm volatile(
       #if __x86_64__
@@ -136,19 +140,18 @@ void co_yield() {
       #endif
       );
 
-      choice->status = CO_DEAD;
+        choice->status=CO_DEAD;
+        if(choice->waiter!=NULL){
+            co_now=choice->waiter;
+            longjmp(co_now->context,1);
+        }
 
-      if (co_now->waiter) {
-        co_now = co_now->waiter;
-        longjmp(co_now->context, 1);
-      }
-      co_yield();
-    } else if (choice->status == CO_RUNNING) {
-      longjmp(co_now->context, 1);
-    } else {
-      assert(0);
+        co_yield();
     }
-
+    else{
+        longjmp(co_now->context,1);
+    }
+    
 }
 
 __attribute__((constructor)) void init(){
