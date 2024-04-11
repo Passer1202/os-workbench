@@ -110,23 +110,33 @@ void co_yield() {
         co_now=choice;
         choice->status=CO_RUNNING;
 
-        asm volatile (
-        #if __x86_64__
-        "movq %0, %%rsp; movq %2, %%rdi; call *%1"
-          :
-          : "b"((uintptr_t)(choice->stack+sizeof(choice->stack))),
-            "d"(choice->func),
-            "a"((uintptr_t)choice->arg)    //(uintptr_t)
-          : "memory"
-        #else
-        "movl %0, %%esp; movl %2, 4(%0); call *%1"
-          :
-          : "b"((uintptr_t)(choice->stack+sizeof(choice->stack)- 8)),
-            "d"(choice->func),
-            "a"((uintptr_t)(choice->arg))
-          : "memory"
-        #endif
-        );
+        asm volatile(
+      #if __x86_64__
+                "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(next->arg))
+                : "memory"
+      #else
+                "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(next->arg))
+                : "memory" 
+      #endif
+      );
+
+      asm volatile(
+      #if __x86_64__
+                "movq (%0), %%rdi"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack)))
+                : "memory"
+      #else
+                "movl 0x8(%0), %%esp; movl 0x4(%0), %%ecx"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8))
+                : "memory"
+      #endif
+      );
 
         choice->status=CO_DEAD;
         if(choice->waiter!=NULL){
