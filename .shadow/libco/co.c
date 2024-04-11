@@ -146,7 +146,7 @@ void co_yield() {
       longjmp(choice->context, 1);
     } 
     //else {
-      
+    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     //}
 
 }
