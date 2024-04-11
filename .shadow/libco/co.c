@@ -37,28 +37,6 @@ struct co *co_now;                      //当前携程的指针
 
 int total;                              //当前携程总数
 
-struct co *get_next_co() {
-  int count = 0;
-  for (int i = 0; i < total; ++i) {
-    assert(co_pointers[i]);
-    if (co_pointers[i]->status == CO_NEW || co_pointers[i]->status == CO_RUNNING) {
-      ++count;
-    }
-  }
-
-  int id = rand() % count, i = 0;
-  for (i = 0; i < total; ++i) {
-    if (co_pointers[i]->status == CO_NEW || co_pointers[i]->status == CO_RUNNING) {
-      if (id == 0) {
-        break;
-      }
-      --id;
-    }
-  }
-  return co_pointers[i];
-}
-
-
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     
     assert(total<CO_SIZE);
@@ -115,13 +93,21 @@ void co_yield() {
 
     //现在需要获取一个线程来执行
     int index=rand()%total;
-    struct co* choice=get_next_co();
+    struct co* choice=co_pointers[index];
     
 
+    //有可能死循环？总有一个线程还活着
+    while(!(choice->status==CO_NEW||choice->status==CO_RUNNING)){
+        index=rand()%total;
+        choice=co_pointers[index];
+    }
+    //assert(0);
+    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
+    co_now=choice;
     
     if(choice->status==CO_NEW){
         //较为复杂的情况
-        
+        co_now=choice;
         choice->status=CO_RUNNING;
 
         asm volatile (
