@@ -37,26 +37,6 @@ struct co *co_now;                      //当前携程的指针
 
 int total;                              //当前携程总数
 
-struct co *get_next_co() {
-  int count = 0;
-  for (int i = 0; i < total; ++i) {
-    assert(co_pointers[i]);
-    if (co_pointers[i]->status == CO_NEW || co_pointers[i]->status == CO_RUNNING) {
-      ++count;
-    }
-  }
-
-  int id = rand() % count, i = 0;
-  for (i = 0; i < total; ++i) {
-    if (co_pointers[i]->status == CO_NEW || co_pointers[i]->status == CO_RUNNING) {
-      if (id == 0) {
-        break;
-      }
-      --id;
-    }
-  }
-  return co_pointers[i];
-}
 
 
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
