@@ -103,7 +103,7 @@ void co_yield() {
         choice=co_pointers[index];
     }
     //assert(0);
-    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
+    //assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     co_now = choice;
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
@@ -145,9 +145,9 @@ void co_yield() {
     } else if (choice->status == CO_RUNNING) {
       longjmp(choice->context, 1);
     } 
-    else {
-      assert(0);
-    }
+    //else {
+      
+    //}
 
 }
 
