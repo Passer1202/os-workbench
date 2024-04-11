@@ -94,8 +94,9 @@ void co_yield() {
   if (val != 0) return;
     //现在需要获取一个线程来执行
     int index=rand()%total;
+  
     struct co* choice=co_pointers[index];
-    
+    printf("ss");
 
     //有可能死循环？总有一个线程还活着
     while(!(choice->status==CO_NEW||choice->status==CO_RUNNING)){
@@ -110,9 +111,9 @@ void co_yield() {
 
       asm volatile(
       #if __x86_64__
-                "movq %%rdi, 0x32(%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
+                "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
                 :
-                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack)-32)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory"
       #else
                 "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
@@ -123,7 +124,7 @@ void co_yield() {
       );
       asm volatile(
       #if __x86_64__
-                "movq 0x8(%0), %%rdi"
+                "movq (%0), %%rdi"
                 :
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack)))
                 : "memory"
@@ -146,9 +147,7 @@ void co_yield() {
       longjmp(choice->context, 1);
     } 
 
-    //else {
     //assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
-    //}
 
 }
 
