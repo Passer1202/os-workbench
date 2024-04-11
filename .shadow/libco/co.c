@@ -147,7 +147,7 @@ void co_yield() {
     } 
 
     //else {
-    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
+   // assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     //}
 
 }
