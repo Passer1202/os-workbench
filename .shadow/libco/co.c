@@ -4,6 +4,7 @@
 #include <setjmp.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 //每个协程的堆栈使用不超过 64 KiB
 #define STACK_SIZE 64*1024
