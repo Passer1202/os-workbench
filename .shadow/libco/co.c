@@ -108,7 +108,7 @@ void co_yield() {
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
 
-            asm volatile(
+      asm volatile(
       #if __x86_64__
                 "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
                 :
