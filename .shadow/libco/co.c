@@ -112,20 +112,20 @@ void co_yield() {
     
     int val=setjmp(co_now->context);
     if (val == 0) {
-    struct co *next = get_next_co();
-    co_now = next;
-    if (next->status == CO_NEW) {
-      next->status = CO_RUNNING;
+    struct co *choice = get_next_co();
+    co_now = choice;
+    if (choice->status == CO_NEW) {
+      choice->status = CO_RUNNING;
       asm volatile(
       #if __x86_64__
                 "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
                 :
-                : "b"((uintptr_t)(next->stack + sizeof(next->stack))), "d"(next->func), "a"((uintptr_t)(next->arg))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory"
       #else
                 "movl %%esp, 0x8(%0); movl %%ecx, 0x4(%0); movl %0, %%esp; movl %2, (%0); call *%1"
                 :
-                : "b"((uintptr_t)(next->stack + sizeof(next->stack) - 8)), "d"(next->func), "a"((uintptr_t)(next->arg))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory" 
       #endif
       );
@@ -134,25 +134,25 @@ void co_yield() {
       #if __x86_64__
                 "movq (%0), %%rdi"
                 :
-                : "b"((uintptr_t)(next->stack + sizeof(next->stack)))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack)))
                 : "memory"
       #else
                 "movl 0x8(%0), %%esp; movl 0x4(%0), %%ecx"
                 :
-                : "b"((uintptr_t)(next->stack + sizeof(next->stack) - 8))
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8))
                 : "memory"
       #endif
       );
 
-      next->status = CO_DEAD;
+      choice->status = CO_DEAD;
 
       if (co_now->waiter) {
         co_now = co_now->waiter;
         longjmp(co_now->context, 1);
       }
       co_yield();
-    } else if (next->status == CO_RUNNING) {
-      longjmp(next->context, 1);
+    } else if (choice->status == CO_RUNNING) {
+      longjmp(choice->context, 1);
     } else {
       assert(0);
     }
