@@ -114,11 +114,8 @@ void co_yield() {
     if(val!=0) return;                  //maybe wrong?
 
     //现在需要获取一个线程来执行
-    int index=rand()%total;
+    //int index=rand()%total;
     struct co* choice=get_next_co();
-    
-
-    
     
     if(choice->status==CO_NEW){
         //较为复杂的情况
