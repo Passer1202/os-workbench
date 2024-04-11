@@ -101,7 +101,7 @@ void co_yield() {
         index=rand()%total;
         choice=co_pointers[index];
     }
-
+    assert(0);
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     
     if(choice->status==CO_NEW){
