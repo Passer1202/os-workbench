@@ -90,7 +90,7 @@ void co_wait(struct co *co) {
 
 void co_yield() {
   int val = setjmp(co_now->context);
-  if (val == 0) {
+  if (val != 0) return;
     //现在需要获取一个线程来执行
     int index=rand()%total;
     struct co* choice=co_pointers[index];
@@ -106,6 +106,7 @@ void co_yield() {
     co_now = choice;
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
+
       asm volatile(
       #if __x86_64__
                 "movq %%rdi, (%0); movq %0, %%rsp; movq %2, %%rdi; call *%1"
@@ -146,9 +147,7 @@ void co_yield() {
     } else {
       assert(0);
     }
-  } else {
-    // longjmp返回，不处理
-  }
+
 }
 
 __attribute__((constructor)) void init(){
