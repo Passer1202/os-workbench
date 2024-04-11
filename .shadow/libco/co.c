@@ -10,7 +10,7 @@
 //任意时刻系统中的协程数量不会超过 128 个
 #define CO_SIZE 128
 
-#define NAME_SIZE 64
+#define NAME_SIZE 30
 
 
 enum co_status {
