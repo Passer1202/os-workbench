@@ -137,7 +137,7 @@ void co_yield() {
 
       choice->status = CO_DEAD;
 
-      if (co_now->waiter) {
+      if (co_now->waiter!=NULL) {
         co_now = co_now->waiter;
         longjmp(co_now->context, 1);
       }
@@ -145,6 +145,7 @@ void co_yield() {
     } else if (choice->status == CO_RUNNING) {
       longjmp(choice->context, 1);
     } 
+
     //else {
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     //}
