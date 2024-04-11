@@ -111,11 +111,21 @@ void co_wait(struct co *co) {
 void co_yield() {
     
     int val=setjmp(co_now->context);
-    if(val==0) {               //maybe wrong?
+    if(val!=0) return;                  //maybe wrong?
 
     //现在需要获取一个线程来执行
-    //int index=rand()%total;
-    struct co* choice=get_next_co();
+    int index=rand()%total;
+    struct co* choice=co_pointers[index];
+    
+
+    //有可能死循环？总有一个线程还活着
+    while(!(choice->status==CO_NEW||choice->status==CO_RUNNING)){
+        index=rand()%total;
+        choice=co_pointers[index];
+    }
+    //assert(0);
+    assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
+    co_now=choice;
     
     if(choice->status==CO_NEW){
         //较为复杂的情况
@@ -160,10 +170,6 @@ void co_yield() {
     }
     else{
         longjmp(co_now->context,1);
-    }
-    }
-    else{
-        
     }
     
 }
