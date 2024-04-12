@@ -115,7 +115,7 @@ void co_yield() {
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory"
       #else
-                "movl %0, %%esp; movl %2, 4(%0); call *%1"
+                "movl %0, %%esp; movl %2, 4(%0); jmp *%1"
                 :
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory" 
