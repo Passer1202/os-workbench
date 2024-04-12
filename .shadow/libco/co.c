@@ -12,14 +12,14 @@
 #define CO_SIZE 128
 
 #define NAME_SIZE 64
-/*
+
 void wrapper(void *sp, void *entry, uintptr_t arg) {
     // stack switching, in assembly
 
     ((void(*)(uintptr_t))entry)(arg);
     // coroutine goes here after entry(arg)
 }
-*/
+
 
 enum co_status {
     CO_NEW = 1,                         // 新创建，还未执行过
@@ -44,6 +44,7 @@ struct co *co_pointers[CO_SIZE];        //存放所有协程的指针
 struct co *co_now;                      //当前携程的指针
 
 int total;                              //当前携程总数
+
 
 
 
@@ -122,22 +123,23 @@ void co_yield() {
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory"
       #else
-                "movl %0, %%esp; movl %2, 4(%0); call *%1"
+                "movl %0, %%esp; movl %2, (%0); call *%1"
                 :
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory" 
       #endif
       );
 
-      //wrapper((uintptr_t)(choice->stack + sizeof(choice->stack)),choice->func,choice->arg);
+      //wrapper((void* )(choice->stack + sizeof(choice->stack)),choice->func,(uintptr_t)choice->arg);
 
 
       choice->status = CO_DEAD;
 
       if (choice->waiter!=NULL) {
         assert(choice->waiter);
-        co_now = choice->waiter;
-        longjmp(co_now->context, 1);
+        choice->waiter->status=CO_RUNNING;
+        //co_now = choice->waiter;
+        //longjmp(co_now->context, 1);
       }
       co_yield();
     } else if (choice->status == CO_RUNNING) {
