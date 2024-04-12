@@ -12,29 +12,14 @@
 #define CO_SIZE 128
 
 #define NAME_SIZE 64
-
+/*
 void wrapper(void *sp, void *entry, uintptr_t arg) {
     // stack switching, in assembly
-
-     asm volatile(
-      #if __x86_64__
-                "movq %0, %%rsp; "
-                :
-                : "b"((uintptr_t)(sp))
-                : "memory"
-      #else
-                "movl %0, %%esp; movl %1, 4(%0)"
-                :
-                : "b"((uintptr_t)(sp - 8)), "a"(arg)
-                : "memory" 
-      #endif
-      );
-
 
     ((void(*)(uintptr_t))entry)(arg);
     // coroutine goes here after entry(arg)
 }
-
+*/
 
 enum co_status {
     CO_NEW = 1,                         // 新创建，还未执行过
@@ -130,7 +115,21 @@ void co_yield() {
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
 
-      wrapper((void *)(uintptr_t)(choice->stack + sizeof(choice->stack)),choice->func,(uintptr_t)choice->arg);
+      asm volatile(
+      #if __x86_64__
+                "movq %0, %%rsp; movq %2, %%rdi; call *%1"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
+                : "memory"
+      #else
+                "movl %0, %%esp; movl %2, 4(%0); call *%1"
+                :
+                : "b"((uintptr_t)(choice->stack + sizeof(choice->stack) - 8)), "d"(choice->func), "a"((uintptr_t)(choice->arg))
+                : "memory" 
+      #endif
+      );
+
+      //wrapper((uintptr_t)(choice->stack + sizeof(choice->stack)),choice->func,choice->arg);
 
 
       choice->status = CO_DEAD;
