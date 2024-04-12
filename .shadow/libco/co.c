@@ -105,6 +105,7 @@ void co_yield() {
   
     struct co* choice=co_pointers[index];
     
+    
     //有可能死循环？总有一个线程还活着
     while(!(choice->status==CO_NEW||choice->status==CO_RUNNING)){
         index=rand()%total;
@@ -113,6 +114,7 @@ void co_yield() {
     //assert(0);
     //assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
     co_now = choice;
+
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
 
@@ -145,7 +147,6 @@ void co_yield() {
     } else if (choice->status == CO_RUNNING) {
       longjmp(choice->context, 1);
     } 
-
     assert(choice->status==CO_NEW||choice->status==CO_RUNNING);
 
 }

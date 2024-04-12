@@ -21,23 +21,7 @@ char *strcat(char *dst, const char *src) {
 }
 
 int strcmp(const char *s1, const char *s2) {
-  int ret=0;
-  while(*s1 && *s2){
-    if(*s1!=*s2){
-      ret=*s1-*s2;
-      break;
-    }
-    s1++;
-    s2++;
-  }
-  if(*s1 && !*s2){
-    ret=1;
-  }
-  else if(!*s1 && *s2){
-    ret=-1;
-  }
-  return ret;
- 
+  panic("Not implemented");
 }
 
 int strncmp(const char *s1, const char *s2, size_t n) {

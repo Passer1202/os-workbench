@@ -2,15 +2,11 @@
 #include <amdev.h>
 #include <klib.h>
 #include <klib-macros.h>
-//#include "mypic.h"
-#include "mybaoer.h"
-//#include "nazi.h"
-#define SIDE 1
 
-const int mypicw=320;
-const int mypich=297;
+#define SIDE 16
 
 static int w, h;  // Screen size
+
 #define KEYNAME(key) \
   [AM_KEY_##key] = #key,
 static const char *key_names[] = { AM_KEYS(KEYNAME) };
@@ -26,7 +22,6 @@ void print_key() {
     puts("Key pressed: ");
     puts(key_names[event.keycode]);
     puts("\n");
-    if(strcmp(key_names[event.keycode],"ESCAPE")==0)halt(0);
   }
 }
 
@@ -47,34 +42,12 @@ void splash() {
   ioe_read(AM_GPU_CONFIG, &info);
   w = info.width;
   h = info.height;
-  
+
   for (int x = 0; x * SIDE <= w; x ++) {
     for (int y = 0; y * SIDE <= h; y++) {
-      
-        //int cx=mypicw/w;
-        //int cy=mypich/h;
-        int index=x*SIDE*mypicw/w+(y*SIDE)*mypich/h*mypicw;
-        uint32_t color=lbaoer_rgb[index*3+0]<<16|lbaoer_rgb[index*3+1]<<8|lbaoer_rgb[index*3+2];
-        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE,color); 
-      
-      //assert(w<=800&&h<=600);
-        
- 
-      /*
-      int xcolor=x%10;
-      switch(xcolor){
-      	case 0:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffffff);break;
-      	case 1:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfffacd);break;
-      	case 2:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfff5ee);break;
-      	case 3:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x87ceeb);break;
-      	case 4:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffc0cb);break;
-      	case 5:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xa020f0);break;
-      	case 6:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x00ff00);break;
-      	case 7:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xff6a6a);break;
-      	case 8:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0x90ee90);break;
-      	case 9:draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xfdf5e6);break;
+      if ((x & 1) ^ (y & 1)) {
+        draw_tile(x * SIDE, y * SIDE, SIDE, SIDE, 0xffffff); // white
       }
-      */
     }
   }
 }
