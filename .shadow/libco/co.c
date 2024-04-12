@@ -25,7 +25,7 @@ void wrapper(void *sp, void *entry, uintptr_t arg) {
       #else
                 "movl %0, %%esp; movl %1, 4(%0)"
                 :
-                : "b"((uintptr_t)(sp - 8)), "a"((uintptr_t)(choice->arg))
+                : "b"((uintptr_t)(sp - 8)), "a"(arg)
                 : "memory" 
       #endif
       );
