@@ -110,7 +110,7 @@ void co_yield() {
 
       asm volatile(
       #if __x86_64__
-                "movq %0, %%rsp; movq %2, %%rdi; jmp *%1"
+                "movq %0, %%rsp; movq %2, %%rdi; call *%1"
                 :
                 : "b"((uintptr_t)(choice->stack + sizeof(choice->stack))), "d"(choice->func), "a"((uintptr_t)(choice->arg))
                 : "memory"
@@ -121,7 +121,7 @@ void co_yield() {
                 : "memory" 
       #endif
       );
-      
+
       choice->status = CO_DEAD;
 
       if (co_now->waiter!=NULL) {
