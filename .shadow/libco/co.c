@@ -130,7 +130,7 @@ void co_yield() {
     if (choice->status == CO_NEW) {
       choice->status = CO_RUNNING;
 
-      wrapper((uintptr_t)(choice->stack + sizeof(choice->stack)),choice->func,choice->arg);
+      wrapper((uintptr_t)(choice->stack + sizeof(choice->stack)),choice->func,(uintptr_t)choice->arg);
 
 
       choice->status = CO_DEAD;
