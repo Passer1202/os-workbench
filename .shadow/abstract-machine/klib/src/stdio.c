@@ -6,6 +6,7 @@
 #if !defined(__ISA_NATIVE__) || defined(__NATIVE_USE_KLIB__)
 
 void reverse(char *s) {
+  
   char *p = s;
   while (*p) {
     p++;
