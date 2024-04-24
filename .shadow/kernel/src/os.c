@@ -3,13 +3,24 @@
 static void os_init() {
     pmm->init();
 }
+#define TESTpmm
 
-static void os_run() {
-    for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
+#if defined TESTpmm
+  static void os_run() {
+    printf("==================\n");
+    printf("Test_begin:\n");
+    test_pmm();
+  }
+#else
+  static void os_run() {
+
+     for (const char *s = "Hello World from CPU #*\n"; *s; s++) {
         putch(*s == '*' ? '0' + cpu_current() : *s);
     }
     while (1) ;
-}
+  }
+#endif
+
 
 MODULE_DEF(os) = {
     .init = os_init,
