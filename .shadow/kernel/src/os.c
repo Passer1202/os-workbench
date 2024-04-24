@@ -3,9 +3,9 @@
 static void os_init() {
     pmm->init();
 }
-#define TESTpmm
+//#define TEST 
 
-#if defined TESTpmm
+#if defined TEST
   static void os_run() {
     printf("==================\n");
     printf("Test_begin:\n");

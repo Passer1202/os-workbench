@@ -12,7 +12,7 @@ enum LOCK_STATE {
 
 typedef int  PMM_LOCK ;
 
-#define TEST
+//#define TEST
 //4GiB
 #define HEAP_SIZE (4LL << 30)
 
