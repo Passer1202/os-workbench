@@ -38,6 +38,8 @@ static void *kalloc(size_t size) {
     get_lock(&lock);
     release_lock(&lock);
     try_lock(&lock);
+    release_lock(&lock);
+    release_lock(&lock);
     return NULL;
 }
 
