@@ -29,11 +29,6 @@ int atoi(const char* nptr) {
   return x;
 }
 
-void* stack_ptr() {
-  void* sp;
-  asm volatile("mov %%rsp, %0" : "=r"(sp));
-  return sp;
-}
 
 void *malloc(size_t size) {
   // On native, malloc() will be called during initialization of C runtime.
@@ -51,11 +46,6 @@ void *malloc(size_t size) {
 
   prev_heap_end = heap_end;
   brk = prev_heap_end + size;
-  printf("%d %d\n", brk,(char *)stack_ptr());
-  if (brk > (char *)stack_ptr()) {
-    
-    panic("out of memory");
-  }
 
   heap_end = brk;
   return prev_heap_end;
