@@ -53,6 +53,7 @@ void *malloc(size_t size) {
   brk = prev_heap_end + size;
 
   if (brk > (char *)stack_ptr()) {
+    printf("%p %p\n", brk,(char *)stack_ptr());
     panic("out of memory");
   }
 
