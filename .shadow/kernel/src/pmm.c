@@ -33,6 +33,7 @@ static int try_lock(int * lock){
 static void *kalloc(size_t size) {
     // TODO
     // You can add more .c files to the repo.
+    assert(0);
     int lock;
     release_lock(&lock);
     init_lock(&lock);
