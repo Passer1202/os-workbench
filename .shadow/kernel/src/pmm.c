@@ -99,6 +99,7 @@ void alloc(int sz){
 }
 
 void test_pmm() {
+    assert(0);
     alloc(1);
     alloc(5);
     alloc(10);
