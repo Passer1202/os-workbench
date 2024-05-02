@@ -90,10 +90,10 @@ static void pmm_init() {
 void alloc(int sz){
     uintptr_t a=(uintptr_t)kalloc(sz);
 
-    uintptr_t align=a & -a;
+    uintptr_t align=a & -a ;
 
 
-    printf("Alloc %d -> %p align = %d\n", sz, a ,align);
+    printf("Alloc %d -> %p align = %d\n", sz, a, align);
 
     assert(a&&align>=sz);
 }

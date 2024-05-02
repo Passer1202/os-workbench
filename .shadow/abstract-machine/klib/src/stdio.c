@@ -62,6 +62,7 @@ int printf(const char *fmt, ...)
                 ret_num++;
                 break;
             case 'x':
+            case 'p':
                 // 接收16进制
                 ArgHexVal = va_arg(pArgs, unsigned long);
                 val_seg = ArgHexVal;
