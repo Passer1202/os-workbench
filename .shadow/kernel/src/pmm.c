@@ -107,6 +107,9 @@ void test_pmm() {
     alloc(4096);
     alloc(4096);
     alloc(4096);
+    while(1){
+        alloc(4096);
+    }
 }
 
 MODULE_DEF(pmm) = {
