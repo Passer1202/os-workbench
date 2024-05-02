@@ -38,9 +38,30 @@ static int try_lock(int * lock){
 }
 
 static void *kalloc(size_t size) {
-    // TODO
-    // You can add more .c files to the repo.
-    return NULL;
+
+    static char* pos;
+
+    char* ret;
+
+    int sz=1;
+
+    if(!pos)pos=heap.start;
+
+    while(sz<size){
+        sz*=2;
+    }
+
+    while((intptr_t)pos%sz!=0){
+        pos++;
+    }
+    
+    ret=pos;
+
+    pos+=sz;
+
+    assert(pos <= (char*)heap.end);
+
+    return ret;
 }
 
 static void kfree(void *ptr) {
