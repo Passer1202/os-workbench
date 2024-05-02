@@ -105,12 +105,14 @@ static void pmm_init() {
 #endif
 
 void alloc(int sz){
+    
     uintptr_t a=(uintptr_t)kalloc(sz);
 
     uintptr_t align=a & -a ;
 
-    
-    printf("CPU:%d Alloc %d -> %p align = %d\n", sz, a, align,cpu_current());
+    atomic{
+    printf("CPU #%d : Alloc %d -> %p align = %d\n", sz, a, align,cpu_current());
+    }
 
     assert(a&&align>=sz);
 }
