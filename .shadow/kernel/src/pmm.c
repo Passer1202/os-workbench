@@ -111,7 +111,7 @@ void alloc(int sz){
     uintptr_t align=a & -a ;
 
     atomic{
-    printf("CPU #%d : Alloc %d -> %p align = %d\n", sz, a, align,cpu_current());
+    printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
     }
 
     assert(a&&align>=sz);
