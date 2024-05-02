@@ -1,5 +1,4 @@
 #include <common.h>
-#include <klib.h>
 //TODO：自定测试框架
 
 //锁的状态
