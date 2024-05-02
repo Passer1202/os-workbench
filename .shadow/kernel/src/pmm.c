@@ -92,9 +92,8 @@ void alloc(int sz){
 
     uintptr_t align=a & -a;
 
-    printf("ok\n");
 
-    printf("alloc: %d bytes, align = %d, addr = %p\n", sz, align, a);
+    printf("Alloc %d -> %p align = %d\n", sz, a ,align);
 
     assert(a&&align>=sz);
 }
