@@ -93,6 +93,8 @@ void alloc(int sz){
 
     uintptr_t align=a & -a;
 
+    printf("ok\n");
+
     printf("alloc: %d bytes, align = %d, addr = %p\n", sz, align, a);
 
     assert(a&&align>=sz);
@@ -101,7 +103,6 @@ void alloc(int sz){
 void test_pmm() {
    
     alloc(1);
-     assert(0);
     alloc(5);
     alloc(10);
     alloc(32);
