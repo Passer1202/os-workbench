@@ -125,6 +125,7 @@ void test_pmm() {
     alloc(32);
     alloc(4096);
     alloc(4096);
+    while(1)
     alloc(4096);
 
 }
