@@ -3,6 +3,8 @@
 #include <klib-macros.h>
 
 void test_pmm();
+typedef int pmm_lock_t;
+
 
 //实现Slab分配器需要的数据结构
 
@@ -21,7 +23,6 @@ typedef struct pagefreenode_t{
 }pfreenode;
 
 typedef struct header_t{
-    void* nothing;
     int size;
     int magic;
 }header;
@@ -31,5 +32,11 @@ typedef struct freenode_t{
     int size;
     int magic;
 }freenode;
+
+typedef struct page_t{
+   pheader *header;
+   pmm_lock_t lock; 
+}page_t;
+
 
 
