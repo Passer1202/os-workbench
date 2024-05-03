@@ -1,13 +1,17 @@
 #include <common.h>
 //TODO：自定测试框架
 
-//锁的状态
+//魔数
+#define MAGIC_NUM 0X1234567
+
+const int MIN_SIZE = 32;
+const int _16KB = 16*1024;//16KB
+const int _16MB = 16*1024*1024;//16MB
+
+/*锁*/
 enum LOCK_STATE {
     PMM_UNLOCKED=0, PMM_LOCKED
 };
-
-#define MAGIC_NUM 0X1234567
-
 //一把大锁保平安（速通版）
 #define atomic \
     for (int _cnt = (get_lock(&biglock),0); _cnt < 1; _cnt++ , release_lock(&biglock))
@@ -31,36 +35,38 @@ static void release_lock(int * lock){
 //    return atomic_xchg(lock, PMM_LOCKED);
 //}
 
+freenode head;
 
 typedef int pmm_lock_t;
 pmm_lock_t biglock;
 
+static void *HUGE_SIZE_ALLOC(size_t size){
+    //一把大锁保平安
+    get_lock(&biglock);
+
+    release_lock(&biglock);
+    return NULL;
+
+
+}
+
 static void *kalloc(size_t size) {
+    if(size<MIN_SIZE)
+        size=MIN_SIZE;
+    else if(size>_16KB){//非常罕见的大内存分配
+        //一把大锁保平安
 
-    static char* pos;
-
-    char* ret;
-    
-    atomic{
-        int sz=1;
-
-        if(!pos)pos=heap.start;
-
-        while(sz<size){
-            sz*=2;
-        }
-
-        while((intptr_t)pos%sz!=0){
-            pos++;
-        }
+        //拒绝16MB以上的内存分配
+        if(size>_16MB)
+            return NULL;
         
-        ret=pos;
-
-        pos+=sz;
-
-        assert(pos <= (char*)heap.end);
+        size_t sz=MIN_SIZE;
+        while(sz<size)
+            sz<<=1;
+        void* ret=HUGE_SIZE_ALLOC(sz);
+        return ret;    
     }
-    return ret;
+    return NULL;
 }
 
 static void kfree(void *ptr) {
