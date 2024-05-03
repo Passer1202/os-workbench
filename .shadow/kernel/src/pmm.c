@@ -8,32 +8,12 @@ enum LOCK_STATE {
 
 #define MAGIC_NUM 0X1234567
 
-//int atomic_xchg(volatile int *addr, int newval);
-//原子 (不会被其他处理器的原子操作打断) 地交换内存地址中的数值,返回原来的值
-
-
-typedef int pmm_lock_t;
-pmm_lock_t biglock;
-
-//#define TEST
-//4GiB
-//初始化锁
-static void init_lock(int * lock){
-    atomic_xchg(lock, PMM_UNLOCKED);
-}
-//自旋直到获取锁
-static void get_lock(int * lock){
-    while(atomic_xchg(lock, PMM_LOCKED) == PMM_LOCKED);
-}
-//释放锁
-static void release_lock(int * lock){
-    assert(atomic_xchg(lock, PMM_UNLOCKED)==PMM_LOCKED);
-}
-
-#define HEAP_SIZE (4LL << 30)
+//一把大锁保平安（速通版）
 #define atomic \
     for (int _cnt = (get_lock(&biglock),0); _cnt < 1; _cnt++ , release_lock(&biglock))
-/*
+
+//int atomic_xchg(volatile int *addr, int newval);
+//原子 (不会被其他处理器的原子操作打断) 地交换内存地址中的数值,返回原来的值
 //初始化锁
 static void init_lock(int * lock){
     atomic_xchg(lock, PMM_UNLOCKED);
@@ -47,10 +27,14 @@ static void release_lock(int * lock){
     assert(atomic_xchg(lock, PMM_UNLOCKED)==PMM_LOCKED);
 }
 //尝试获取锁
-static int try_lock(int * lock){
-    return atomic_xchg(lock, PMM_LOCKED);
-}
-*/
+//static int try_lock(int * lock){
+//    return atomic_xchg(lock, PMM_LOCKED);
+//}
+
+
+typedef int pmm_lock_t;
+pmm_lock_t biglock;
+
 static void *kalloc(size_t size) {
 
     static char* pos;
