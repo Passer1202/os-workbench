@@ -35,7 +35,7 @@ static void release_lock(int * lock){
 //    return atomic_xchg(lock, PMM_LOCKED);
 //}
 
-freenode head;
+freenode* head;
 
 typedef int pmm_lock_t;
 pmm_lock_t biglock;
@@ -81,6 +81,7 @@ static void pmm_init() {
   uintptr_t pmsize = ((uintptr_t)heap.end - (uintptr_t)heap.start);
   printf("Got %d MiB heap: [%p, %p)\n", pmsize >> 20, heap.start, heap.end);
   
+  head =heap.start;
   init_lock(&biglock);
 
 }
