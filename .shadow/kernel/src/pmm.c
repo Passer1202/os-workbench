@@ -334,14 +334,13 @@ static void kfree(void *ptr) {
             assert(ph->free_1st>0);
         }
         //release_lock(&localpage[cpuwork].lock);
-        //release_lock(&localpage[cpu_current()].lock);
-        release_lock(&biglock);
+        release_lock(&localpage[cpu_current()].lock);
         return;
 
     }
     else{
         //release_lock(&localpage[cpu_current()].lock);
-        //get_lock(&biglock);
+        get_lock(&biglock);
         header *h=ptr-sizeof(header);
         freenode *nodea=NULL;
         freenode *nodeb=NULL;
@@ -465,7 +464,7 @@ void test_pmm() {
     while(1){
     void* a=kalloc(4096);
     kfree(a);
-    //printf("ok\n");
+    printf("ok\n");
     atomic{
     printf("CPU #%d :kalloc 4096 at %p\n",cpu_current(),a);
     }
