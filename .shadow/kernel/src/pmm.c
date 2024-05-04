@@ -228,9 +228,8 @@ static void *kalloc(size_t size) {
         return ret;
     }
 }
-
+//有死锁
 static void kfree(void *ptr) {
-
     //这里面的锁是不是不对劲
      //get_lock(&biglock);
     assert(ptr!=NULL);
@@ -461,13 +460,11 @@ void test_pmm() {
     alloc(10);
     alloc(32);
     
-    while(1){
-    void* a=kalloc(24*1024);
+    void* a=kalloc(1024);
     kfree(a);
+     atomic{
     printf("cpu:#%d\n",cpu_current());
-
-    }
-    
+     }
 }
 
 MODULE_DEF(pmm) = {
