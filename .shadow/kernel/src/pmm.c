@@ -465,6 +465,7 @@ void test_pmm() {
      atomic{
     printf("cpu:#%d\n",cpu_current());
      }
+     assert(0);
 }
 
 MODULE_DEF(pmm) = {
