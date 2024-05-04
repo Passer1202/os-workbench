@@ -230,8 +230,178 @@ static void *kalloc(size_t size) {
 }
 
 static void kfree(void *ptr) {
-    // TODO
-    // You can add more .c files to the repo.
+
+    //这里面的锁是不是不对劲
+    assert(ptr!=NULL);
+    //遍历cpu本地的页
+    get_lock(&localpage[cpu_current()].lock);
+    pheader *ph=NULL;
+    int isok=0;
+    for(size_t i=0;i<cpu_count();i++){
+        ph=localpage[i].header;
+        while(ph){
+            if((uintptr_t)ptr>=(uintptr_t)ph&&(uintptr_t)ptr<(uintptr_t)ph+_64KB){
+                isok=1;
+                break;
+            }
+        }
+        if(isok)
+            break;
+    }
+    if(ph){
+        assert(isok);
+        assert((uintptr_t)ptr>=(uintptr_t)ph&&(uintptr_t)ptr<(uintptr_t)ph+_64KB);
+        pfreenode *nodea=NULL;//after
+        pfreenode *nodeb=NULL;//before
+        pfreenode *p=(void*)ph+ph->free_1st*ph->size;
+        //遍历，看看是不是在cpu里的
+        while(p){
+            if((uintptr_t)p>(uintptr_t)ptr){
+                if(nodea==NULL){
+                    nodea=p;
+                }
+                else{
+                    nodea=(nodea>p)?p:nodea;
+                }
+            }
+            if((uintptr_t)p<(uintptr_t)ptr){
+                if(nodeb==NULL){
+                    nodeb=p;
+                }
+                else{
+                    nodeb=(nodeb<p)?p:nodeb;
+                }
+            }
+            p=p->next;
+        }
+        //前一个节点挨着ptr
+        if(nodeb&&(uintptr_t)nodeb+nodeb->size==(uintptr_t)ptr){
+            nodeb->size+=ph->size;
+            if(ptr+ph->size==(void*)nodea){
+                nodeb->size+=nodea->size;
+                p=(void*)ph+ph->free_1st*ph->size;
+                while(p){
+                    if(p->next==nodea){
+                        break;
+                    }
+                    p=p->next;
+                }
+                if(p){
+                    p->next=nodea->next;
+                }
+                else{
+                    ph->free_1st=((uintptr_t)nodeb-(uintptr_t)ph)/ph->size;
+                }
+            }
+            if(nodeb->size==_64KB-ph->size){
+                ph->size=0;
+            }
+        }
+        //后一个节点挨着ptr
+        else if(ptr+ph->size==(void*)nodea){
+           pfreenode *pf=(pfreenode *)ptr;
+           pf->magic=MAGIC_NUM;
+           pf->size+=nodea->size;
+           pf->next=(void*)ph+ph->free_1st*ph->size;
+           ph->free_1st=((uintptr_t)pf-(uintptr_t)ph)/ph->size;
+           assert(ph->free_1st>0);
+           assert(ph->free_1st*ph->size<_64KB);
+           p=(void*)ph+ph->free_1st*ph->size;
+           while(p){
+            if(p->next==nodea){
+                break;
+            }
+            p=p->next;
+           }
+           p->next=nodea->next;
+           if(pf->size==_64KB-ph->size){
+               ph->size=0;
+           }
+        }
+        //没有节点挨着ptr
+        else{
+            pfreenode *pf=(pfreenode *)ptr;
+            pf->magic=MAGIC_NUM;
+            pf->size=ph->size;
+            pfreenode *pre=(void*)ph+ph->free_1st*ph->size;
+            pf->next=pre;
+            ph->free_1st=((uintptr_t)pf-(uintptr_t)ph)/ph->size;
+            assert(ph->free_1st>0);
+        }
+        release_lock(&localpage[cpu_current()].lock);
+        return;
+
+    }
+    else{
+        release_lock(&localpage[cpu_current()].lock);
+        get_lock(&biglock);
+        header *h=ptr-sizeof(header);
+        freenode *nodea=NULL;
+        freenode *nodeb=NULL;
+        freenode *p=head;
+        assert(h->magic==MAGIC_NUM);
+        size_t sz=h->size;
+        freenode *fn=(void*)h;
+        while(p){
+            if((uintptr_t)p>(uintptr_t)h){
+                if(nodea==NULL){
+                    nodea=p;
+                }
+                else{
+                    nodea=(nodea>p)?p:nodea;
+                }
+            }
+            if((uintptr_t)p<(uintptr_t)h){
+                if(nodeb==NULL){
+                    nodeb=p;
+                }
+                else{
+                    nodeb=(nodeb<p)?p:nodeb;
+                }
+            }
+            p=p->next;
+        }
+        if(nodeb&&(uintptr_t)nodeb+nodeb->size==(uintptr_t)h){
+            nodeb->size+=sz;
+            nodeb->size+=sizeof(header);
+            if(ptr+sz==(void*)nodea){
+                nodeb->size+=nodea->size;
+                p=head;
+                while(p){
+                    if(p->next==nodea){
+                        break;
+                    }
+                    p=p->next;
+                }
+                if(p){
+                    p->next=nodea->next;
+                }
+                else{
+                    head=head->next;
+                }
+            }
+        }
+        else if(ptr+sz==(void*)nodea){
+            fn->size=nodea->size+sz;
+            fn->next=head;
+            head=fn;
+            p=fn;
+            while(p){
+                if(p->next==nodea){
+                    break;
+                }
+                p=p->next;
+            }
+            p->next=nodea->next;
+        }
+        else{
+            fn->size=sz;
+            fn->next=head;
+            head=fn;
+        }
+        release_lock(&biglock);
+        return;
+    }
 }
 
 
@@ -286,9 +456,11 @@ void test_pmm() {
     alloc(32);
     alloc(4096);
     alloc(4096);
+    uintptr_t a=(uintptr_t)kalloc(4096);
+    kfree((void*)a);
     while(1)
     alloc(4096);
-
+    
 }
 
 MODULE_DEF(pmm) = {
