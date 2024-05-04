@@ -237,20 +237,20 @@ static void kfree(void *ptr) {
     get_lock(&localpage[cpu_current()].lock);
     pheader *ph=NULL;
     int isok=0;
-    int cpuwork=0;
+    //int cpuwork=0;
     for(size_t i=0;i<cpu_count();i++){
-        get_lock(&localpage[i].lock);
+        //get_lock(&localpage[i].lock);
         ph=localpage[i].header;
         while(ph){
             if((uintptr_t)ptr>=(uintptr_t)ph&&(uintptr_t)ptr<(uintptr_t)ph+_64KB){
                 isok=1;
-                cpuwork=i;
+                //cpuwork=i;
                 break;
             }
         }
         if(isok)
             break;
-        release_lock(&localpage[i].lock);
+        //release_lock(&localpage[i].lock);
     }
     if(ph){
         assert(isok);
@@ -332,7 +332,7 @@ static void kfree(void *ptr) {
             ph->free_1st=((uintptr_t)pf-(uintptr_t)ph)/ph->size;
             assert(ph->free_1st>0);
         }
-        release_lock(&localpage[cpuwork].lock);
+        //release_lock(&localpage[cpuwork].lock);
         release_lock(&localpage[cpu_current()].lock);
         return;
 
