@@ -464,7 +464,7 @@ void test_pmm() {
     while(1){
     void* a=kalloc(4096);
     kfree(a);
-    printf("ok\n");
+    printf("cpu:#%d\n",cpu_current());
 
     }
     
