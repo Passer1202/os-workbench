@@ -461,7 +461,7 @@ void test_pmm() {
     while(1){
     void* a=kalloc(4096);
     kfree(a);
-        
+    printf("ok\n");
     atomic{
     printf("CPU #%d :kalloc 4096 at %p\n",cpu_current(),a);
     }
