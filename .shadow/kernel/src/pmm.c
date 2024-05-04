@@ -454,10 +454,11 @@ void test_pmm() {
     alloc(5);
     alloc(10);
     alloc(32);
+    
+    while(1){
     void* a=kalloc(4096);
     kfree((void*)a);
-    while(1)
-    alloc(4096);
+    }
     
 }
 
