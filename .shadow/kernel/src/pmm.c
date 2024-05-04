@@ -458,6 +458,9 @@ void test_pmm() {
     while(1){
     void* a=kalloc(4096);
     kfree((void*)a);
+    atomic{
+    printf("kalloc 4096\n");
+    }
     }
     
 }
