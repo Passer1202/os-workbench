@@ -232,9 +232,10 @@ static void *kalloc(size_t size) {
 static void kfree(void *ptr) {
 
     //这里面的锁是不是不对劲
+     get_lock(&biglock);
     assert(ptr!=NULL);
     //遍历cpu本地的页
-    get_lock(&localpage[cpu_current()].lock);
+    //get_lock(&localpage[cpu_current()].lock);
     pheader *ph=NULL;
     int isok=0;
     //int cpuwork=0;
@@ -333,13 +334,14 @@ static void kfree(void *ptr) {
             assert(ph->free_1st>0);
         }
         //release_lock(&localpage[cpuwork].lock);
-        release_lock(&localpage[cpu_current()].lock);
+        //release_lock(&localpage[cpu_current()].lock);
+        release_lock(&biglock);
         return;
 
     }
     else{
-         release_lock(&localpage[cpu_current()].lock);
-        get_lock(&biglock);
+        //release_lock(&localpage[cpu_current()].lock);
+        //get_lock(&biglock);
         header *h=ptr-sizeof(header);
         freenode *nodea=NULL;
         freenode *nodeb=NULL;
