@@ -232,10 +232,10 @@ static void *kalloc(size_t size) {
 static void kfree(void *ptr) {
 
     //这里面的锁是不是不对劲
-     get_lock(&biglock);
+     //get_lock(&biglock);
     assert(ptr!=NULL);
     //遍历cpu本地的页
-    //get_lock(&localpage[cpu_current()].lock);
+    get_lock(&localpage[cpu_current()].lock);
     pheader *ph=NULL;
     int isok=0;
     //int cpuwork=0;
