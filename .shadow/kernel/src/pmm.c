@@ -339,7 +339,7 @@ static void kfree(void *ptr) {
 
     }
     else{
-        //release_lock(&localpage[cpu_current()].lock);
+        release_lock(&localpage[cpu_current()].lock);
         get_lock(&biglock);
         header *h=ptr-sizeof(header);
         freenode *nodea=NULL;
