@@ -454,10 +454,8 @@ void test_pmm() {
     alloc(5);
     alloc(10);
     alloc(32);
-    alloc(4096);
-    alloc(4096);
-    //uintptr_t a=(uintptr_t)kalloc(4096);
-    //kfree((void*)a);
+    void* a=kalloc(4096);
+    kfree((void*)a);
     while(1)
     alloc(4096);
     
