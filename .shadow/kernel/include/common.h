@@ -15,24 +15,27 @@ typedef struct pageheader_t{
     unsigned free_1st;          //第一个空闲块的位置
 }pheader;
 
-//空闲块的节点信息
+//管理分配个cpu的页的空闲块的节点信息
 typedef struct pagefreenode_t{
     struct pagefreenode_t *next;
     int size;
     int magic;
 }pfreenode;
 
+//已分配节点的头
 typedef struct header_t{
     int size;
     int magic;
 }header;
 
+//管理堆中的空闲节点
 typedef struct freenode_t{
     struct freenode_t *next;
     int size;
     int magic;
 }freenode;
 
+//管理cpu所拥有的页
 typedef struct page_t{
    pheader *header;
    pmm_lock_t lock; 

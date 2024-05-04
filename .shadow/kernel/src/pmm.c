@@ -41,69 +41,84 @@ static void release_lock(int * lock){
 
 freenode* head;
 
-pmm_lock_t biglock;
+pmm_lock_t biglock;//堆区的大锁
 
-page_t localpage[CPU_MAX];//cpu本地的页们
+page_t localpage[CPU_MAX];//cpu本地的页
 
 static void *HUGE_SIZE_ALLOC(size_t size){
     //一把大锁保平安
+
+    assert(size%MIN_SIZE==0);
+    assert(size>=_16KB);
+
     get_lock(&biglock);
+
     freenode *p=head;
-    freenode *pre=NULL;
+    freenode *node=NULL;
     while(p){
         if(p->size>=size){//能分配的下
-            if(pre==NULL)
-                pre=p;
+            if(node==NULL)
+                node=p;
             else
-                pre=(pre<p)?p:pre;
+                node=(node<p)?p:node;//选靠后的
         }
         p=p->next;
     }
-    if(pre==NULL){
+    if(node==NULL){
+        //分配失败
         release_lock(&biglock);
         return NULL;
     }
-    assert(pre!=NULL);
-    assert(pre->size>=size);
-    void *ret=(void*)pre+pre->size-size;
+    assert(node!=NULL);
+    assert(node->size>=size);
+    void *ret=(void*)node+node->size-size;
     header *h=ret-sizeof(header);
     h->size=size;
     h->magic=MAGIC_NUM;
+    node->size=(uintptr_t)h-(uintptr_t)node;
     release_lock(&biglock);
+
     return ret;
 }
-void get_page(pheader **header){
+
+void get_page(pheader **h){
     //TODO
-    //分配一页
+    //分配_64KB的页
+
     freenode *node=NULL;
 
     get_lock(&biglock);
 
     freenode *p=head;
-    freenode *pre=NULL;
+    freenode *last=NULL;
     while(p){
         if(p->size>=_64KB){
             node=p;
             break;
         }
-        pre=p;
+        last=p;
         p=p->next;
     }
-    if(p){
+    if(node){
         if(node->size==_64KB){
-            if(pre){
-                assert(pre->next==node);
-                pre->next=node->next;
+            if(last){//不是第一个节点
+                assert(last->next==node);
+                last->next=node->next;
             }
+            else{
+                assert(head==node);
+                head=node->next;
+            }
+
         }
         else{
             assert(node->size>_64KB);
             freenode *freenode=(void*)node+_64KB;
             freenode->size=node->size-_64KB;
             freenode->next=node->next;
-            if(pre){
-                assert(pre->next==node);
-                pre->next=freenode;
+            if(last){
+                assert(last->next==node);
+                last->next=freenode;
             }
             else{
                 assert(head==node);
@@ -111,12 +126,12 @@ void get_page(pheader **header){
             }
         }
         release_lock(&biglock);
-        *header=(void*)node;
+        *h=(void*)node;
         return;
     }
     else{
         release_lock(&biglock);
-        *header=NULL;
+        *h=NULL;
         return;
     }
 }
@@ -141,8 +156,8 @@ static void *kalloc(size_t size) {
     while(sz<size)
         sz<<=1;
     int cpunow=cpu_current();
+    get_lock(&localpage[cpunow].lock);
     if(localpage[cpunow].header==NULL){
-        get_lock(&localpage[cpunow].lock);
         //分配一页
         get_page(&localpage[cpunow].header);
         //TODO
@@ -155,10 +170,10 @@ static void *kalloc(size_t size) {
         p->size=_64KB-sz;
         p->magic=MAGIC_NUM;
         p->next=NULL;
-        release_lock(&localpage[cpunow].lock);
     }
-    get_lock(&localpage[cpunow].lock);
+
     pheader *ph=localpage[cpunow].header;
+
     while(ph){
         if(ph->size==sz&&ph->free_1st>0)
             break;
@@ -167,63 +182,59 @@ static void *kalloc(size_t size) {
     if(ph){
         assert(ph->size==sz&&ph->free_1st>0);
         pfreenode *node=(void* )ph+ph->free_1st*sz;
-        if(node->size>=sz){
-            assert(node->magic==MAGIC_NUM);
-            node->size-=sz;
-            if(node->size==0){
-                if(node->next==NULL){
-                    ph->free_1st=0;
-                }
-                else{
-                    ph->free_1st=((uintptr_t)node->next-(uintptr_t)ph)/sz;
-                    assert((uintptr_t)ph+ph->free_1st*sz==(uintptr_t)node->next);
+        assert(node->size>=sz);
+        assert(node->magic==MAGIC_NUM);
 
-                }
+        if(node->size==sz){
+            if(node->next==NULL){
+                ph->free_1st=0;
             }
             else{
-                pfreenode *newnode=(void*)node+sz;
-                newnode->size=node->size;
-                newnode->magic=MAGIC_NUM;
-                newnode->next=node->next;
-                ph->free_1st++;
-                assert((uintptr_t)ph+ph->free_1st*sz==(uintptr_t)newnode);
-                assert(ph->free_1st*sz<_64KB);
+                ph->free_1st=((uintptr_t)node->next-(uintptr_t)ph)/sz;
+                assert((uintptr_t)ph+ph->free_1st*sz==(uintptr_t)node->next);
+
             }
-            release_lock(&localpage[cpunow].lock);
-            return (void*)node;
         }
         else{
-            release_lock(&localpage[cpunow].lock);
-            assert(0);
+            pfreenode *newnode=(void*)node+sz;
+            newnode->size=node->size-sz;         
+            newnode->magic=MAGIC_NUM;
+            newnode->next=node->next;
+            ph->free_1st++;
+            assert((uintptr_t)ph+ph->free_1st*sz==(uintptr_t)newnode);
+            assert(ph->free_1st*sz<_64KB);
         }
+        release_lock(&localpage[cpunow].lock);
+        return (void*)node;
     }
     else{
         //没这种slab
-        pheader *pagehead=localpage[cpunow].header;
-        while(pagehead){
-            if(pagehead->size==0&&pagehead->free_1st>=0){
-                pagehead->size=sz;
+        ph=localpage[cpunow].header;
+
+        while(ph){
+            if(ph->size==0&&ph->free_1st>0){
+                ph->size=sz;
                 break;
             }
-            pagehead=pagehead->next;
+            ph=ph->next;
         }
-        if(pagehead==NULL){
-            get_page(&pagehead);
-            if(pagehead==NULL){//没有空闲页了
+        if(ph==NULL){
+            get_page(&ph);
+            if(ph==NULL){//没有空闲页了
                 release_lock(&localpage[cpunow].lock);
                 return NULL;
             }
-            pagehead->size=sz;
-            pagehead->free_1st=1;
-            pagehead->next=localpage[cpunow].header;
-            localpage[cpunow].header=pagehead;
+            ph->size=sz;
+            ph->free_1st=1;
+            ph->next=localpage[cpunow].header;
+            localpage[cpunow].header=ph;
         }
-        void* ret=(void*)pagehead+pagehead->free_1st*sz;
+        void* ret=(void*)ph+ph->free_1st*sz;
         pfreenode *newnode=ret+sz;
         newnode->next=NULL;
         newnode->magic=MAGIC_NUM;
-        pagehead->free_1st++;
-        newnode->size=_64KB-pagehead->free_1st*sz;
+        ph->free_1st++;
+        newnode->size=_64KB-ph->free_1st*sz;
         release_lock(&localpage[cpunow].lock);
         return ret;
     }
@@ -294,18 +305,21 @@ static void kfree(void *ptr) {
                     p->next=nodea->next;
                 }
                 else{
-                    ph->free_1st=((uintptr_t)nodeb-(uintptr_t)ph)/ph->size;
+                    p=nodea->next;
+                    assert(p!=NULL);
+                    ph->free_1st=((uintptr_t)p-(uintptr_t)ph)/ph->size;
                 }
             }
             if(nodeb->size==_64KB-ph->size){
                 ph->size=0;
+                //slab全空
             }
         }
         //后一个节点挨着ptr
-        else if(ptr+ph->size==(void*)nodea){
+        else if(nodea&&ptr+ph->size==(void*)nodea){
            pfreenode *pf=(pfreenode *)ptr;
            pf->magic=MAGIC_NUM;
-           pf->size+=nodea->size;
+           pf->size=ph->size+nodea->size;
            pf->next=(void*)ph+ph->free_1st*ph->size;
            ph->free_1st=((uintptr_t)pf-(uintptr_t)ph)/ph->size;
            assert(ph->free_1st>0);
@@ -317,18 +331,21 @@ static void kfree(void *ptr) {
             }
             p=p->next;
            }
+           assert(p!=NULL);
            p->next=nodea->next;
+           
            if(pf->size==_64KB-ph->size){
                ph->size=0;
            }
+
         }
         //没有节点挨着ptr
         else{
             pfreenode *pf=(pfreenode *)ptr;
             pf->magic=MAGIC_NUM;
             pf->size=ph->size;
-            pfreenode *pre=(void*)ph+ph->free_1st*ph->size;
-            pf->next=pre;
+            pfreenode *firstnode=(void*)ph+ph->free_1st*ph->size;
+            pf->next=firstnode;
             ph->free_1st=((uintptr_t)pf-(uintptr_t)ph)/ph->size;
             assert(ph->free_1st>0);
         }
@@ -386,11 +403,11 @@ static void kfree(void *ptr) {
                 }
             }
         }
-        else if(ptr+sz==(void*)nodea){
-            fn->size=nodea->size+sz;
+        else if(nodea&&ptr+sz==(void*)nodea){
+            fn->size=nodea->size+sz+sizeof(header);
             fn->next=head;
             head=fn;
-            p=fn;
+            p=head;
             while(p){
                 if(p->next==nodea){
                     break;
@@ -400,7 +417,7 @@ static void kfree(void *ptr) {
             p->next=nodea->next;
         }
         else{
-            fn->size=sz;
+            fn->size=sz+sizeof(header);
             fn->next=head;
             head=fn;
         }
@@ -459,13 +476,9 @@ void test_pmm() {
     alloc(5);
     alloc(10);
     alloc(32);
-    
-    void* a=kalloc(1024);
-    kfree(a);
-     atomic{
-    printf("cpu:#%d\n",cpu_current());
-     }
-     assert(0);
+    while(1){
+        alloc(4096);
+    }
 }
 
 MODULE_DEF(pmm) = {
