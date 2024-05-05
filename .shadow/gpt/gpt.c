@@ -116,9 +116,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(int fn){
     assert(cnt>0);
-    for(int _=0;_<100;_++){
-
-        if(fn==1){
+    if(fn==1){
             
             mutex_lock(&cond_lock);
             while(Mstart1 == 0)
@@ -162,7 +160,7 @@ void tmatmul_forward(int fn){
             cond_broadcast(&cond);
             mutex_unlock(&cond_lock);
 
-        }
+    }
         else if(fn==2){
             mutex_lock(&cond_lock);
             while(Mstart2 == 0)
@@ -206,8 +204,8 @@ void tmatmul_forward(int fn){
             cond_broadcast(&cond);
             mutex_unlock(&cond_lock);
 
-        }
     }
+    
 }
 
 
@@ -232,6 +230,9 @@ void matmul_forward(float* out,
     MOC = OC;
     mutex_unlock(&M_lock);
 
+    void* p=wrapper(&threads_[0]);
+    void* p=wrapper(&threads_[1]);
+
     //等待开始计算
     mutex_lock(&cond_lock);
     while(Mstart1 != 0||Mstart2 != 0)
@@ -240,7 +241,6 @@ void matmul_forward(float* out,
     }
     Mstart1 = 1;
     Mstart2 = 1;
-
     cond_broadcast(&cond);
     mutex_unlock(&cond_lock);
 
@@ -251,7 +251,7 @@ void matmul_forward(float* out,
         cond_wait(&cond, &cond_lock);
     }
     mutex_unlock(&cond_lock);
-
+    
     /*
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
