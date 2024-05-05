@@ -206,7 +206,6 @@ void tmatmul_forward(int fn){
 
     }
     }
-    assert(0);
     
 }
 
