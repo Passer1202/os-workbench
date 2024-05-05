@@ -116,7 +116,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(void* fn){
 
-    int x=(int)fn;
+    int x=(int)(int*)fn;
 
     float* Mout1=Mout;
     float* Minp1=Minp;
