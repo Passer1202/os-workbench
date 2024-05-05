@@ -231,8 +231,9 @@ void matmul_forward(float* out,
     mutex_unlock(&M_lock);
 
     wrapper_(&threads_[0]);
-    wrapper_(&threads_[1]);
     assert(0);
+    wrapper_(&threads_[1]);
+    
     //等待开始计算
     mutex_lock(&cond_lock);
     while(Mstart1 != 0||Mstart2 != 0)
