@@ -192,10 +192,10 @@ void matmul_forward(float* out,
         (void*)3
     );
     
-    pthread_join(&mythread[0],NULL);
-    pthread_join(&mythread[1],NULL); 
-    pthread_join(&mythread[2],NULL);
-    pthread_join(&mythread[3],NULL);
+    pthread_join(mythread[0],NULL);
+    pthread_join(mythread[1],NULL); 
+    pthread_join(mythread[2],NULL);
+    pthread_join(mythread[3],NULL);
     /*
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
