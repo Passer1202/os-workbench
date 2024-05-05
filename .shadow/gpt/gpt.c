@@ -115,8 +115,8 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 }
 
 void tmatmul_forward(int fn){
-
-    for(int _=0;_<5*(cnt);_++){
+    assert(cnt>0);
+    for(int _=0;_<5*cnt;_++){
         if(fn==1){
             
             mutex_lock(&cond_lock);
