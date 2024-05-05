@@ -1,6 +1,8 @@
 // Original Author: Andrej Karpathy
 // https://github.com/karpathy/llm.c
 
+//这是一份投机的代码:D
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
