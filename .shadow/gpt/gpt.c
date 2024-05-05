@@ -116,7 +116,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(int fn){
     assert(cnt>0);
-    for(int _=0;_<6*cnt;_++){
+    for(int _=0;_<100;_++){
 
         if(fn==1){
             
