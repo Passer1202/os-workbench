@@ -685,7 +685,7 @@ int main(int argc, char** argv) {
     }
 
 
-    cnt=n-argc+1;
+    //cnt=n-argc+1;
 
 
     for (int t = argc - 1; t < n; t++) {
