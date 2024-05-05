@@ -116,6 +116,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(int fn){
 
+    printf("thread %d\n",fn);
     if(fn==1){
             
             mutex_lock(&cond_lock);
