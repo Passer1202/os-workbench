@@ -12,6 +12,35 @@
 #include "thread.h"
 #include "thread-sync.h"
 
+/*定义一组全局变量方便并行*/
+float* Mout;
+float* Minp;
+float* Mweight;
+float* Mbias;
+int MB; 
+int MT;
+int MC;
+int MOC;
+
+/*开始计算*/
+int Mstart1=0;
+int Mstart2=0;
+
+/*锁*/
+mutex_t cond_lock;
+
+mutex_t M_lock;
+
+
+
+/*条件变量*/
+cond_t cond=COND_INIT();
+
+int atend=0;
+
+
+
+
 // ----------------------------------------------------------------------------
 // all the individual layers' forward passes
 // B = batch_size, T = sequence_length, C = channels, V = vocab_size
@@ -83,6 +112,104 @@ void layernorm_forward(float* out, float* mean, float* rstd,
     }
 }
 
+void tmatmul_forward(int fn){
+
+    while(1){
+    if(fn==1){
+        
+        mutex_lock(&cond_lock);
+        while(Mstart1 == 0)
+        {
+            cond_wait(&cond, &cond_lock);
+        }
+        mutex_unlock(&cond_lock);
+
+        mutex_lock(&M_lock);
+        float* Mout1=Mout;
+        float* Minp1=Minp;
+        float* Mweight1=Mweight;
+        float* Mbias1=Mbias;
+        int MB1=MB; 
+        int MT1=MT;
+        int MC1=MC;
+        int MOC1=MOC;
+        mutex_unlock(&M_lock);
+
+        for (int b = 0; b < MB1/2; b++) {
+            for (int t = 0; t < MT1; t++) {
+                float* out_bt = Mout1 + b * MT1 * MOC1 + t * MOC1;
+                float* inp_bt = Minp1 + b * MT1 * MC1 + t * MC1;
+                for (int o = 0; o < MOC1; o++) {
+                    float val = (Mbias1 != NULL) ? Mbias1[o] : 0.0f;
+                    float* wrow = Mweight1 + o*MC1;
+                    for (int i = 0; i < MC1; i++) {
+                        val += inp_bt[i] * wrow[i];
+                    }
+                    out_bt[o] = val;
+                }
+            }
+        }
+
+        mutex_lock(&cond_lock);
+        while(Mstart1 == 0)
+        {
+            cond_wait(&cond, &cond_lock);
+        }
+        Mstart1 = 0;
+        cond_broadcast(&cond);
+        mutex_unlock(&cond_lock);
+
+        
+    }
+    else if(fn==2){
+        mutex_lock(&cond_lock);
+        while(Mstart2 == 0)
+        {
+            cond_wait(&cond, &cond_lock);
+        }
+        mutex_unlock(&cond_lock);
+
+        mutex_lock(&M_lock);
+        float* Mout2=Mout;
+        float* Minp2=Minp;
+        float* Mweight2=Mweight;
+        float* Mbias2=Mbias;
+        int MB2=MB; 
+        int MT2=MT;
+        int MC2=MC;
+        int MOC2=MOC;
+        mutex_unlock(&M_lock);
+
+        for (int b = MB2/2; b < MB2; b++) {
+            for (int t = 0; t < MT2; t++) {
+                float* out_bt = Mout2 + b * MT2 * MOC2 + t * MOC2;
+                float* inp_bt = Minp2 + b * MT2 * MC2 + t * MC2;
+                for (int o = 0; o < MOC2; o++) {
+                    float val = (Mbias2 != NULL) ? Mbias2[o] : 0.0f;
+                    float* wrow = Mweight2 + o*MC2;
+                    for (int i = 0; i < MC2; i++) {
+                        val += inp_bt[i] * wrow[i];
+                    }
+                    out_bt[o] = val;
+                }
+            }
+        }
+
+        mutex_lock(&cond_lock);
+        while(Mstart2 == 0)
+        {
+            cond_wait(&cond, &cond_lock);
+        }
+        Mstart2 = 0;
+        cond_broadcast(&cond);
+        mutex_unlock(&cond_lock);
+
+    }
+    }
+    
+}
+
+
 void matmul_forward(float* out,
                     float* inp, float* weight, float* bias,
                     int B, int T, int C, int OC) {
@@ -90,7 +217,41 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
+
     //#pragma omp parallel for collapse(2)
+
+    mutex_lock(&M_lock);
+    Mout = out;
+    Minp = inp;
+    Mweight = weight;
+    Mbias = bias;
+    MB = B;
+    MT = T;
+    MC = C;
+    MOC = OC;
+    mutex_unlock(&M_lock);
+
+    //等待开始计算
+    mutex_lock(&cond_lock);
+    while(Mstart1 != 0||Mstart2 != 0)
+    {
+        cond_wait(&cond, &cond_lock);
+    }
+    Mstart1 = 1;
+    Mstart2 = 1;
+
+    cond_broadcast(&cond);
+    mutex_unlock(&cond_lock);
+
+    //等待计算完成
+    mutex_lock(&cond_lock);
+    while(Mstart1 != 0 || Mstart2 != 0)
+    {
+        cond_wait(&cond, &cond_lock);
+    }
+    mutex_unlock(&cond_lock);
+
+    /*
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
@@ -105,6 +266,7 @@ void matmul_forward(float* out,
             }
         }
     }
+    */
 }
 
 void attention_forward(float* out, float* preatt, float* att,
@@ -203,7 +365,7 @@ void softmax_forward(float* probs, float* logits, int B, int T, int V) {
     // output: probs are (B,T,V) of the probabilities (sums to 1.0 in each b,t position)
     // input: logits is (B,T,V) of the unnormalized log probabilities
 
-    #pragma omp parallel for collapse(2)
+    //#pragma omp parallel for collapse(2)
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             // probs <- softmax(logits)
@@ -517,6 +679,9 @@ void gpt2_forward(GPT2 *model, int* inputs, int B, int T) {
         float* l_residual3 = acts.residual3 + l * B * T * C;
 
         // now do the forward pass
+
+        //先来试一下只并行matmul_forward
+
         layernorm_forward(l_ln1, l_ln1_mean, l_ln1_rstd, residual, l_ln1w, l_ln1b, B, T, C);
         matmul_forward(l_qkv, l_ln1, l_qkvw, l_qkvb, B, T, C, 3*C);
         attention_forward(l_atty, l_preatt, l_att, l_qkv, B, T, C, NH);
@@ -589,6 +754,15 @@ int main(int argc, char** argv) {
             tokens[i] = GPT2_EOT;
         }
     }
+
+    //初始化锁
+    mutex_init(&M_lock);
+    mutex_init(&cond_lock);
+
+    create(tmatmul_forward);
+
+    create(tmatmul_forward);
+
 
     for (int t = argc - 1; t < n; t++) {
         gpt2_forward(&model, tokens, 1, t);
