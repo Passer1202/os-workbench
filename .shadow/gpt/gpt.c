@@ -764,10 +764,6 @@ int main(int argc, char** argv) {
 
     cnt=n-argc+1;
 
-    create(tmatmul_forward);
-
-    create(tmatmul_forward);
-
 
     for (int t = argc - 1; t < n; t++) {
         gpt2_forward(&model, tokens, 1, t);
