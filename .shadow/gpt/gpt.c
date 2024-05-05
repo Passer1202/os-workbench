@@ -114,7 +114,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
     }
 }
 
-void tmatmul_forward(int fn){
+void* tmatmul_forward(int fn){
 
     int x= fn;
 
@@ -142,7 +142,7 @@ void tmatmul_forward(int fn){
                 }
             }
     }
-    
+    return NULL;
 }
 
 
