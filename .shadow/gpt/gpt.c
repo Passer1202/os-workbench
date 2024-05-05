@@ -781,8 +781,7 @@ int main(int argc, char** argv) {
 
     gpt2_free(&model);
 
-    atend=1;
-    join();
+    //join();
     
 
     return 0;
