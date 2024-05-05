@@ -206,6 +206,7 @@ void tmatmul_forward(int fn){
 
     }
     }
+    assert(0);
     
 }
 
@@ -774,9 +775,12 @@ int main(int argc, char** argv) {
         fflush(stdout);
     }
 
+    
+
     gpt2_free(&model);
 
-    atend=1;
+    assert(0);
+    
 
     return 0;
 }
