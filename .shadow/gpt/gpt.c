@@ -779,7 +779,7 @@ int main(int argc, char** argv) {
 
     gpt2_free(&model);
 
-    assert(0);
+    atend=1;
     
 
     return 0;
