@@ -24,24 +24,6 @@ int MT;
 int MC;
 int MOC;
 
-/*开始计算*/
-int Mstart1=0;
-int Mstart2=0;
-
-/*锁*/
-mutex_t cond_lock;
-
-mutex_t M_lock;
-
-
-
-/*条件变量*/
-cond_t cond=COND_INIT();
-
-int atend=0;
-
-int cnt=0;
-
 
 
 
@@ -702,9 +684,6 @@ int main(int argc, char** argv) {
         }
     }
 
-    //初始化锁
-    mutex_init(&M_lock);
-    mutex_init(&cond_lock);
 
     cnt=n-argc+1;
 
