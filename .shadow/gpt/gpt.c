@@ -114,97 +114,97 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(int fn){
 
-    while(atend!=0){
-    if(fn==1){
-        
-        mutex_lock(&cond_lock);
-        while(Mstart1 == 0)
-        {
-            cond_wait(&cond, &cond_lock);
-        }
-        mutex_unlock(&cond_lock);
+    while(atend==0){
+        if(fn==1){
+            
+            mutex_lock(&cond_lock);
+            while(Mstart1 == 0)
+            {
+                cond_wait(&cond, &cond_lock);
+            }
+            mutex_unlock(&cond_lock);
 
-        mutex_lock(&M_lock);
-        float* Mout1=Mout;
-        float* Minp1=Minp;
-        float* Mweight1=Mweight;
-        float* Mbias1=Mbias;
-        int MB1=MB; 
-        int MT1=MT;
-        int MC1=MC;
-        int MOC1=MOC;
-        mutex_unlock(&M_lock);
+            mutex_lock(&M_lock);
+            float* Mout1=Mout;
+            float* Minp1=Minp;
+            float* Mweight1=Mweight;
+            float* Mbias1=Mbias;
+            int MB1=MB; 
+            int MT1=MT;
+            int MC1=MC;
+            int MOC1=MOC;
+            mutex_unlock(&M_lock);
 
-        for (int b = 0; b < MB1/2; b++) {
-            for (int t = 0; t < MT1; t++) {
-                float* out_bt = Mout1 + b * MT1 * MOC1 + t * MOC1;
-                float* inp_bt = Minp1 + b * MT1 * MC1 + t * MC1;
-                for (int o = 0; o < MOC1; o++) {
-                    float val = (Mbias1 != NULL) ? Mbias1[o] : 0.0f;
-                    float* wrow = Mweight1 + o*MC1;
-                    for (int i = 0; i < MC1; i++) {
-                        val += inp_bt[i] * wrow[i];
+            for (int b = 0; b < MB1/2; b++) {
+                for (int t = 0; t < MT1; t++) {
+                    float* out_bt = Mout1 + b * MT1 * MOC1 + t * MOC1;
+                    float* inp_bt = Minp1 + b * MT1 * MC1 + t * MC1;
+                    for (int o = 0; o < MOC1; o++) {
+                        float val = (Mbias1 != NULL) ? Mbias1[o] : 0.0f;
+                        float* wrow = Mweight1 + o*MC1;
+                        for (int i = 0; i < MC1; i++) {
+                            val += inp_bt[i] * wrow[i];
+                        }
+                        out_bt[o] = val;
                     }
-                    out_bt[o] = val;
                 }
             }
+
+            mutex_lock(&cond_lock);
+            while(Mstart1 == 0)
+            {
+                cond_wait(&cond, &cond_lock);
+            }
+            Mstart1 = 0;
+            cond_broadcast(&cond);
+            mutex_unlock(&cond_lock);
+
+            
         }
+        else if(fn==2){
+            mutex_lock(&cond_lock);
+            while(Mstart2 == 0)
+            {
+                cond_wait(&cond, &cond_lock);
+            }
+            mutex_unlock(&cond_lock);
 
-        mutex_lock(&cond_lock);
-        while(Mstart1 == 0)
-        {
-            cond_wait(&cond, &cond_lock);
-        }
-        Mstart1 = 0;
-        cond_broadcast(&cond);
-        mutex_unlock(&cond_lock);
+            mutex_lock(&M_lock);
+            float* Mout2=Mout;
+            float* Minp2=Minp;
+            float* Mweight2=Mweight;
+            float* Mbias2=Mbias;
+            int MB2=MB; 
+            int MT2=MT;
+            int MC2=MC;
+            int MOC2=MOC;
+            mutex_unlock(&M_lock);
 
-        
-    }
-    else if(fn==2){
-        mutex_lock(&cond_lock);
-        while(Mstart2 == 0)
-        {
-            cond_wait(&cond, &cond_lock);
-        }
-        mutex_unlock(&cond_lock);
-
-        mutex_lock(&M_lock);
-        float* Mout2=Mout;
-        float* Minp2=Minp;
-        float* Mweight2=Mweight;
-        float* Mbias2=Mbias;
-        int MB2=MB; 
-        int MT2=MT;
-        int MC2=MC;
-        int MOC2=MOC;
-        mutex_unlock(&M_lock);
-
-        for (int b = MB2/2; b < MB2; b++) {
-            for (int t = 0; t < MT2; t++) {
-                float* out_bt = Mout2 + b * MT2 * MOC2 + t * MOC2;
-                float* inp_bt = Minp2 + b * MT2 * MC2 + t * MC2;
-                for (int o = 0; o < MOC2; o++) {
-                    float val = (Mbias2 != NULL) ? Mbias2[o] : 0.0f;
-                    float* wrow = Mweight2 + o*MC2;
-                    for (int i = 0; i < MC2; i++) {
-                        val += inp_bt[i] * wrow[i];
+            for (int b = MB2/2; b < MB2; b++) {
+                for (int t = 0; t < MT2; t++) {
+                    float* out_bt = Mout2 + b * MT2 * MOC2 + t * MOC2;
+                    float* inp_bt = Minp2 + b * MT2 * MC2 + t * MC2;
+                    for (int o = 0; o < MOC2; o++) {
+                        float val = (Mbias2 != NULL) ? Mbias2[o] : 0.0f;
+                        float* wrow = Mweight2 + o*MC2;
+                        for (int i = 0; i < MC2; i++) {
+                            val += inp_bt[i] * wrow[i];
+                        }
+                        out_bt[o] = val;
                     }
-                    out_bt[o] = val;
                 }
             }
-        }
 
-        mutex_lock(&cond_lock);
-        while(Mstart2 == 0)
-        {
-            cond_wait(&cond, &cond_lock);
-        }
-        Mstart2 = 0;
-        cond_broadcast(&cond);
-        mutex_unlock(&cond_lock);
+            mutex_lock(&cond_lock);
+            while(Mstart2 == 0)
+            {
+                cond_wait(&cond, &cond_lock);
+            }
+            Mstart2 = 0;
+            cond_broadcast(&cond);
+            mutex_unlock(&cond_lock);
 
-    }
+        }
     }
     
 }
