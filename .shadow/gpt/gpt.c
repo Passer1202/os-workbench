@@ -114,7 +114,7 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 
 void tmatmul_forward(int fn){
 
-    while(1){
+    while(!atend){
     if(fn==1){
         
         mutex_lock(&cond_lock);
@@ -775,6 +775,8 @@ int main(int argc, char** argv) {
     }
 
     gpt2_free(&model);
+
+    atend=1;
 
     return 0;
 }
