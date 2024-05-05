@@ -101,25 +101,17 @@ void layernorm_forward(float* out, float* mean, float* rstd,
 void* tmatmul_forward(void* fn){
 
     intptr_t x=(intptr_t)fn;
-
-    float* Mout1=Mout;
-    float* Minp1=Minp;
-    float* Mweight1=Mweight;
-    float* Mbias1=Mbias;
-    int MB1=MB;
     int MT2=MT*(x+1)/4; 
     int MT1=MT*x/4;
-    int MC1=MC;
-    int MOC1=MOC;
 
-    for (int b = 0; b < MB1; b++) {
+    for (int b = 0; b < MB; b++) {
         for (int t = MT1; t < MT2; t++) {
-            float* out_bt = Mout1 + b * MT1 * MOC1 + t * MOC1;
-            float* inp_bt = Minp1 + b * MT1 * MC1 + t * MC1;
-            for (int o = 0; o < MOC1; o++) {
-                float val = (Mbias1 != NULL) ? Mbias1[o] : 0.0f;
-                float* wrow = Mweight1 + o*MC1;
-                for (int i = 0; i < MC1; i++) {
+            float* out_bt = Mout + b * MT1 * MOC + t * MOC;
+            float* inp_bt = Minp + b * MT1 * MC + t * MC;
+            for (int o = 0; o < MOC; o++) {
+                float val = (Mbias != NULL) ? Mbias1[o] : 0.0f;
+                float* wrow = Mweight + o*MC;
+                for (int i = 0; i < MC; i++) {
                     val += inp_bt[i] * wrow[i];
                 }
                 out_bt[o] = val;
