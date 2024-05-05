@@ -109,7 +109,7 @@ void* tmatmul_forward(void* fn){
             float* out_bt = Mout + b * MT1 * MOC + t * MOC;
             float* inp_bt = Minp + b * MT1 * MC + t * MC;
             for (int o = 0; o < MOC; o++) {
-                float val = (Mbias != NULL) ? Mbias1[o] : 0.0f;
+                float val = (Mbias != NULL) ? Mbias[o] : 0.0f;
                 float* wrow = Mweight + o*MC;
                 for (int i = 0; i < MC; i++) {
                     val += inp_bt[i] * wrow[i];
