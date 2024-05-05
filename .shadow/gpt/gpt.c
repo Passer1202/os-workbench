@@ -230,8 +230,8 @@ void matmul_forward(float* out,
     MOC = OC;
     mutex_unlock(&M_lock);
 
-    void* p=wrapper_(&threads_[0]);
-    p=wrapper_(&threads_[1]);
+    wrapper_(&threads_[0]);
+    wrapper_(&threads_[1]);
 
     //等待开始计算
     mutex_lock(&cond_lock);
