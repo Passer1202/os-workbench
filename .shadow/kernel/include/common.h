@@ -3,43 +3,45 @@
 #include <klib-macros.h>
 
 void test_pmm();
-typedef int pmm_lock_t;
 
+//参考了WYY的定义
+//未分配内存和已分配内存可以共用这个 header，
+//当内存块处于未分配状态时，内存块被放在链表中，
+//union 字段存放的是下一个链表节点的地址；
+//当内存块处于已分配状态时，union 字段存放魔数。
+//一个 kfree() 地址来临时，
+//只要查看其前一个 uintptr_t 中是不是 ALLOC_MAGIC，
+//就能确定这个地址合不合法，再往前看就能获得内存块的 size。
 
-//实现Slab分配器需要的数据结构
+typedef struct __header_t {
+    size_t sz;
+    union {
+        uintptr_t magic;
+        struct __header_t *next;
+    };
+}header_t;
 
-//页的头节点信息
-typedef struct pageheader_t{
-    struct pageheader_t *next;
-    int size;                   //slab 大小
-    unsigned free_1st;          //第一个空闲块的位置
-}pheader;
+//魔数
+#define MAGIC_NUM 0X1234567
+//cpu数量不超过8个
+#define CPU_MAX 8
+//分配的最小内存块大小
+#define MIN_SIZE  32
+//16KB
+#define _16KB  16*1024
+//64KB
+#define _64KB  64*1024
+//16MB
+#define _16MB  16*1024*1024
 
-//管理分配个cpu的页的空闲块的节点信息
-typedef struct pagefreenode_t{
-    struct pagefreenode_t *next;
-    int size;
-    int magic;
-}pfreenode;
+/*定义锁lock_t*/
+typedef int lock_t;
 
-//已分配节点的头
-typedef struct header_t{
-    int size;
-    int magic;
-}header;
+/*锁的状态*/
+enum LOCK_STATE {
+    UNLOCKED=0, LOCKED
+};
 
-//管理堆中的空闲节点
-typedef struct freenode_t{
-    struct freenode_t *next;
-    int size;
-    int magic;
-}freenode;
-
-//管理cpu所拥有的页
-typedef struct page_t{
-   pheader *header;
-   pmm_lock_t lock; 
-}page_t;
-
-
-
+/*锁的API*/
+//int atomic_xchg(volatile int *addr, int newval);
+//原子 (不会被其他处理器的原子操作打断) 地交换内存地址中的数值,返回原来的值
