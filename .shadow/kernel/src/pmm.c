@@ -20,6 +20,7 @@ typedef int pmm_lock_t;
 //4GiB
 #define HEAP_SIZE (4LL << 30)
 
+/*
 //初始化锁
 static void init_lock(int * lock){
     atomic_xchg(lock, PMM_UNLOCKED);
@@ -36,7 +37,7 @@ static void release_lock(int * lock){
 static int try_lock(int * lock){
     return atomic_xchg(lock, PMM_LOCKED);
 }
-
+*/
 static void *kalloc(size_t size) {
 
     static char* pos;
@@ -87,12 +88,28 @@ static void pmm_init() {
 }
 #endif
 
+void alloc(int sz){
+    uintptr_t a=(uintptr_t)kalloc(sz);
+
+    uintptr_t align=a & -a;
+
+    printf("alloc: %d bytes, align = %d, addr = %p\n", sz, align, a);
+
+    assert(a&&align>=sz);
+}
+
 void test_pmm() {
-    pmm_lock_t pmm_lock;
-    init_lock(&pmm_lock);
-    get_lock(&pmm_lock);
-    release_lock(&pmm_lock);
-    try_lock(&pmm_lock);
+    alloc(1);
+    alloc(5);
+    alloc(10);
+    alloc(32);
+    alloc(4096);
+    alloc(4096);
+    alloc(4096);
+    while(1){
+        alloc(4096);
+        
+    }
 }
 
 MODULE_DEF(pmm) = {
