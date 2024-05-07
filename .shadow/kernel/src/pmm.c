@@ -1,5 +1,4 @@
 #include <common.h>
-
 //TODO：自定测试框架
 
 //锁的状态
@@ -14,12 +13,26 @@ enum LOCK_STATE {
 
 
 typedef int pmm_lock_t;
-
+pmm_lock_t biglock;
 
 //#define TEST
 //4GiB
-#define HEAP_SIZE (4LL << 30)
+//初始化锁
+static void init_lock(int * lock){
+    atomic_xchg(lock, PMM_UNLOCKED);
+}
+//自旋直到获取锁
+static void get_lock(int * lock){
+    while(atomic_xchg(lock, PMM_LOCKED) == PMM_LOCKED);
+}
+//释放锁
+static void release_lock(int * lock){
+    assert(atomic_xchg(lock, PMM_UNLOCKED)==PMM_LOCKED);
+}
 
+#define HEAP_SIZE (4LL << 30)
+#define atomic \
+    for (int _cnt = (get_lock(&biglock),0); _cnt < 1; _cnt++ , release_lock(&biglock))
 /*
 //初始化锁
 static void init_lock(int * lock){
@@ -43,25 +56,26 @@ static void *kalloc(size_t size) {
     static char* pos;
 
     char* ret;
-
-    int sz=1;
-
-    if(!pos)pos=heap.start;
-
-    while(sz<size){
-        sz*=2;
-    }
-
-    while((intptr_t)pos%sz!=0){
-        pos++;
-    }
     
-    ret=pos;
+    atomic{
+        int sz=1;
 
-    pos+=sz;
+        if(!pos)pos=heap.start;
 
-    assert(pos <= (char*)heap.end);
+        while(sz<size){
+            sz*=2;
+        }
 
+        while((intptr_t)pos%sz!=0){
+            pos++;
+        }
+        
+        ret=pos;
+
+        pos+=sz;
+
+        assert(pos <= (char*)heap.end);
+    }
     return ret;
 }
 
@@ -76,6 +90,8 @@ static void kfree(void *ptr) {
 static void pmm_init() {
   uintptr_t pmsize = ((uintptr_t)heap.end - (uintptr_t)heap.start);
   printf("Got %d MiB heap: [%p, %p)\n", pmsize >> 20, heap.start, heap.end);
+  
+  init_lock(&biglock);
 
 }
 #else
@@ -89,16 +105,20 @@ static void pmm_init() {
 #endif
 
 void alloc(int sz){
+    
     uintptr_t a=(uintptr_t)kalloc(sz);
 
-    uintptr_t align=a & -a;
+    uintptr_t align=a & -a ;
 
-    printf("alloc: %d bytes, align = %d, addr = %p\n", sz, align, a);
+    atomic{
+    printf("CPU #%d : Alloc %d -> %p align = %d\n", sz, a, align,cpu_current());
+    }
 
     assert(a&&align>=sz);
 }
 
 void test_pmm() {
+   
     alloc(1);
     alloc(5);
     alloc(10);
@@ -106,10 +126,7 @@ void test_pmm() {
     alloc(4096);
     alloc(4096);
     alloc(4096);
-    while(1){
-        alloc(4096);
-        
-    }
+
 }
 
 MODULE_DEF(pmm) = {
