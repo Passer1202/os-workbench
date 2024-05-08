@@ -98,7 +98,7 @@ static void *kalloc(size_t size) {
         //(4KB,16MB]
         //大内存分配,一把大锁保平安
         acquire_lock(&heap_lock);
-        printf("CPU #%d : Alloc %d\n", cpu_current(),sz);
+        //printf("CPU #%d : Alloc %d\n", cpu_current(),sz);
 
         header_t *p=head;
         header_t *pre=NULL;
