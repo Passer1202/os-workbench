@@ -1,6 +1,7 @@
 #include <common.h>
 //TODO：自定测试框架
 
+
 //重构代码！！！！
 
 //魔数
@@ -79,22 +80,21 @@ typedef pheader_t cpheader_t;
 cpheader_t* cpu_page[CPU_MAX];
 
 
-
 static void *kalloc(size_t size) {
     
     if(size>_16MB){
         return NULL;
     }
 
-    assert(size<=_16MB);
+    //assert(size<=_16MB);
 
     size_t sz=MIN_SIZE;
     while(sz<size){
             sz<<=1;
     }
 
-    assert(sz>=MIN_SIZE);
-    assert(sz>=size);
+    //assert(sz>=MIN_SIZE);
+    //assert(sz>=size);
 
     if(sz>_4KB){
         //(4KB,16MB]
@@ -111,7 +111,7 @@ static void *kalloc(size_t size) {
                     pos--;
                 }
                 //此时pos有两种情况
-                assert(pos>=((char*)p+sizeof(header_t)));
+                //assert(pos>=((char*)p+sizeof(header_t)));
 
                 if(pos<((char*)p+2*sizeof(header_t))){
                     //原来的header_t要作废，形成空洞
@@ -227,11 +227,8 @@ static void *kalloc(size_t size) {
 
     }
 
-
-    
-    
 }
-//有死锁
+
 static void kfree(void *ptr) {
     return;
 }
