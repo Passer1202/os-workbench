@@ -114,10 +114,12 @@ static void *kalloc(size_t size) {
                 if(pos<((char*)p+2*sizeof(header_t))){
                     //原来的header_t要作废，形成空洞
                     if(pre){
+                        assert(pre->next==p);
                         pre->next=p->next;
                         //跳了过去
                     }
                     else{
+                        assert(p==head);
                         head=p->next;
                     }
 
@@ -153,7 +155,9 @@ static void *kalloc(size_t size) {
     if(cpu_page[cpu_now]==NULL){
         //分配一页64KB的内存
         //void* newslab=alloc_page();
+        release_lock(&cpu_page_lock[cpu_now]);
         void *newslab=kalloc(_64KB);
+        acquire_lock(&cpu_page_lock[cpu_now]);
 
         if(newslab==NULL){
             release_lock(&cpu_page_lock[cpu_now]);
@@ -276,9 +280,9 @@ void test_pmm() {
     alloc(5);
     alloc(10);
     alloc(32);
-    while(1){
-        alloc(4096);
-    }
+    //while(1){
+        //alloc(4096);
+    //}
 }
 
 MODULE_DEF(pmm) = {
