@@ -129,7 +129,7 @@ static void *kalloc(size_t size) {
                     else{
                         //原来的header_t不会被破坏，只需要略加维护
                         //此时原header_t对应的size可能是0
-                        p->sz=p->sz-sz-sizeof(header_t);
+                        p->sz=pos-2*sizeof(header_t)-(char*)p;
                     }
                     header_t *new=(header_t*)pos-sizeof(header_t);
                     new->sz=sz;
