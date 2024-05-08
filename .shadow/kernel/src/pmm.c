@@ -109,36 +109,38 @@ static void *kalloc(size_t size) {
                 while((intptr_t)pos%sz!=0){
                     pos--;
                 }
-                //此时pos有两种情况
-                //assert(pos>=((char*)p+sizeof(header_t)));
+                if(pos>=(char*)p){
+                    //此时pos有两种情况
+                    //assert(pos>=((char*)p+sizeof(header_t)));
 
-                if(pos<((char*)p+2*sizeof(header_t))){
-                    //原来的header_t要作废，形成空洞
-                    if(pre){
-                        assert(pre->next==p);
-                        pre->next=p->next;
-                        //跳了过去
+                    if(pos<((char*)p+2*sizeof(header_t))){
+                        //原来的header_t要作废，形成空洞
+                        if(pre){
+                            assert(pre->next==p);
+                            pre->next=p->next;
+                            //跳了过去
+                        }
+                        else{
+                            assert(p==head);
+                            head=p->next;
+                        }
+
                     }
                     else{
-                        assert(p==head);
-                        head=p->next;
+                        //原来的header_t不会被破坏，只需要略加维护
+                        //此时原header_t对应的size可能是0
+                        p->sz=p->sz-sz-sizeof(header_t);
                     }
+                    header_t *new=(header_t*)pos-sizeof(header_t);
+                    new->sz=sz;
+                    new->magic=MAGIC_NUM;
+                    //p<pos-sizeof(header_t)<p+sizeof(header_t)
+                    //p-sizeof(header_t)>p+sizeof(header_t)
 
+                    //返回pos
+                    release_lock(&heap_lock);
+                    return (void*)pos;
                 }
-                else{
-                    //原来的header_t不会被破坏，只需要略加维护
-                    //此时原header_t对应的size可能是0
-                    p->sz=p->sz-sz-sizeof(header_t);
-                }
-                header_t *new=(header_t*)pos-sizeof(header_t);
-                new->sz=sz;
-                new->magic=MAGIC_NUM;
-                //p<pos-sizeof(header_t)<p+sizeof(header_t)
-                //p-sizeof(header_t)>p+sizeof(header_t)
-
-                //返回pos
-                release_lock(&heap_lock);
-                return (void*)pos;
             }
             pre=p;
             p=p->next;
@@ -278,11 +280,11 @@ void alloc(int sz){
 
 void test_pmm() {
    
-    //alloc(1);
-    //alloc(5);
-    //alloc(10);
-    //alloc(32);
-    //alloc(4096);
+    alloc(1);
+    alloc(5);
+    alloc(10);
+    alloc(32);
+    alloc(4096);
     alloc(5000);
     //while(1){
         //alloc(4096);
