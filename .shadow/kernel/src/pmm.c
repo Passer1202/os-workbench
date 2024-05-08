@@ -247,9 +247,7 @@ static void pmm_init() {
     head->sz = pmsize-sizeof(header_t);//减去头部大小
     head->next = NULL;
 
-    printf("PMM: init done\n");
-    //锁不分配给CPU，分配给slab_page.
-
+    
     //初始化每个CPU的page，都为空NULL
     for(size_t i=0;i<cpu_count();i++){
         cpu_page[i]=NULL;
@@ -257,6 +255,9 @@ static void pmm_init() {
     }
 
     init_lock(&heap_lock);
+    printf("PMM: init done\n");
+    //锁不分配给CPU，分配给slab_page.
+
 
 }
 
