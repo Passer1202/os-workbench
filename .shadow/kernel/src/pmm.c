@@ -1,6 +1,5 @@
 #include <common.h>
 //TODO：自定测试框架
-
 //重构代码！！！！
 
 //魔数
@@ -104,9 +103,9 @@ static void *kalloc(size_t size) {
         header_t *pre=NULL;
 
         while(p){
-            if(p->sz>=sz){
+            if(p->sz>=sz+sizeof(header_t)){
                 char* pos=(char*)p+sizeof(header_t)+p->sz-sz;
-                while((intptr_t)p%sz!=0){
+                while((intptr_t)pos%sz!=0){
                     pos--;
                 }
                 //此时pos有两种情况
