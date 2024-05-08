@@ -99,7 +99,7 @@ static void *kalloc(size_t size) {
         //大内存分配,一把大锁保平安
         acquire_lock(&heap_lock);
         printf("CPU #%d : Alloc %d\n", cpu_current(),sz);
-        
+
         header_t *p=head;
         header_t *pre=NULL;
 
@@ -278,11 +278,11 @@ void alloc(int sz){
 
 void test_pmm() {
    
-    alloc(1);
-    alloc(5);
-    alloc(10);
-    alloc(32);
-    alloc(4096);
+    //alloc(1);
+    //alloc(5);
+    //alloc(10);
+    //alloc(32);
+    //alloc(4096);
     alloc(5000);
     //while(1){
         //alloc(4096);
