@@ -109,7 +109,7 @@ static void *kalloc(size_t size) {
                 while((intptr_t)pos%sz!=0){
                     pos--;
                 }
-                if(pos>=(char*)p){
+                if(pos>=(char*)p+sizeof(header_t)){
                     //此时pos有两种情况
                     //assert(pos>=((char*)p+sizeof(header_t)));
 
