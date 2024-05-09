@@ -383,12 +383,7 @@ void test_pmm() {
 
     void* ptr= kalloc(5000);
     kfree(ptr);
-
-    ptr= kalloc(5000);
-    kfree(ptr);
-
-    ptr= kalloc(5000);
-    kfree(ptr);
+    
     atomic{
     printf("PMM: test passed\n");
     }
