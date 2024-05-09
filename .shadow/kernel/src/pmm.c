@@ -153,17 +153,17 @@ static void *kalloc(size_t size) {
 
     //没slab或slab满了就分配一个slab
     int cpu_now=cpu_current();
-    acquire_lock(&cpu_page_lock[cpu_now]);
+    //acquire_lock(&cpu_page_lock[cpu_now]);
     
     if(cpu_page[cpu_now]==NULL){
         //分配一页64KB的内存
         //void* newslab=alloc_page();
-        release_lock(&cpu_page_lock[cpu_now]);
+        //release_lock(&cpu_page_lock[cpu_now]);
         void *newslab=kalloc(_64KB);
-        acquire_lock(&cpu_page_lock[cpu_now]);
+        //acquire_lock(&cpu_page_lock[cpu_now]);
 
         if(newslab==NULL){
-            release_lock(&cpu_page_lock[cpu_now]);
+            //release_lock(&cpu_page_lock[cpu_now]);
             return NULL;
         }
 
@@ -185,7 +185,7 @@ static void *kalloc(size_t size) {
 
         void *ret=ph->first_slab;
         ph->first_slab+=sz;
-        release_lock(&cpu_page_lock[cpu_now]);
+        //release_lock(&cpu_page_lock[cpu_now]);
         return ret;
 
         //分配第一个slab
@@ -206,14 +206,14 @@ static void *kalloc(size_t size) {
             //找到了
             void *ret=ph->first_slab+sz;
             ph->first_slab+=sz;
-            release_lock(&cpu_page_lock[cpu_now]);
+            //release_lock(&cpu_page_lock[cpu_now]);
             return ret;
         }
         else{
             void *newslab=kalloc(_64KB);
 
             if(newslab==NULL){
-                release_lock(&cpu_page_lock[cpu_now]);
+                //release_lock(&cpu_page_lock[cpu_now]);
                 return NULL;
             }
             pheader_t* nph=(pheader_t*)newslab;
@@ -226,7 +226,7 @@ static void *kalloc(size_t size) {
             }
             void *ret=nph->first_slab;
             nph->first_slab+=sz;
-            release_lock(&cpu_page_lock[cpu_now]);
+            //release_lock(&cpu_page_lock[cpu_now]);
             return ret;
         }
 
