@@ -236,24 +236,7 @@ static void *kalloc(size_t size) {
 
 static void kfree(void *ptr) {
     //slab我先不还
-    int cpu_no=0;
-    for(;cpu_no<cpu_count();cpu_no++){
-        acquire_lock(&cpu_page_lock[cpu_no]);
-        pheader_t *ph=cpu_page[cpu_no];
-        while(ph){
-            if(ptr>=(void*)ph && ptr<(void*)ph+_64KB){
-                //找到了
-                //assert((intptr_t)ptr%(ph->sz)==0);
-                //assert((intptr_t)ptr%(ph->sz)==0);
-                //assert((intptr_t)ptr%(ph->sz)==0);
-                //assert((intptr_t)ptr%(ph->sz)==0);
-                release_lock(&cpu_page_lock[cpu_no]);
-                //assert(0);
-                return;
-            }
-            ph=ph->next;
-        }
-    }
+    
     //大内存
     acquire_lock(&heap_lock);
     header_t *p=head;
