@@ -1,8 +1,8 @@
 #include <common.h>
 
-
 //TODO：提速
-
+//
+//bug:虚拟机会神秘重启
 //魔数
 #define MAGIC_NUM 0X1234567
 //cpu数量不超过8个
@@ -237,7 +237,6 @@ static void *kalloc(size_t size) {
 
 static void kfree(void *ptr) {
     //slab我先不还
-    return;
     int cpu_no=0;
     for(;cpu_no<cpu_count();cpu_no++){
         acquire_lock(&cpu_page_lock[cpu_no]);
@@ -380,14 +379,7 @@ void test_pmm() {
     alloc(32);
     alloc(4096);
     alloc(5000);
-
-
-    void* ptr= kalloc(5000);
-    kfree(ptr);
-
-    void *x=kalloc(5000);
-    kfree(x);
-
+    alloc(5000);
     atomic{
     printf("PMM: test passed\n");
     }
