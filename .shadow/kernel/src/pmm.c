@@ -237,6 +237,7 @@ static void *kalloc(size_t size) {
 
 static void kfree(void *ptr) {
     //slab我先不还
+    return;
     int cpu_no=0;
     for(;cpu_no<cpu_count();cpu_no++){
         acquire_lock(&cpu_page_lock[cpu_no]);
@@ -386,7 +387,7 @@ void test_pmm() {
 
     void *x=kalloc(5000);
     kfree(x);
-    
+
     atomic{
     printf("PMM: test passed\n");
     }
