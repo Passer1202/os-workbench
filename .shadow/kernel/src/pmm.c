@@ -153,17 +153,17 @@ static void *kalloc(size_t size) {
 
     //没slab或slab满了就分配一个slab
     int cpu_now=cpu_current();
-    //acquire_lock(&cpu_page_lock[cpu_now]);
+    acquire_lock(&cpu_page_lock[cpu_now]);
     
     if(cpu_page[cpu_now]==NULL){
         //分配一页64KB的内存
         //void* newslab=alloc_page();
-        //release_lock(&cpu_page_lock[cpu_now]);
+        release_lock(&cpu_page_lock[cpu_now]);
         void *newslab=kalloc(_64KB);
-        //acquire_lock(&cpu_page_lock[cpu_now]);
+        acquire_lock(&cpu_page_lock[cpu_now]);
 
         if(newslab==NULL){
-            //release_lock(&cpu_page_lock[cpu_now]);
+            release_lock(&cpu_page_lock[cpu_now]);
             return NULL;
         }
 
@@ -185,7 +185,7 @@ static void *kalloc(size_t size) {
 
         void *ret=ph->first_slab;
         ph->first_slab+=sz;
-        //release_lock(&cpu_page_lock[cpu_now]);
+        release_lock(&cpu_page_lock[cpu_now]);
         return ret;
 
         //分配第一个slab
@@ -206,14 +206,14 @@ static void *kalloc(size_t size) {
             //找到了
             void *ret=ph->first_slab+sz;
             ph->first_slab+=sz;
-            //release_lock(&cpu_page_lock[cpu_now]);
+            release_lock(&cpu_page_lock[cpu_now]);
             return ret;
         }
         else{
             void *newslab=kalloc(_64KB);
 
             if(newslab==NULL){
-                //release_lock(&cpu_page_lock[cpu_now]);
+                release_lock(&cpu_page_lock[cpu_now]);
                 return NULL;
             }
             pheader_t* nph=(pheader_t*)newslab;
@@ -226,7 +226,7 @@ static void *kalloc(size_t size) {
             }
             void *ret=nph->first_slab;
             nph->first_slab+=sz;
-            //release_lock(&cpu_page_lock[cpu_now]);
+            release_lock(&cpu_page_lock[cpu_now]);
             return ret;
         }
 
@@ -235,6 +235,94 @@ static void *kalloc(size_t size) {
 }
 
 static void kfree(void *ptr) {
+    //slab我先不还
+    int cpu_no=0;
+    for(;cpu_no<cpu_count();cpu_no++){
+        acquire_lock(&cpu_page_lock[cpu_no]);
+        pheader_t *ph=cpu_page[cpu_no];
+        while(ph){
+            if(ptr>=(void*)ph && ptr<(void*)ph+_64KB){
+                //找到了
+                //assert((intptr_t)ptr%(ph->sz)==0);
+                //assert((intptr_t)ptr%(ph->sz)==0);
+                //assert((intptr_t)ptr%(ph->sz)==0);
+                //assert((intptr_t)ptr%(ph->sz)==0);
+                release_lock(&cpu_page_lock[cpu_no]);
+                return;
+            }
+            ph=ph->next;
+        }
+    }
+    //大内存
+    acquire_lock(&heap_lock);
+    header_t *p=head;
+    header_t *pre=NULL;
+    header_t *aft=NULL;
+    while(p){
+        if(ptr>(void*)p){
+            if(pre){
+                pre=pre>p?pre:p;
+            }
+            else
+                pre=p;
+        }
+        else if(ptr<(void*)p){
+            if(aft){
+                aft=aft<p?aft:p;
+            }
+            else
+                aft=p;
+        }
+        p=p->next;
+    }
+    header_t *cur=(header_t*)((char*)ptr-sizeof(header_t));
+
+    if(pre&&(void*)pre+pre->sz+sizeof(header_t)==(void*)cur){
+        //合并
+        pre->sz=pre->sz+sizeof(header_t)+cur->sz;
+        if(aft&&(void*)cur+cur->sz+sizeof(header_t)==(void*)aft){
+            pre->sz=pre->sz+sizeof(header_t)+aft->sz;
+            p=head;
+            while(p->next){
+                if(p->next==aft){
+                    break;
+                }
+                p=p->next;
+            }
+            if(p&&p->next==aft){
+                //aft是头
+                head=aft->next;
+            }
+            else{
+                p->next=aft->next;
+            }
+        }
+    }
+    else if(aft&&(void*)cur+cur->sz+sizeof(header_t)==(void*)aft){
+        //合并
+        cur->sz=cur->sz+sizeof(header_t)+aft->sz;
+        p=head;
+        while(p->next){
+            if(p->next==aft){
+                break;
+            }
+            p=p->next;
+        }
+        if(p&&p->next==aft){
+            //aft是头
+            head=aft->next;
+        }
+        else{
+            p->next=aft->next;
+        }
+        cur->next=head;
+        head=cur;
+    }
+    else{
+        cur->next=head;
+        head=cur;
+    }
+    release_lock(&heap_lock);
     return;
 }
 
@@ -278,6 +366,7 @@ void alloc(int sz){
     assert(a&&align>=sz);
 }
 
+
 void test_pmm() {
    
     alloc(1);
@@ -286,6 +375,10 @@ void test_pmm() {
     alloc(32);
     alloc(4096);
     alloc(5000);
+
+    void* ptr= kalloc(4096);
+    kfree(ptr);
+
     //while(1){
         //alloc(4096);
     //}
