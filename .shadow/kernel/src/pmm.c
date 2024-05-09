@@ -377,8 +377,7 @@ void test_pmm() {
     alloc(4096);
     alloc(5000);
 
-    void* ptr= kalloc(4096);
-    kfree(ptr);
+    
     printf("Test1 done\n");
 
     //while(1){
