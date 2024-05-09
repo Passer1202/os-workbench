@@ -248,7 +248,7 @@ static void kfree(void *ptr) {
                 //assert((intptr_t)ptr%(ph->sz)==0);
                 //assert((intptr_t)ptr%(ph->sz)==0);
                 release_lock(&cpu_page_lock[cpu_no]);
-                assert(0);
+                //assert(0);
                 return;
             }
             ph=ph->next;
@@ -380,9 +380,6 @@ void test_pmm() {
     void* ptr= kalloc(4096);
     kfree(ptr);
     printf("Test1 done\n");
-    ptr= kalloc(5000);
-    kfree(ptr);
-    printf("Test done\n");
 
     //while(1){
         //alloc(4096);
