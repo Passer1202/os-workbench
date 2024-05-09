@@ -248,6 +248,7 @@ static void kfree(void *ptr) {
                 //assert((intptr_t)ptr%(ph->sz)==0);
                 //assert((intptr_t)ptr%(ph->sz)==0);
                 release_lock(&cpu_page_lock[cpu_no]);
+                assert(0);
                 return;
             }
             ph=ph->next;
