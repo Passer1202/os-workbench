@@ -1,6 +1,7 @@
 #include <common.h>
-//TODO：自定测试框架
-//重构代码！！！！
+
+
+//TODO：提速
 
 //魔数
 #define MAGIC_NUM 0X1234567
@@ -379,15 +380,16 @@ void test_pmm() {
     alloc(4096);
     alloc(5000);
 
-    void* ptr= kalloc(5000);
-    kfree(ptr);
+    
 
-    atomic{
-    printf("Test1 done\n");
+   
+    while(1){
+        void* ptr= kalloc(5000);
+        kfree(ptr);
+         atomic{
+        printf("CPU:#%d kalloc&&kfree\n",cpu_current());
     }
-    //while(1){
-        //alloc(4096);
-    //}
+    }
 }
 
 MODULE_DEF(pmm) = {
