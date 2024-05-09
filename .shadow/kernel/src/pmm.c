@@ -324,7 +324,7 @@ static void kfree(void *ptr) {
         head=cur;
     }
     release_lock(&heap_lock);
-    assert(0);
+    //assert(0);
     return;
 }
 
@@ -381,8 +381,9 @@ void test_pmm() {
     void* ptr= kalloc(4096);
     kfree(ptr);
 
+    atomic{
     printf("Test1 done\n");
-
+    }
     //while(1){
         //alloc(4096);
     //}
