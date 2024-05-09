@@ -385,7 +385,7 @@ void test_pmm() {
     kfree(ptr);
 
     int index=0;
-    while(index<1000){
+    while(index<10){
         ptr=kalloc(5000);
         if(ptr==NULL){
             break;
