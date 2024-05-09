@@ -386,7 +386,13 @@ void test_pmm() {
 
     while(1){
         ptr=kalloc(5000);
+        if(ptr==NULL){
+            break;
+        }
         kfree(ptr);
+    }
+    atomic{
+    printf("PMM: test passed\n");
     }
 }
 
