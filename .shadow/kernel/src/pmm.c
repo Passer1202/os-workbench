@@ -378,7 +378,7 @@ void test_pmm() {
     alloc(4096);
     alloc(5000);
 
-    void* ptr= kalloc(4096);
+    void* ptr= kalloc(5000);
     kfree(ptr);
 
     atomic{
