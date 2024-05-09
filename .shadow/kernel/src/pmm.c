@@ -381,10 +381,12 @@ void test_pmm() {
     alloc(5000);
 
 
+    void* ptr= kalloc(5000);
+    kfree(ptr);
+
     while(1){
-        void* ptr= kalloc(5000);
+        ptr=kalloc(5000);
         kfree(ptr);
-        
     }
 }
 
