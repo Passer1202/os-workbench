@@ -77,8 +77,9 @@ static void *kalloc(size_t size) {
     while((intptr_t)p%sz!=0){
         p++;
     }
+    
     char* ret=p;
-
+    p+=sz;
     release_lock(&heap_lock);
     return ret;
     
