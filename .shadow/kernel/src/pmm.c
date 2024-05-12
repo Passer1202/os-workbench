@@ -62,7 +62,7 @@ static void *kalloc(size_t size) {
         sz*=2;
     }
 
-    if(sz>16*1024*1024){
+    if(sz>(1<<24)){
         release_lock(&heap_lock);
         return NULL;
     }
@@ -105,7 +105,7 @@ static void pmm_init() {
     printf("Got %d MiB heap: [%p, %p)\n", pmsize >> 20, heap.start, heap.end);
 
     init_lock(&heap_lock);
-    printf("PMM: init done\n");
+    //printf("PMM: init done\n");
     //锁不分配给CPU，分配给slab_page.
 
 
