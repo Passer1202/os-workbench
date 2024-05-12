@@ -62,6 +62,11 @@ static void *kalloc(size_t size) {
         sz*=2;
     }
 
+    if(sz>16*1024*1024){
+        release_lock(&heap_lock);
+        return NULL;
+    }
+
     static char* p;
     
     if(!p){
