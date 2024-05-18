@@ -91,16 +91,15 @@ int main(int argc, char *argv[]) {
 
     static char line[4096];
     
-    char s[100][5000];
+    char s[50000];
 
-    snprintf(s[0], sizeof(s[0]), "aaaa\n");
-    snprintf(s[1], sizeof(s[1]), "bbbb\n");
+    
 
-    char *p=(char*)s;
+    snprintf(s, sizeof(s), "aaaa\n");
+    
+    printf("%d\n",str_len(s));
 
-    printf("%s\n",p);
-
-
+    return 0;
 
     while (1) {
         printf("crepl> ");
