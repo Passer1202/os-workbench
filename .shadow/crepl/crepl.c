@@ -7,7 +7,7 @@
 #include <dlfcn.h>
 #include <stdbool.h>
 
-//32存在问题
+
 
 const char *lib_name = "/tmp/mylib.so";
 
@@ -68,7 +68,15 @@ void init(){
 
     char cmd[256];
 
-    snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+    #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
+    // 64-bit environment
+     snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+    #else
+    // 32-bit environment
+     snprintf(cmd, sizeof(cmd), "gcc -m32 -shared -o %s %s",lib_name, source_filename);
+    #endif
+
+   
     //gcc -shared -o my_library.so my_library.c
     run_cmd(cmd);
     // 3. 清理临时文件
@@ -130,7 +138,13 @@ int main(int argc, char *argv[]) {
             char cmd[256];
 
             remove(lib_name);
+            #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
+            // 64-bit environment
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+            #else
+            // 32-bit environment
+            snprintf(cmd, sizeof(cmd), "gcc -m32 -shared -o %s %s",lib_name, source_filename);
+            #endif
     
             if(run_cmd(cmd)==1){
                 memset(source_code,0,sizeof(source_code));
@@ -178,7 +192,13 @@ int main(int argc, char *argv[]) {
             char cmd[256];
 
             remove(lib_name);
+            #if defined(_WIN64) || defined(__x86_64__) || defined(__ppc64__)
+            // 64-bit environment
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+            #else
+            // 32-bit environment
+            snprintf(cmd, sizeof(cmd), "gcc -m32 -shared -o %s %s",lib_name, source_filename);
+            #endif
     
            if(run_cmd(cmd)==1){
                 memset(source_code,0,sizeof(source_code));
