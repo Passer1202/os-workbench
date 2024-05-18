@@ -24,8 +24,7 @@ void run_cmd(const char *cmd){
         // 在子进程中执行编译命令
         execl("/bin/sh", "/bin/sh", "-c", cmd, NULL);
         // 如果exec失败则打印错误并退出
-        printf("error\n");
-        //error("execl");
+        perror("execl");
         exit(1);
     } else {  // 父进程
         // 等待子进程结束
@@ -132,7 +131,7 @@ int main(int argc, char *argv[]) {
             remove(source_filename);
 
             printf("Function defined.\n");
-
+            
         }
         else{
             //输入的应该是表达式
