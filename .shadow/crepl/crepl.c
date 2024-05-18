@@ -16,10 +16,8 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-         // 1. 创建临时源代码文件
-        const char *source_code = "#include <stdio.h> int main() { printf(\"Hello, World!\\n\"); return 0; }";
-        printf("source_code: %s\n", source_code);
-        const char *source_filename = "/tmp/temp_code.c";
+        const char *source_code = "int add(int a, int b) { return a + b; }";
+        const char *source_filename = "/temp_code.c";
         FILE *source_file = fopen(source_filename, "w");
         if (source_file == NULL) {
             perror("fopen");
@@ -29,36 +27,18 @@ int main(int argc, char *argv[]) {
         fclose(source_file);
 
         // 2. 编译源代码文件
-        const char *binary_filename = "/tmp/temp_code.out";
+        const char *library_filename = "/temp_code.so";
         char compile_command[256];
-        snprintf(compile_command, sizeof(compile_command), "gcc %s -o %s", source_filename, binary_filename);
+        snprintf(compile_command, sizeof(compile_command), "gcc -shared -o %s %s",library_filename, source_filename);
+
+        //gcc -shared -o my_library.so my_library.c
 
         int compile_result = system(compile_command);
         if (compile_result != 0) {
             fprintf(stderr, "Compilation failed with error code %d\n", compile_result);
             return 1;
         }
-
-        // 3. 检查生成的二进制文件并执行
-        if (access(binary_filename, X_OK) == 0) {
-            printf("Compilation succeeded, executing the binary...\n");
-            int exec_result = system(binary_filename);
-            if (exec_result != 0) {
-                fprintf(stderr, "Execution failed with error code %d\n", exec_result);
-                return 1;
-            }
-        } else {
-            fprintf(stderr, "Binary file is not executable\n");
-            return 1;
-        }
-
-        // 清理临时文件
-        remove(source_filename);
-        remove(binary_filename);
-
-
         
-
         // To be implemented.
         printf("Got %zu chars.\n", strlen(line));
     }
@@ -69,7 +49,7 @@ int main(int argc, char *argv[]) {
 int main() {
     // 1. 创建临时源代码文件
     const char *source_code = "#include <stdio.h>\nint main() { printf(\"Hello, World!\\n\"); return 0; }";
-    const char *source_filename = "/tmp/temp_code.c";
+    const char *source_filename = "/temp_code.c";
     FILE *source_file = fopen(source_filename, "w");
     if (source_file == NULL) {
         perror("fopen");
@@ -79,9 +59,11 @@ int main() {
     fclose(source_file);
 
     // 2. 编译源代码文件
-    const char *binary_filename = "/tmp/temp_code.out";
+    const char *library_filename = "/temp_code.so";
     char compile_command[256];
-    snprintf(compile_command, sizeof(compile_command), "gcc %s -o %s", source_filename, binary_filename);
+    snprintf(compile_command, sizeof(compile_command), "gcc -shared -o %s %s",library_filename, source_filename);
+
+    //gcc -shared -o my_library.so my_library.c
 
     int compile_result = system(compile_command);
     if (compile_result != 0) {
