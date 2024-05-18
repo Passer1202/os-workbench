@@ -156,9 +156,7 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             fprintf(source_file, "%s", source_code);
-
-
-             fprintf(source_file, "%s", source_code);
+            
             fclose(source_file);
 
             // 2. 编译源代码文件
