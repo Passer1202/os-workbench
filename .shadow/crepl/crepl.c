@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
             // 1. 创建临时源代码文件
 
             line[strlen(line)-1] = '\0';
-            char code[4096];
+            char code[5000];
 
             char wrapper[64];
 
