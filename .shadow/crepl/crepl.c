@@ -146,7 +146,49 @@ int main(int argc, char *argv[]) {
 
             // 1. 创建临时源代码文件
 
-            
+            line[strlen(line)-1] = '\0';
+            char code[5000];
+
+            char wrapper[64];
+
+            snprintf(code, sizeof(code), "int __expr_wrapper_%d() {\n return %s;\n}", no, line);
+            snprintf(wrapper, sizeof(wrapper), "_empty");
+
+            const char *source_code = code;
+            printf("%s\n",source_code);
+
+            const char *source_filename = "/tmp/temp_code.c";
+            FILE *source_file = fopen(source_filename, "w");
+            if (source_file == NULL) {
+                perror("fopen");
+                return 1;
+            }
+            fprintf(source_file, "%s", source_code);
+
+            const char *library_filename = "/tmp/temp_code.o";
+            char cmd[256];
+            //gcc -c -fPIC new_function.c -o new_function.o
+            snprintf(cmd, sizeof(cmd), "gcc -c -fPIC %s -o %s", source_filename,library_filename);
+
+            run_cmd(cmd);
+
+            //gcc -shared -o liboriginal.so -Wl,--whole-archive liboriginal.so -Wl,--no-whole-archive new_function.o
+
+            const char *newlib_name = "/tmp/mylib_new.so";
+
+            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s -Wl,--whole-archive %s -Wl,--no-whole-archive %s", newlib_name, lib_name, library_filename);
+
+            run_cmd(cmd);
+
+            //snprintf(cmd, sizeof(cmd), "mv %s %s", newlib_name, lib_name);
+
+            //run_cmd(cmd);
+
+            // 3. 清理临时文件
+            remove(source_filename);
+            remove(library_filename);
+            remove(newlib_name);
+
             
             void *handle;
             int (*foo)(void);  // 假设foo是一个无参数且返回void的函数
