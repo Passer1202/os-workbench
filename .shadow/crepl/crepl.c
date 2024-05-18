@@ -21,7 +21,7 @@ void init(){
     
     if (source_file == NULL) {
         perror("fopen");
-        return 1;
+        return ;
     }
     fprintf(source_file, "%s", source_code);
     fclose(source_file);
@@ -52,7 +52,7 @@ void init(){
         // 检查子进程退出状态
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
             fprintf(stderr, "Compilation failed\n");
-            return 1;
+            return ;
         }
     }
 
