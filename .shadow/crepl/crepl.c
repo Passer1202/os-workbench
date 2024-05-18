@@ -58,11 +58,11 @@ int main(int argc, char *argv[]) {
 
         //gcc -shared -o my_library.so my_library.c
 
-        int compile_result = system(new_compile_command);
+        compile_result = system(new_compile_command);
 
         char cmd[256];
         snprintf(cmd, sizeof(cmd), "gcc -shared -o /tmp/temp_code.so /tmp/new_temp_code.o /tmp/temp_code.so");
-        
+
         if (compile_result != 0) {
             fprintf(stderr, "Compilation failed with error code %d\n", compile_result);
             return 1;
