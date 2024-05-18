@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        const char *source_code = "void add(int a, int b) {  }";
+        const char *source_code = "int add(int a, int b) { return a + b;}";
         const char *source_filename = "/tmp/temp_code.c";
         FILE *source_file = fopen(source_filename, "w");
         if (source_file == NULL) {
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         }
 
         void *handle;
-        void (*foo)(void);  // 假设foo是一个无参数且返回void的函数
+        int (*foo)(int a,int b);  // 假设foo是一个无参数且返回void的函数
         char *error;
 
         // 打开共享库
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 调用函数
-        foo();
+        printf("%d\n",foo(1,2));
 
         // 关闭共享库
         dlclose(handle);
