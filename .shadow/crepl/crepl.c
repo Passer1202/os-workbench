@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
 
             const char *newlib_name = "/tmp/mylib_new.so";
 
-            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s -Wl,--whole-archive %s %s", newlib_name, lib_name, library_filename);
+            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s %s", newlib_name, lib_name, library_filename);
 
             run_cmd(cmd);
 
