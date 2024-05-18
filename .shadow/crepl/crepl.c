@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        const char *source_code = "int add(int a, int b) { return a + b;}";
+        const char *source_code = "";
         const char *source_filename = "/tmp/temp_code.c";
         FILE *source_file = fopen(source_filename, "w");
         if (source_file == NULL) {
@@ -35,6 +35,34 @@ int main(int argc, char *argv[]) {
         //gcc -shared -o my_library.so my_library.c
 
         int compile_result = system(compile_command);
+        if (compile_result != 0) {
+            fprintf(stderr, "Compilation failed with error code %d\n", compile_result);
+            return 1;
+        }
+
+
+        const char *new_source_code = "int add(int a, int b) { return a + b;}";
+        const char *new_source_filename = "/tmp/new_temp_code.c";
+        FILE *new_source_file = fopen(new_source_filename, "w");
+        if (new_source_file == NULL) {
+            perror("fopen");
+            return 1;
+        }
+        fprintf(new_source_file, "%s", new_source_code);
+        fclose(new_source_file);
+
+        // 2. 编译源代码文件
+        const char *new_library_filename = "/tmp/new_temp_code.o";
+        char new_compile_command[256];
+        snprintf(new_compile_command, sizeof(new_compile_command), "gcc -c -o %s %s",new_library_filename, new_source_filename);
+
+        //gcc -shared -o my_library.so my_library.c
+
+        int compile_result = system(new_compile_command);
+
+        char cmd[256];
+        snprintf(cmd, sizeof(cmd), "gcc -shared -o /tmp/temp_code.so /tmp/new_temp_code.o /tmp/temp_code.so");
+        
         if (compile_result != 0) {
             fprintf(stderr, "Compilation failed with error code %d\n", compile_result);
             return 1;
