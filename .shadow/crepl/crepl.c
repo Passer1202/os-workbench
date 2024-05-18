@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
             char wrapper[64];
 
-            snprintf(code, sizeof(code), "int __expr_wrapper_%d() {\n return %s;\n}\n", no, line);
+            snprintf(code, sizeof(code), "int __expr_wrapper_%d() {\n return %s;\n}", no, line);
             snprintf(wrapper, sizeof(wrapper), "__expr_wrapper_%d", no++);
 
             const char *source_code = code;
