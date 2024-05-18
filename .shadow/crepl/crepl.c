@@ -94,14 +94,6 @@ int main(int argc, char *argv[]) {
 
     int no = 0;
 
-    static char line[4096];
-    
-    char s[50000];
-
-    printf("%s",s);
-
-    return 0;
-
     while (1) {
         printf("crepl> ");
         fflush(stdout);
