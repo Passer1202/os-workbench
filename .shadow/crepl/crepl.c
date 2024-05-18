@@ -32,7 +32,7 @@ int run_cmd(const char *cmd){
         waitpid(pid, &status, 0);
         // 检查子进程退出状态
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-            printf(stderr, "Compilation failed\n");
+            fprintf(stderr, "Compilation failed\n");
             return 1;
         }
     
