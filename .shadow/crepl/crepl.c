@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
     
 
     snprintf(s, sizeof(s), "aaaa\n");
-    
+    snprintf(s+strlen(s), sizeof(s+strlen(s)), "aaaa\n");
     printf("%d\n",(int)strlen(s));
 
     return 0;
