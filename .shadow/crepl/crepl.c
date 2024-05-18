@@ -129,6 +129,9 @@ int main(int argc, char *argv[]) {
             run_cmd(cmd);
   
             remove(source_filename);
+
+            printf("Function defined.\n");
+            
         }
         else{
             //输入的应该是表达式
