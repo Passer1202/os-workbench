@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
             char wrapper[64];
 
             snprintf(code, sizeof(code), "int __expr_wrapper_%d() {\n return %s;\n}", no, line);
-            snprintf(wrapper, sizeof(wrapper), "a");
+            snprintf(wrapper, sizeof(wrapper), "_empty");
 
             const char *source_code = code;
             printf("%s\n",source_code);
@@ -215,7 +215,8 @@ int main(int argc, char *argv[]) {
             }
 
             // 调用函数
-            printf("%d\n", foo());
+            foo();
+            //printf("%d\n", foo());
 
             // 关闭共享库
             dlclose(handle); 
