@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
 
             // 调用函数
             //foo();
-            printf("%d\n", foo());
+            printf("=%d\n", foo());
 
             // 关闭共享库
             dlclose(handle); 
