@@ -122,11 +122,11 @@ int main(int argc, char *argv[]) {
 
             run_cmd(cmd);
 
-            //gcc -shared -o liboriginal.so -Wl,--whole-archive liboriginal.so -Wl,--no-whole-archive new_function.o
+            //gcc -shared -o liboriginal.so -Wl,--whole-archive liboriginal.so new_function.o
 
             const char *newlib_name = "/tmp/mylib_new.so";
 
-            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s -Wl,--whole-archive %s -Wl,--no-whole-archive %s", newlib_name, lib_name, library_filename);
+            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s -Wl,--whole-archive %s %s", newlib_name, lib_name, library_filename);
 
             run_cmd(cmd);
 
