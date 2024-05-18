@@ -155,6 +155,7 @@ int main(int argc, char *argv[]) {
             snprintf(wrapper, sizeof(wrapper), "__expr_wrapper_%d", no++);
 
             const char *source_code = code;
+            printf("%s\n",source_code);
 
             const char *source_filename = "/tmp/temp_code.c";
             FILE *source_file = fopen(source_filename, "w");
