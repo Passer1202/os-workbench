@@ -139,6 +139,38 @@ int main(int argc, char *argv[]) {
             remove(library_filename);
             remove(newlib_name);
 
+            void *handle;
+            int (*foo)(void);  // 假设foo是一个无参数且返回void的函数
+            char *error;
+
+            // 打开共享库
+            handle = dlopen(lib_name, RTLD_LAZY);
+            if (!handle) {
+                fprintf(stderr, "%s\n", dlerror());
+                return 1;
+            }
+
+            // 清除现有的错误
+            dlerror();
+
+            //我先将换行符删掉
+
+            // 获取foo函数的地址
+            *(void **) (&foo) = dlsym(handle,"_empty");
+            if ((error = dlerror()) != NULL)  {
+                fprintf(stderr, "%s\n", error);
+                dlclose(handle);
+                return 1;
+            }
+
+            // 调用函数
+            //foo();
+            printf("%d\n", foo());
+
+            // 关闭共享库
+            dlclose(handle);
+
+
         }
         else{
             //输入的应该是表达式
@@ -207,7 +239,7 @@ int main(int argc, char *argv[]) {
             //我先将换行符删掉
 
             // 获取foo函数的地址
-            *(void **) (&foo) = dlsym(handle, "_empty");
+            *(void **) (&foo) = dlsym(handle, wrapper);
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
                 dlclose(handle);
@@ -215,8 +247,8 @@ int main(int argc, char *argv[]) {
             }
 
             // 调用函数
-            foo();
-            //printf("%d\n", foo());
+            //foo();
+            printf("%d\n", foo());
 
             // 关闭共享库
             dlclose(handle); 
