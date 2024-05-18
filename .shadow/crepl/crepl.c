@@ -11,6 +11,8 @@
 
 const char *lib_name = "/tmp/mylib.so";
 
+char source_code[500000];
+
 void run_cmd(const char *cmd){
 
      // 创建子进程
@@ -43,8 +45,11 @@ void init(){
     //初始化，生成一个空的共享库
 
     // 1. 创建临时源代码文件
-    const char *source_code = "void _empty(){return ;}";
-    const char *source_filename= "/tmp/empty_lib.c";
+    const char *code = "void _empty(){return ;}\n";
+    strcat(source_code,code);
+
+    const char *source_filename= "/tmp/source_code.c";
+
     FILE *source_file = fopen(source_filename, "w");
 
     
@@ -93,10 +98,6 @@ int main(int argc, char *argv[]) {
     
     char s[50000];
 
-    
-
-    snprintf(s, sizeof(s), "aaaa\n");
-    snprintf(s, sizeof(s),"%s aaaaaaa\n", s);
     printf("%s",s);
 
     return 0;
@@ -113,7 +114,8 @@ int main(int argc, char *argv[]) {
             //输入是函数;
 
             // 1. 创建临时源代码文件
-            const char *source_code = line;
+            const char *code = line;
+            strcat(source_code,code);
             const char *source_filename = "/tmp/temp_code.c";
             FILE *source_file = fopen(source_filename, "w");
             if (source_file == NULL) {
@@ -124,29 +126,15 @@ int main(int argc, char *argv[]) {
             fclose(source_file);
 
             // 2. 编译源代码文件
-            const char *library_filename = "/tmp/temp_code.o";
+
             char cmd[256];
-            //gcc -c -fPIC new_function.c -o new_function.o
-            snprintf(cmd, sizeof(cmd), "gcc -c -fPIC %s -o %s", source_filename,library_filename);
 
+            remove(lib_name);
+            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+    
             run_cmd(cmd);
-
-            //gcc -shared -o liboriginal.so -Wl,--whole-archive liboriginal.so new_function.o
-
-            const char *newlib_name = "/tmp/mylib_new.so";
-
-            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s %s", newlib_name, lib_name, library_filename);
-
-            run_cmd(cmd);
-
-            snprintf(cmd, sizeof(cmd), "mv %s %s", newlib_name, lib_name);
-
-            run_cmd(cmd);
-
-            // 3. 清理临时文件
+  
             remove(source_filename);
-            remove(library_filename);
-            remove(newlib_name);
         }
         else{
             //输入的应该是表达式
