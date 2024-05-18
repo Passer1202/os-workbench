@@ -38,7 +38,7 @@ void init(){
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork");
-        return 1;
+        return ;
     } else if (pid == 0) {  // 子进程
         // 在子进程中执行编译命令
         execl("/bin/sh", "/bin/sh", "-c", compile_command, NULL);
