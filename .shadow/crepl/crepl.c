@@ -32,7 +32,7 @@ int run_cmd(const char *cmd){
         waitpid(pid, &status, 0);
         // 检查子进程退出状态
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
-            printf("Compilation failed\n");
+            printf(stderr, "Compilation failed\n");
             return 1;
         }
     
@@ -111,6 +111,10 @@ int main(int argc, char *argv[]) {
 
             // 1. 创建临时源代码文件
             const char *code = line;
+
+            char pre[500000];
+            strcpy(pre,source_code);
+
             strcat(source_code,code);
             const char *source_filename = "/tmp/temp_code.c";
             FILE *source_file = fopen(source_filename, "w");
@@ -128,7 +132,11 @@ int main(int argc, char *argv[]) {
             remove(lib_name);
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
     
-            if(run_cmd(cmd)==1)continue;
+            if(run_cmd(cmd)==1){
+                memset(source_code,0,sizeof(source_code));
+                strcpy(source_code,pre);
+                continue;
+            };
   
             remove(source_filename);
 
@@ -140,6 +148,9 @@ int main(int argc, char *argv[]) {
             //使用wrapper
 
             // 1. 创建临时源代码文件
+
+            char pre[500000];
+            strcpy(pre,source_code);
 
             line[strlen(line)-1] = '\0';
            
@@ -169,7 +180,11 @@ int main(int argc, char *argv[]) {
             remove(lib_name);
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
     
-            if(run_cmd(cmd)==1)continue;
+           if(run_cmd(cmd)==1){
+                memset(source_code,0,sizeof(source_code));
+                strcpy(source_code,pre);
+                continue;
+            };
   
             remove(source_filename);
 
