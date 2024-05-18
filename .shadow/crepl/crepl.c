@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
             char wrapper[64];
 
             snprintf(wrapper_code, sizeof(wrapper_code), "int __expr_wrapper_%d(){ return %s;}\n", no, line);
-            snprintf(wrapper, sizeof(wrapper), " __expr_wrapper_%d",no++);
+            snprintf(wrapper, sizeof(wrapper), "__expr_wrapper_%d",no++);
 
             strcat(source_code,wrapper_code);
 
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
             //我先将换行符删掉
 
             // 获取foo函数的地址
-            *(void **) (&foo) = dlsym(handle,"a");
+            *(void **) (&foo) = dlsym(handle,wrapper);
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
                 dlclose(handle);
