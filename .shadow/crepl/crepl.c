@@ -94,6 +94,9 @@ int main(int argc, char *argv[]) {
 
     int no = 0;
 
+    static char line[4096];
+    
+
     while (1) {
         printf("crepl> ");
         fflush(stdout);
