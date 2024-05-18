@@ -67,6 +67,10 @@ int main(int argc, char *argv[]) {
 
         // 关闭共享库
         dlclose(handle);
+
+          remove(source_filename);
+            remove(library_filename);
+
         return 0;
         
         // To be implemented.
