@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
         }
 
         const char *source_code = "int add(int a, int b) { return a + b; }";
-        const char *source_filename = "/temp_code.c";
+        const char *source_filename = "temp_code.c";
         FILE *source_file = fopen(source_filename, "w");
         if (source_file == NULL) {
             perror("fopen");
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         fclose(source_file);
 
         // 2. 编译源代码文件
-        const char *library_filename = "/temp_code.so";
+        const char *library_filename = "temp_code.so";
         char compile_command[256];
         snprintf(compile_command, sizeof(compile_command), "gcc -shared -o %s %s",library_filename, source_filename);
 
