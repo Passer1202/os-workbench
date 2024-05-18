@@ -35,7 +35,10 @@ int run_cmd(const char *cmd){
             fprintf(stderr, "Compilation failed\n");
             return 1;
         }
+    
     }
+
+    return 0;
 
 
 }
