@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
         }
 
          // 1. 创建临时源代码文件
-        const char *source_code = "#include <stdio.h>\nint main() { printf(\"Hello, World!\\n\"); return 0; }";
+        const char *source_code = "#include <stdio.h> int main() { printf(\"Hello, World!\\n\"); return 0; }";
         printf("source_code: %s\n", source_code);
         const char *source_filename = "/tmp/temp_code.c";
         FILE *source_file = fopen(source_filename, "w");
