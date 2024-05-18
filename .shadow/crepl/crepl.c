@@ -93,7 +93,8 @@ int main(int argc, char *argv[]) {
     
     char s[100][5000];
 
-    snprintf(s[0], sizeof(s[0]), "aaaa");
+    snprintf(s[0], sizeof(s[0]), "aaaa\n");
+    snprintf(s[1], sizeof(s[1]), "bbbb\n");
 
     char *p=(char*)s;
 
