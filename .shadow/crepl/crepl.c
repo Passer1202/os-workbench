@@ -152,9 +152,10 @@ int main(int argc, char *argv[]) {
             // 清除现有的错误
             dlerror();
 
-            // 获取foo函数的地址
-            printf("a\n");
+            //我先将换行符删掉
+            line[strlen(line)-1] = '\0';
 
+            // 获取foo函数的地址
             *(void **) (&foo) = dlsym(handle, line);
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
