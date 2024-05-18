@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
             //我先将换行符删掉
 
             // 获取foo函数的地址
-            *(void **) (&foo) = dlsym(handle, wrapper);
+            *(void **) (&foo) = dlsym(handle,"a");
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
                 dlclose(handle);
