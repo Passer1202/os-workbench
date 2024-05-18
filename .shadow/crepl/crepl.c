@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     int no = 0;
 
     static char line[4096];
-    
+
     while (1) {
         printf("crepl> ");
         fflush(stdout);
@@ -137,15 +137,16 @@ int main(int argc, char *argv[]) {
             // 1. 创建临时源代码文件
 
             line[strlen(line)-1] = '\0';
-            /*
-            char code[5000];
+           
+            char wrapper_code[5000];
 
             char wrapper[64];
 
-            snprintf(code, sizeof(code), "int __expr_wrapper_%d() { return %s;}", no, line);
-            snprintf(wrapper, sizeof(wrapper), "_empty");
+            snprintf(wrapper_code, sizeof(wrapper_code), "int __expr_wrapper_%d() { return %s;}\n", no, line);
+            snprintf(wrapper, sizeof(wrapper), " __expr_wrapper_%d",no++);
 
-            const char *source_code = code;
+            strcat(source_code,wrapper_code);
+
             printf("%s\n",source_code);
 
             const char *source_filename = "/tmp/temp_code.c";
@@ -156,31 +157,22 @@ int main(int argc, char *argv[]) {
             }
             fprintf(source_file, "%s", source_code);
 
-            const char *library_filename = "/tmp/temp_code.o";
+
+             fprintf(source_file, "%s", source_code);
+            fclose(source_file);
+
+            // 2. 编译源代码文件
+
             char cmd[256];
-            //gcc -c -fPIC new_function.c -o new_function.o
-            snprintf(cmd, sizeof(cmd), "gcc -c -fPIC %s -o %s", source_filename,library_filename);
 
+            remove(lib_name);
+            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
+    
             run_cmd(cmd);
-
-            //gcc -shared -o liboriginal.so -Wl,--whole-archive liboriginal.so -Wl,--no-whole-archive new_function.o
-
-            const char *newlib_name = "/tmp/mylib_new.so";
-
-            snprintf(cmd, sizeof(cmd), "gcc -shared -o %s -Wl,--whole-archive %s -Wl,--no-whole-archive %s", newlib_name, lib_name, library_filename);
-
-            run_cmd(cmd);
-
-            snprintf(cmd, sizeof(cmd), "mv %s %s", newlib_name, lib_name);
-
-            run_cmd(cmd);
-
-            // 3. 清理临时文件
+  
             remove(source_filename);
-            remove(library_filename);
-            remove(newlib_name);
 
-            */
+            
             void *handle;
             int (*foo)(void);  // 假设foo是一个无参数且返回void的函数
             char *error;
@@ -198,7 +190,7 @@ int main(int argc, char *argv[]) {
             //我先将换行符删掉
 
             // 获取foo函数的地址
-            *(void **) (&foo) = dlsym(handle, line);
+            *(void **) (&foo) = dlsym(handle, wrapper);
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
                 dlclose(handle);
