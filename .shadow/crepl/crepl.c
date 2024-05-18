@@ -142,12 +142,10 @@ int main(int argc, char *argv[]) {
 
             char wrapper[64];
 
-            snprintf(wrapper_code, sizeof(wrapper_code), "int __expr_wrapper_%d() { return %s;}\n", no, line);
+            snprintf(wrapper_code, sizeof(wrapper_code), "int __expr_wrapper_%d(){ return %s;}\n", no, line);
             snprintf(wrapper, sizeof(wrapper), " __expr_wrapper_%d",no++);
 
             strcat(source_code,wrapper_code);
-
-            printf("%s\n",source_code);
 
             const char *source_filename = "/tmp/temp_code.c";
             FILE *source_file = fopen(source_filename, "w");
@@ -156,7 +154,7 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             fprintf(source_file, "%s", source_code);
-            
+
             fclose(source_file);
 
             // 2. 编译源代码文件
@@ -170,7 +168,6 @@ int main(int argc, char *argv[]) {
   
             remove(source_filename);
 
-            
             void *handle;
             int (*foo)(void);  // 假设foo是一个无参数且返回void的函数
             char *error;
