@@ -153,7 +153,9 @@ int main(int argc, char *argv[]) {
             dlerror();
 
             // 获取foo函数的地址
-            *(void **) (&foo) = dlsym(handle, "a");
+            printf("%s\n",line);
+            
+            *(void **) (&foo) = dlsym(handle, line);
             if ((error = dlerror()) != NULL)  {
                 fprintf(stderr, "%s\n", error);
                 dlclose(handle);
