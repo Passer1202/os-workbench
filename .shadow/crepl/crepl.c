@@ -70,8 +70,7 @@ void init(){
 
     snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
     //gcc -shared -o my_library.so my_library.c
-    if(run_cmd(cmd)==1)continue;
-
+    run_cmd(cmd);
     // 3. 清理临时文件
     remove(source_filename);
 
