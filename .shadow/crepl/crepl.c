@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <dlfcn.h>
+#include <stdbool.h>
 
 
 const char *lib_name = "/tmp/mylib.so";
@@ -14,7 +15,7 @@ void init(){
     //初始化，生成一个空的共享库
 
     // 1. 创建临时源代码文件
-    const char *source_code = "int _empty(){return 1;}";
+    const char *source_code = "void _empty(){return ;}";
     const char *source_filename= "/tmp/empty_lib.c";
     FILE *source_file = fopen(source_filename, "w");
 
@@ -58,6 +59,17 @@ void init(){
 
 }
 
+bool is_function(const char *s) {
+    // To be implemented.
+    char *result = strstr(s, "int");
+    if(result != NULL){
+        if(s[0] == 'i' && s[1] == 'n' && s[2] == 't' && s[3] == ' ')
+        return true;
+    }
+
+    return false;
+}
+
 
 
 int main(int argc, char *argv[]) {
@@ -74,8 +86,24 @@ int main(int argc, char *argv[]) {
         if (!fgets(line, sizeof(line), stdin)) {
             break;
         }
+        
+        if(is_function(line)){
+            printf("is function\n");
+        }
+        else{
+            printf("not function\n");
+        }
+        
+        
+        // To be implemented.
+        //printf("Got %zu chars.\n", strlen(line));
+    }
+}
 
-        void *handle;
+
+/*
+
+void *handle;
         int (*foo)(void);  // 假设foo是一个无参数且返回void的函数
         char *error;
 
@@ -101,13 +129,9 @@ int main(int argc, char *argv[]) {
         printf("%d\n", foo());
 
         // 关闭共享库
-        dlclose(handle);
-        
-        
-        // To be implemented.
-        printf("Got %zu chars.\n", strlen(line));
-    }
-}
+        dlclose(handle);  
+
+*/
 
 
 /*
