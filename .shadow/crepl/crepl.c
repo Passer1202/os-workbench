@@ -13,13 +13,13 @@ const char *lib_name = "/tmp/mylib.so";
 
 char source_code[500000];
 
-void run_cmd(const char *cmd){
+int run_cmd(const char *cmd){
 
      // 创建子进程
     pid_t pid = fork();
     if (pid < 0) {
         perror("fork");
-        return ;
+        return 1;
     } else if (pid == 0) {  // 子进程
         // 在子进程中执行编译命令
         execl("/bin/sh", "/bin/sh", "-c", cmd, NULL);
@@ -33,7 +33,7 @@ void run_cmd(const char *cmd){
         // 检查子进程退出状态
         if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
             fprintf(stderr, "Compilation failed\n");
-            return ;
+            return 1;
         }
     }
 
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
             remove(lib_name);
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
     
-            run_cmd(cmd);
+            if(run_cmd(cmd)==1)continue;
   
             remove(source_filename);
 
@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
             remove(lib_name);
             snprintf(cmd, sizeof(cmd), "gcc -shared -o %s %s",lib_name, source_filename);
     
-            run_cmd(cmd);
+            if(run_cmd(cmd)==1)continue;
   
             remove(source_filename);
 
