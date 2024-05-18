@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         char *error;
 
         // 打开共享库
-        handle = dlopen("/tmp/mylib.so", RTLD_LAZY);
+        handle = dlopen(lib_name, RTLD_LAZY);
         if (!handle) {
             fprintf(stderr, "%s\n", dlerror());
             return 1;
