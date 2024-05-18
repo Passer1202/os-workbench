@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         }
 
         void *handle;
-        int (*foo)(int a,int b);  // 假设foo是一个无参数且返回void的函数
+        int (*foo)();  // 假设foo是一个无参数且返回void的函数
         char *error;
 
         // 打开共享库
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
         // 关闭共享库
         dlclose(handle);
 
-          remove(source_filename);
-            remove(library_filename);
+        remove(source_filename);
+        remove(library_filename);
 
         return 0;
         
