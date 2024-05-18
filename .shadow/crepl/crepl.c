@@ -95,10 +95,10 @@ int main(int argc, char *argv[]) {
 
     snprintf(s[0], sizeof(s[0]), "aaaa");
 
-    char *p=s;
+    char *p=(char*)s;
 
     printf("%s\n",p);
-    
+
 
 
     while (1) {
