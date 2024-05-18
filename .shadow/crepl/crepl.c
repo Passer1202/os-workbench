@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 
             char wrapper[64];
 
-            snprintf(code, sizeof(code), "int __expr_wrapper_%d() {\n return %s;\n}", no, line);
+            snprintf(code, sizeof(code), "int __expr_wrapper_%d() { return %s;}", no, line);
             snprintf(wrapper, sizeof(wrapper), "_empty");
 
             const char *source_code = code;
@@ -180,9 +180,9 @@ int main(int argc, char *argv[]) {
 
             run_cmd(cmd);
 
-            //snprintf(cmd, sizeof(cmd), "mv %s %s", newlib_name, lib_name);
+            snprintf(cmd, sizeof(cmd), "mv %s %s", newlib_name, lib_name);
 
-            //run_cmd(cmd);
+            run_cmd(cmd);
 
             // 3. 清理临时文件
             remove(source_filename);
