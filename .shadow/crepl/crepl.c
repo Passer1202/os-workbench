@@ -91,6 +91,15 @@ int main(int argc, char *argv[]) {
 
     static char line[4096];
     
+    char s[100][5000];
+
+    snprintf(s[0], sizeof(s[0]), "aaaa");
+
+    char *p=s;
+
+    printf("%s\n",p);
+    
+
 
     while (1) {
         printf("crepl> ");
