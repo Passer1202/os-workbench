@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
         struct timespec ts;
         ts.tv_sec = 0;
-        ts.tv_nsec = 1000000000L; // 100000000 纳秒（0.1 秒）
+        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
         //总时间
         double total_time = 0;
@@ -173,6 +173,12 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
+            }
+            
+            sys_* p=head;
+            for(int i=0;i<5;i++){
+                printf("%s (%d%%)\n", p->name, p->time/total_time*100);
+                p=p->next;
             }
             nanosleep(&ts, NULL);
         }
