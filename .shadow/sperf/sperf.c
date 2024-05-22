@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-//#define DEBUG 0
+#define DEBUG 0
 
 //todo:处理数据
 
@@ -112,12 +112,11 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            printf("s");
             while (fgets(buf, 4096, fp) > 0) 
             {
                 fflush(stdout);
                 //正则表达式
-                printf("%s",buf);
+                //printf("%s",buf);
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL)
                 {
