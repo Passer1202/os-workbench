@@ -114,7 +114,6 @@ int main(int argc, char *argv[]) {
         struct timeval current_time;
 
         gettimeofday(&last_output_time, NULL); // 获取当前时间
-        sleep(1);
         
         int run_flag=1;
 
@@ -186,7 +185,7 @@ int main(int argc, char *argv[]) {
                 gettimeofday(&current_time, NULL); // 获取当前时间
 
                 // 如果距离上次输出已经过了0.1秒
-                if (current_time.tv_usec-last_output_time.tv_usec >= 100000) {
+                if (current_time.tv_usec-last_output_time.tv_usec >= 1000) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
                         if(!p)break;
