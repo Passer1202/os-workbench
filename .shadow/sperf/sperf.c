@@ -175,7 +175,7 @@ int main(int argc, char *argv[]) {
                 }
                 
             }
-
+/*
             sys_* p=head;
                 for(int i=0;i<5;i++){
                     if(!p)break;
@@ -189,8 +189,7 @@ int main(int argc, char *argv[]) {
                 for(int i=0;i<80;i++){
                     fwrite(&null_char, sizeof(char), 1, stdout);
                 }
-            
-            
+            */
         }
     }
     return 0;
