@@ -130,9 +130,8 @@ int main(int argc, char *argv[]) {
                 #ifdef DEBUG
                 printf("Syscall: %s, Time: %s %f\n", syscall, time, t);
                 #endif
-
                 //遍历链表，能找到就更新时间，否则插入新的节点
-                
+                assert(0);
                 sys_* p=head;
                 sys_* pre=NULL;
                 while(p){
@@ -162,8 +161,8 @@ int main(int argc, char *argv[]) {
                 head=renew_list(head, p);
 
             }
-            nanosleep(&ts, NULL);
-            printf("s");
+            //nanosleep(&ts, NULL);
+            //printf("s");
             //输出是一行行来的
         }
     }
