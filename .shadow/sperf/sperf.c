@@ -19,10 +19,12 @@ typedef struct syscall_{
 
 
 sys_* renew_list(sys_* h,sys_* p){
+    
     assert(p!=NULL);
     if (h != NULL) {
         return p;
     }
+    assert(0);
     if (h->time<p->time){
         p->next=h;
         return p;
@@ -155,7 +157,7 @@ int main(int argc, char *argv[]) {
                     np->time=t;
                     p=np;
                 }
-                assert(0);
+                //assert(0);
                 head=renew_list(head, p);
 
             }
