@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
-        assert(dup2(pipefd[1], STDOUT_FILENO)!=-1);
+        assert(dup2(pipefd[1], STDERR_FILENO)!=-1);
        
         //参考jyy,手工构建argv
         char exec_argv[argc+2];
@@ -47,9 +47,17 @@ int main(int argc, char *argv[]) {
         //父进程    //读strace的输出并处理
         //关闭写端
         assert(close(pipefd[1])!=-1);
-
-        dup2(pipefd[0], STDIN_FILENO);
+        char buf[4096];
+        FILE *fp = fdopen(pipefd[0], "r");
+        while(1){
+            fflush(stdout);
+            if (!fgets(buf, sizeof(buf), pipefd[0])) {
+                break;
+            }
+            printf("%s\n", buf);
+        }
         
+
     }
     return 0;
 }
