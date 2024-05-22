@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     pid_t pid = fork();
     //创建失败返回-1
     assert(pid != -1);
-
+     assert(0);
     if (pid == 0) {
         //子进程   //执行strace命令
 
@@ -74,7 +74,6 @@ int main(int argc, char *argv[]) {
         //strace -T 
         //./
         //
-         assert(0);
         exec_argv[0] = "strace";
         exec_argv[1] = "-T";
         for (int i = 1; i < argc; i++) {
