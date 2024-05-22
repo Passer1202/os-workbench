@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            while (!fgets(buf, 4096, fp)) 
+            while (fgets(buf, 4096, fp)>0) 
             {
                  if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) {
