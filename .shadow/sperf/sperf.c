@@ -9,6 +9,8 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 
+
+extern char **environ;
 //#define DEBUG 0
 
 //todo:处理数据
@@ -84,12 +86,11 @@ int main(int argc, char *argv[]) {
         //argv和envp中间隔一个“NULL”
         exec_argv[argc+1] = NULL;
        
-        char *exec_envp[] = { "PATH=/bin", NULL, };
-
+        
         //绝对路径处理
-        execve("/strace", exec_argv, exec_envp);
-        execve("/bin/strace", exec_argv, exec_envp);
-        execve("/usr/bin/strace", exec_argv, exec_envp);
+        execve("/strace", exec_argv, environ);
+        execve("/bin/strace", exec_argv, environ);
+        execve("/usr/bin/strace", exec_argv, environ);
         perror("execvp");
          //关闭写端
         assert(close(pipefd[1])!=-1);
