@@ -189,7 +189,10 @@ int main(int argc, char *argv[]) {
                 p=p->next;
                 //fflush(stdout);
             }
-
+            for(int i=0;i<80;i++){
+                printf('\0');
+            }
+            
             nanosleep(&ts, NULL);
         }
     }
