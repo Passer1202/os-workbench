@@ -49,7 +49,7 @@ sys_* renew_list(sys_* h,sys_* p){
 
 int main(int argc, char *argv[]) {
     /*创建匿名管道，子进程写，父进程读*/
-    int pipefd[2];
+    int pipefd[2]={0};
     
     //创建失败返回-1
     assert(pipe(pipefd) != -1);
@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 
     if (pid == 0) {
         //子进程   //执行strace命令
-        assert(close(1)!=-1);
+
         //assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
@@ -69,6 +69,11 @@ int main(int argc, char *argv[]) {
        
         //参考jyy,手工构建argv
         char* exec_argv[argc+2];
+        //3
+        //0 1 2
+        //strace -T 
+        //./
+        //
         exec_argv[0] = "strace";
         exec_argv[1] = "-T";
         for (int i = 1; i < argc; i++) {
@@ -76,7 +81,7 @@ int main(int argc, char *argv[]) {
         }
         //argv和envp中间隔一个“NULL”
         exec_argv[argc+1] = NULL;
-
+        assert(0);
         char *exec_envp[] = { "PATH=/bin", NULL, };
 
         //绝对路径处理
