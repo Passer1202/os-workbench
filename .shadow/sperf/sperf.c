@@ -110,6 +110,7 @@ int main(int argc, char *argv[]) {
         double total_time = 0;
 
         clock_t last_output_time = clock();
+        usleep(100000);
         
         int run_flag=1;
 
@@ -178,7 +179,6 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
-
                 clock_t current_time = clock(); // 获取当前时钟周期数
                 double time_elapsed = (double)(current_time - last_output_time) / CLOCKS_PER_SEC; // 计算距离上次输出经过的秒数
 
