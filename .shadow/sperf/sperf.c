@@ -104,8 +104,9 @@ int main(int argc, char *argv[]) {
                 
                 sys_* p=head;
                 sys_* pre=NULL;
-                while(!p){
+                while(p){
                     if(strcmp(p->name,syscall)==0)break;
+                    assert(0);
                     pre=p;
                     p=p->next;
                 }
