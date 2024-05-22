@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-//#define DEBUG 0
+#define DEBUG 0
 
 //todo:处理数据
 
@@ -122,7 +122,9 @@ int main(int argc, char *argv[]) {
                     //更新链表
                 }
                 else{
-                   
+                    sys_* np=(sys_*)malloc(sizeof(sys_));
+                    np->name=syscall;
+                    np->time=t;
                 }
 
 
