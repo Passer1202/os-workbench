@@ -33,12 +33,12 @@ sys_* renew_list(sys_* h,sys_* p){
     sys_ *pre = h;
     sys_ *cur = h->next;
     while(cur){
+        assert(0);
         if(cur->time<p->time)
             break;
         pre=cur;
         cur=cur->next;
     }
-    assert(0);
     assert(pre->next==cur);
     p->next = cur;
     pre->next = p;
