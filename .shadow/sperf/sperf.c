@@ -167,7 +167,7 @@ int main(int argc, char *argv[]) {
                 head=renew_list(head, p);
 
             }
-            //nanosleep(&ts, NULL);
+            nanosleep(&ts, NULL);
 
             printf("s");
             //输出是一行行来的
