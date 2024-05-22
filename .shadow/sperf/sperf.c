@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            while (fgets(buf, 4096, fp)!=0) 
+            while ((run_flag=fgets(buf, 4096, fp))!=0) 
             {
 
                 regex_t regex_name,regex_time;
