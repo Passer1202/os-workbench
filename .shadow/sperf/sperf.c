@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
         //strace -T 
         //./
         //
+         assert(0);
         exec_argv[0] = "strace";
         exec_argv[1] = "-T";
         for (int i = 1; i < argc; i++) {
@@ -81,7 +82,7 @@ int main(int argc, char *argv[]) {
         }
         //argv和envp中间隔一个“NULL”
         exec_argv[argc+1] = NULL;
-        assert(0);
+       
         char *exec_envp[] = { "PATH=/bin", NULL, };
 
         //绝对路径处理
