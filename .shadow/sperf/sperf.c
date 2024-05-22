@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 
 //todo:处理数据
 
@@ -102,6 +102,30 @@ int main(int argc, char *argv[]) {
 
                 //遍历链表，能找到就更新时间，否则插入新的节点
                 
+                sys_* p=head;
+                sys_* pre=NULL;
+                while(!p){
+                    if(strcmp(p->name,syscall)==0)break;
+                    pre=p;
+                    p=p->next;
+                }
+                if(p){
+                    //找到了
+                    p->time=p->time+t;
+                    if(pre){
+                        pre->next=p->next;
+                    }
+                    else{
+                        head=p->next;
+                    }
+                    free(syscall);
+                    //更新链表
+                }
+                else{
+                    sys_* np=(sys_*)malloc(sizeof(sys_));
+                    np->name=syscall;
+                    np->time=t;
+                }
 
 
             }
