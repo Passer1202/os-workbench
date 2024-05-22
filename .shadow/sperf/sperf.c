@@ -173,8 +173,10 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
+                
+            }
 
-                sys_* p=head;
+            sys_* p=head;
                 for(int i=0;i<5;i++){
                     if(!p)break;
                     //assert(0);
@@ -187,8 +189,6 @@ int main(int argc, char *argv[]) {
                 for(int i=0;i<80;i++){
                     fwrite(&null_char, sizeof(char), 1, stdout);
                 }
-                
-            }
             
             
         }
