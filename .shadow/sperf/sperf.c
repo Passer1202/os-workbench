@@ -31,6 +31,7 @@ int main(int argc, char *argv[]) {
     if (pid == 0) {
         //子进程   //执行strace命令
         //关闭读端
+        assert(close(1)!=-1);
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
         assert(dup2(pipefd[1], STDERR_FILENO)!=-1);
@@ -87,7 +88,7 @@ int main(int argc, char *argv[]) {
                 char time[64];
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
                 snprintf(time, match_time.rm_eo - match_time.rm_so + 1, "%s", buf + match_time.rm_so);
-                //printf("Syscall: %s, Time: %s\n", syscall, time);
+                printf("Syscall: %s, Time: %s\n", syscall, time);
             }
 
             //输出是一行行来的
