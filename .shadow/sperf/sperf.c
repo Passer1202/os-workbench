@@ -96,6 +96,9 @@ int main(int argc, char *argv[]) {
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
 
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
 
         while(1){
@@ -161,8 +164,8 @@ int main(int argc, char *argv[]) {
                 head=renew_list(head, p);
 
             }
-            //nanosleep(&ts, NULL);
-            //printf("s");
+            nanosleep(&ts, NULL);
+            printf("s");
             //输出是一行行来的
         }
     }
