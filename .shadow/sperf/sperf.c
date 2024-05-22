@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         //子进程   //执行strace命令
 
         //关闭读端
-        assert(close(1)!=-1);
+        //assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     } else {
         //父进程    //读strace的输出并处理
         //关闭写端
-        assert(close(0)!=-1);
+        //assert(close(0)!=-1);
         assert(close(pipefd[1])!=-1);
 
         char buf[4096];
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
             
             sys_* p=head;
             for(int i=0;i<5;i++){
-                printf("%s (%f%%)\n", p->name, p->time/total_time*100);
+                printf("%s (%0.1f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
             }
             nanosleep(&ts, NULL);
