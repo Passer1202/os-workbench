@@ -114,9 +114,8 @@ int main(int argc, char *argv[]) {
         struct timeval current_time;
 
         gettimeofday(&last_output_time, NULL); // 获取当前时间
-        usleep(10000);
         int run_flag=1;
-
+        int print_flag=0;
         while(run_flag==1){
             while (fgets(buf, 4096, fp)>0) 
             {
@@ -185,6 +184,7 @@ int main(int argc, char *argv[]) {
                 gettimeofday(&current_time, NULL); // 获取当前时间
 
                 // 如果距离上次输出已经过了0.1秒
+                
                 long long elapsed = (current_time.tv_sec - last_output_time.tv_sec) * 1000000LL + (current_time.tv_usec - last_output_time.tv_usec);
                 if (elapsed >= 100000LL) {
                     sys_* p=head;
@@ -201,15 +201,29 @@ int main(int argc, char *argv[]) {
                         fwrite(&null_char, sizeof(char), 1, stdout);
                     }
                     //assert(0);
-
+                print_flag=1;
                 last_output_time = current_time;
                 
                 }
-
             
             }
             
         }
+        if(!print_flag){
+                sys_* p=head;
+                    for(int i=0;i<5;i++){
+                        if(!p)break;
+                        //assert(0);
+                        printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
+                        p=p->next;
+                        
+                    }
+                    fflush(stdout);
+                    char null_char = '\0';
+                    for(int i=0;i<80;i++){
+                        fwrite(&null_char, sizeof(char), 1, stdout);
+                    }
+            }
     }
     return 0;
 }
