@@ -102,75 +102,80 @@ int main(int argc, char *argv[]) {
 
         //总时间
         double total_time = 0;
+        int run_flag=1;
 
-        while(1){
-            fflush(stdout);
-
-            if (fgets(buf, sizeof(buf), fp)>0) {
-                break;
-            }
-            //目前看父进程会结束，先这样写
+        while(run_flag==1){
             
-            //正则表达式
-            regex_t regex_name,regex_time;
-            regmatch_t match_name,match_time;
 
-            const char pattern_name[] = "[^\\(\n\r\b\t]*\\(";
-            const char pattern_time[] = "<[0-9\\.]+>";
+            while(fgets(buf, sizeof(buf), fp)>0)
+            {
+                fflush(stdout);
+                //正则表达式
 
-            assert(regcomp(&regex_name, pattern_name, REG_EXTENDED)==0);
-            assert(regcomp(&regex_time, pattern_time, REG_EXTENDED)==0);
-
-            //执行正则匹配
-            int ret_name = regexec(&regex_name, buf, 1, &match_name, 0);
-            int ret_time = regexec(&regex_time, buf, 1, &match_time, 0);
-            if (ret_name == 0 && ret_time == 0) {
-                //提取匹配的系统调用名和时间
-                char* syscall=malloc(sizeof(char)*(match_name.rm_eo - match_name.rm_so));
-                char time[64];
-                snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
-                snprintf(time, match_time.rm_eo - match_time.rm_so -1 , "%s", buf + match_time.rm_so + 1);
-                double t = atof(time);
-                total_time=total_time+t;
-                //调试信息
-                #ifdef DEBUG
-                printf("Syscall: %s, Time: %s %f\n", syscall, time, t);
-                #endif
-                //遍历链表，能找到就更新时间，否则插入新的节点
-                //assert(0);
-                sys_* p=head;
-                sys_* pre=NULL;
-                while(p){
-                    if(strcmp(p->name,syscall)==0)break;
-                    pre=p;
-                    p=p->next;
+                if (strstr(buf, "+++ exited with 0 +++") != NULL ||
+                    strstr(buf, "+++ exited with 1 +++") != NULL) 
+                {
+                    run_flag = 0;
+                    break;
                 }
-                if(p){
-                    //找到了
-                    p->time=p->time+t;
-                    if(pre){
-                        pre->next=p->next;
+                
+                regex_t regex_name,regex_time;
+                regmatch_t match_name,match_time;
+
+                const char pattern_name[] = "[^\\(\n\r\b\t]*\\(";
+                const char pattern_time[] = "<[0-9\\.]+>";
+
+                assert(regcomp(&regex_name, pattern_name, REG_EXTENDED)==0);
+                assert(regcomp(&regex_time, pattern_time, REG_EXTENDED)==0);
+
+                //执行正则匹配
+                int ret_name = regexec(&regex_name, buf, 1, &match_name, 0);
+                int ret_time = regexec(&regex_time, buf, 1, &match_time, 0);
+                if (ret_name == 0 && ret_time == 0) {
+                    //提取匹配的系统调用名和时间
+                    char* syscall=malloc(sizeof(char)*(match_name.rm_eo - match_name.rm_so));
+                    char time[64];
+                    snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
+                    snprintf(time, match_time.rm_eo - match_time.rm_so -1 , "%s", buf + match_time.rm_so + 1);
+                    double t = atof(time);
+                    total_time=total_time+t;
+                    //调试信息
+                    #ifdef DEBUG
+                    printf("Syscall: %s, Time: %s %f\n", syscall, time, t);
+                    #endif
+                    //遍历链表，能找到就更新时间，否则插入新的节点
+                    //assert(0);
+                    sys_* p=head;
+                    sys_* pre=NULL;
+                    while(p){
+                        if(strcmp(p->name,syscall)==0)break;
+                        pre=p;
+                        p=p->next;
+                    }
+                    if(p){
+                        //找到了
+                        p->time=p->time+t;
+                        if(pre){
+                            pre->next=p->next;
+                        }
+                        else{
+                            head=p->next;
+                        }
+                        free(syscall);
+                        //更新链表
                     }
                     else{
-                        head=p->next;
+                        sys_* np=(sys_*)malloc(sizeof(sys_));
+                        np->name=syscall;
+                        np->time=t;
+                        p=np;
                     }
-                    free(syscall);
-                    //更新链表
-                }
-                else{
-                    sys_* np=(sys_*)malloc(sizeof(sys_));
-                    np->name=syscall;
-                    np->time=t;
-                    p=np;
-                }
-                //assert(0);
-                head=renew_list(head, p);
+                    //assert(0);
+                    head=renew_list(head, p);
 
+                }
             }
             nanosleep(&ts, NULL);
-
-            printf("s");
-            //输出是一行行来的
         }
     }
     return 0;
