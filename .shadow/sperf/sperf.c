@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
 
                 assert(regcomp(&regex_name, pattern_name, REG_EXTENDED)==0);
                 assert(regcomp(&regex_time, pattern_time, REG_EXTENDED)==0);
-                 assert(0);
+                
                 //执行正则匹配
                 int ret_name = regexec(&regex_name, buf, 1, &match_name, 0);
                 int ret_time = regexec(&regex_time, buf, 1, &match_time, 0);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 
                 }
             }
-            
+             assert(0);
             sys_* p=head;
             for(int i=0;i<5;i++){
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
