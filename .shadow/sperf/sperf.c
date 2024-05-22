@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
                 double spent_time = atof(time);
                 //调试信息
                 #ifdef DEBUG
-                printf("Syscall: %s, Time: %f\n", syscall, spent_time);
+                printf("Syscall: %s, Time: %s %f\n", syscall, spent_time);
                 #endif
 
 
