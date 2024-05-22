@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         //子进程   //执行strace命令
 
         //关闭读端
-        assert(close(1)!=-1);
+        //assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
@@ -109,10 +109,11 @@ int main(int argc, char *argv[]) {
             {
                 fflush(stdout);
                 //正则表达式
-                printf("%s\n",buf);
+                //printf("%s\n",buf);
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) 
                 {
+                    assert(0);
                     run_flag = 0;
                     break;
                 }
