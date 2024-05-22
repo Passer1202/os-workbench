@@ -49,13 +49,17 @@ int main(int argc, char *argv[]) {
         assert(close(pipefd[1])!=-1);
         char buf[4096];
         FILE *fp = fdopen(pipefd[0], "r");
+        assert(fp);
+
         while(1){
             fflush(stdout);
             if (!fgets(buf, sizeof(buf), fp)) {
                 break;
             }
+            //目前看父进程会结束，先这样写
+            
             printf("%s", buf);
-            printf("\n");
+            //输出是一行行来的
         }
     }
     return 0;
