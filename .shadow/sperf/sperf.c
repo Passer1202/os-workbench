@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     if (pid == 0) {
         //子进程   //执行strace命令
 
-        //assert(close(1)!=-1);
+        assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准错误输出重定向到管道的写端
