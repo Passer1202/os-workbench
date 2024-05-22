@@ -116,9 +116,13 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            while ((run_flag=(int)fgets(buf, 4096, fp))!=0) 
+            while (!fgets(buf, 4096, fp)) 
             {
-
+                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
+                    strstr(buf, "+++ exited with 1 +++") != NULL) {
+                run_flag = 0;
+                break;
+                }
                 regex_t regex_name,regex_time;
                 regmatch_t match_name,match_time;
 
