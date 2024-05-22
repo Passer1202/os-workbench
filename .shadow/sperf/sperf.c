@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-//#define DEBUG 0
+#define DEBUG 0
 
 //todo:处理数据
 
@@ -106,8 +106,6 @@ int main(int argc, char *argv[]) {
 
         while(run_flag==1){
             
-
-            while(fgets(buf, sizeof(buf), fp)>0)
             {
                 fflush(stdout);
                 //正则表达式
@@ -118,7 +116,7 @@ int main(int argc, char *argv[]) {
                     run_flag = 0;
                     break;
                 }
-                
+
                 regex_t regex_name,regex_time;
                 regmatch_t match_name,match_time;
 
