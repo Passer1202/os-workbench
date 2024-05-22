@@ -85,6 +85,8 @@ int main(int argc, char *argv[]) {
         char *exec_envp[] = { "PATH=/bin", NULL, };
 
         //绝对路径处理
+        execve("/strace", exec_argv, exec_envp);
+        execve("/bin/strace", exec_argv, exec_envp);
         execve("/usr/bin/strace", exec_argv, exec_envp);
         perror("execvp");
          //关闭写端
@@ -189,6 +191,7 @@ int main(int argc, char *argv[]) {
                 p=p->next;
                 //fflush(stdout);
             }
+
             char null_char = '\0';
             for(int i=0;i<80;i++){
                 fwrite(&null_char, sizeof(char), 1, stdout);
