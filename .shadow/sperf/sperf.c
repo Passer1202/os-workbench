@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
                 char syscall[64];
                 char time[64];
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
-                snprintf(time, match_time.rm_eo - match_time.rm_so + 1, "%s", buf + match_time.rm_so);
+                snprintf(time, match_time.rm_eo - match_time.rm_so -1 , "%s", buf + match_time.rm_so + 1);
                 double spent_time = atof(time);
                 //调试信息
                 #ifdef DEBUG
