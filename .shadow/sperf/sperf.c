@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            
+            while (fgets(buf, 4096, fp) > 0) 
             {
                 fflush(stdout);
                 //正则表达式
