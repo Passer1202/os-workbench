@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     if (pid == 0) {
         //子进程   //执行strace命令
 
-        assert(close(1)!=-1);
+        //assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准错误输出重定向到管道的写端
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
 
         while(run_flag==1){
-            while (fgets(buf, 4096, fp) > 0) 
+            while (fgets(buf, 4096, fp) != 0) 
             {
                 
                 //正则表达式
@@ -182,7 +182,7 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
-                printf("s");
+                
             }
             
             sys_* p=head;
