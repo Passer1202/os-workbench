@@ -13,7 +13,7 @@
 typedef struct syscall_{
     double time;
     char* name;
-    struct syscall_list* next;
+    struct syscall_* next;
 }sys_;
 
 
