@@ -185,7 +185,8 @@ int main(int argc, char *argv[]) {
                 gettimeofday(&current_time, NULL); // 获取当前时间
 
                 // 如果距离上次输出已经过了0.1秒
-                if (current_time.tv_usec-last_output_time.tv_usec >= 1000) {
+                long long elapsed = (current_time.tv_sec - last_output_time.tv_sec) * 1000000LL + (current_time.tv_usec - last_output_time.tv_usec);
+                if (elapsed >= 100000LL) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
                         if(!p)break;
