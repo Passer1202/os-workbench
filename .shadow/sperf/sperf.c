@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
+                printf("s");
             }
             
             sys_* p=head;
