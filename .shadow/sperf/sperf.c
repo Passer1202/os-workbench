@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
                 if(!p)assert(0);
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
-                fflush(stdout);
+                //fflush(stdout);
             }
 
             nanosleep(&ts, NULL);
