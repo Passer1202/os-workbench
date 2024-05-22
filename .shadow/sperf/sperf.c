@@ -189,8 +189,9 @@ int main(int argc, char *argv[]) {
                 p=p->next;
                 //fflush(stdout);
             }
+            char null_char = '\0';
             for(int i=0;i<80;i++){
-                fwrite('\0', sizeof(char), 1, stdout);
+                fwrite(&null_char, sizeof(char), 1, stdout);
             }
 
             nanosleep(&ts, NULL);
