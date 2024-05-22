@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
         struct timeval current_time;
 
         gettimeofday(&last_output_time, NULL); // 获取当前时间
-        usleep(10);
+        usleep(100);
         int run_flag=1;
 
         while(run_flag==1){
