@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
                 //fflush(stdout);
             }
             for(int i=0;i<80;i++){
-                printf('\0');
+                fwrite('\0', sizeof(char), 1, stdout);
             }
 
             nanosleep(&ts, NULL);
