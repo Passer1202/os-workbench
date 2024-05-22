@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 
 #ifndef DEBUG
 int main(int argc, char *argv[]) {
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
             if (!fgets(buf, sizeof(buf), fp)) {
                 break;
             }
-            printf("%s\n", buf);
+            printf("%s", buf);
         }
         
 
