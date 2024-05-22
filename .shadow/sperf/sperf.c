@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <regex.h>
 #include <assert.h>
@@ -6,7 +7,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 
 //todo:处理数据
 
@@ -16,6 +17,32 @@ typedef struct syscall_{
     struct syscall_* next;
 }sys_;
 
+
+sys_* renew_list(sys_* h,sys_* p){
+    assert(p!=NULL);
+    if (h != NULL) {
+        return p;
+    }
+    if (h->time<p->time){
+        p->next=h;
+        return p;
+    }
+    
+    sys_ *pre = h;
+    sys_ *cur = h->next;
+    while(cur){
+        if(cur->time<p->time)
+            break;
+        pre=cur;
+        cur=cur->next;
+    }
+    assert(pre->next=cur);
+    p->next = cur;
+    pre->next = p;
+    
+    return h;
+    
+}
 
 
 int main(int argc, char *argv[]) {
@@ -66,6 +93,10 @@ int main(int argc, char *argv[]) {
 
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
+
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100000000L;
 
         while(1){
             fflush(stdout);
@@ -125,11 +156,14 @@ int main(int argc, char *argv[]) {
                     sys_* np=(sys_*)malloc(sizeof(sys_));
                     np->name=syscall;
                     np->time=t;
+                    p=np;
                 }
 
+                head=renew_list(head, p);
 
             }
-
+            nanosleep(&ts, NULL);
+            printf("s");
             //输出是一行行来的
         }
     }
