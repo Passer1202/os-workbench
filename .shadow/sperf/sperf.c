@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
         exec_argv[argc+1] = NULL;
        
         char *exec_envp[] = { "PATH=/bin", NULL, };
-        assert(0);
+
         //绝对路径处理
         execve("/usr/bin/strace", exec_argv, exec_envp);
         perror("execvp");
@@ -101,7 +101,8 @@ int main(int argc, char *argv[]) {
 
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
-
+        assert(0);
+        
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
