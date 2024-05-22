@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 
 //#define DEBUG 0
 
@@ -109,8 +110,10 @@ int main(int argc, char *argv[]) {
         //总时间
         double total_time = 0;
 
-        clock_t last_output_time = clock();
-        usleep(1000000);
+        struct timeval last_output_time;
+        struct timeval current_time;
+
+        gettimeofday(&last_output_time, NULL); // 获取当前时间
         
         int run_flag=1;
 
@@ -179,11 +182,10 @@ int main(int argc, char *argv[]) {
                     head=renew_list(head, p);
 
                 }
-                clock_t current_time = clock(); // 获取当前时钟周期数
-                double time_elapsed = (double)(current_time - last_output_time) / CLOCKS_PER_SEC; // 计算距离上次输出经过的秒数
+                gettimeofday(&current_time, NULL); // 获取当前时间
 
                 // 如果距离上次输出已经过了0.1秒
-                if (time_elapsed <0.1) {
+                if (current_time.tv_usec-last_output_time.tv_usec >= 100000) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
                         if(!p)break;
