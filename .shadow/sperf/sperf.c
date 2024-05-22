@@ -6,13 +6,13 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 
 //todo:处理数据
 
 typedef struct syscall_{
     double time;
-    char name[64];
+    char* name;
     struct syscall_list* next;
 }sys_;
 
@@ -90,15 +90,40 @@ int main(int argc, char *argv[]) {
             int ret_time = regexec(&regex_time, buf, 1, &match_time, 0);
             if (ret_name == 0 && ret_time == 0) {
                 //提取匹配的系统调用名和时间
-                char syscall[64];
+                char* syscall=malloc(sizeof(char)*(match_name.rm_eo - match_name.rm_so));
                 char time[64];
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
                 snprintf(time, match_time.rm_eo - match_time.rm_so -1 , "%s", buf + match_time.rm_so + 1);
-                double spent_time = atof(time);
+                double t = atof(time);
                 //调试信息
                 #ifdef DEBUG
-                printf("Syscall: %s, Time: %s %f\n", syscall, time, spent_time);
+                printf("Syscall: %s, Time: %s %f\n", syscall, time, t);
                 #endif
+
+                //遍历链表，能找到就更新时间，否则插入新的节点
+
+                sys_* p=head;
+                sys_* pre=NULL;
+                while(!p){
+                    if(strcmp(p->name,syscall)==0)break;
+                    pre=p;
+                    p=p->next;
+                }
+                if(p){
+                    //找到了
+                    p->time=p->time+t;
+                    if(pre){
+                        pre->next=p->next;
+                    }
+                    else{
+                        head=p->next;
+                    }
+                    //更新链表
+                }
+                else{
+                    sys_* np=(sys_*)malloc(sizeof(sys_));
+                    np->name=syscall;
+                }
 
 
             }
