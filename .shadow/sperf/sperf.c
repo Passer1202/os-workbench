@@ -182,9 +182,9 @@ int main(int argc, char *argv[]) {
                     //assert(0);
                     printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                     p=p->next;
-                    fflush(stdout);
+                    
                 }
-
+                fflush(stdout);
                 char null_char = '\0';
                 for(int i=0;i<80;i++){
                     fwrite(&null_char, sizeof(char), 1, stdout);
