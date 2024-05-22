@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define DEBUG 0
+//#define DEBUG 0
 
 //todo:处理数据
 
