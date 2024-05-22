@@ -10,6 +10,13 @@
 
 //todo:处理数据
 
+typedef struct syscall_{
+    double time;
+    char name[64];
+    struct syscall_list* next;
+}sys_;
+
+
 
 int main(int argc, char *argv[]) {
     /*创建匿名管道，子进程写，父进程读*/
@@ -53,7 +60,10 @@ int main(int argc, char *argv[]) {
         //父进程    //读strace的输出并处理
         //关闭写端
         assert(close(pipefd[1])!=-1);
+
         char buf[4096];
+        sys_ *head=NULL;
+
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
 
@@ -84,10 +94,13 @@ int main(int argc, char *argv[]) {
                 char time[64];
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
                 snprintf(time, match_time.rm_eo - match_time.rm_so + 1, "%s", buf + match_time.rm_so);
-                //
+                double spent_time = atof(time);
+                //调试信息
                 #ifdef DEBUG
-                printf("Syscall: %s, Time: %s\n", syscall, time);
+                printf("Syscall: %s, Time: %f\n", syscall, spent_time);
                 #endif
+
+
             }
 
             //输出是一行行来的
