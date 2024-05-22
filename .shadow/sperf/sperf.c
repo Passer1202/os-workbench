@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     pid_t pid = fork();
     //创建失败返回-1
     assert(pid != -1);
-     assert(0);
+    
     if (pid == 0) {
         //子进程   //执行strace命令
 
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
         exec_argv[argc+1] = NULL;
        
         char *exec_envp[] = { "PATH=/bin", NULL, };
-
+        assert(0);
         //绝对路径处理
         execve("/usr/bin/strace", exec_argv, exec_envp);
         perror("execvp");
