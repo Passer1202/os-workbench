@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
         while(run_flag==1){
             while (fgets(buf, 4096, fp) > 0) 
             {
-                fflush(stdout);
+                
                 //正则表达式
                 //printf("%s",buf);
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
@@ -187,6 +187,7 @@ int main(int argc, char *argv[]) {
                 if(!p)assert(0);
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
+                fflush(stdout);
             }
 
             nanosleep(&ts, NULL);
