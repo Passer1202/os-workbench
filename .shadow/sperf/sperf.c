@@ -36,7 +36,7 @@ sys_* renew_list(sys_* h,sys_* p){
         pre=cur;
         cur=cur->next;
     }
-    assert(pre->next=cur);
+    assert(pre->next==cur);
     p->next = cur;
     pre->next = p;
     
