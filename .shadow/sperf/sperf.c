@@ -106,9 +106,9 @@ int main(int argc, char *argv[]) {
         assert(fp);
        
 
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
+        //struct timespec ts;
+       // ts.tv_sec = 0;
+        //ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
         //总时间
         double total_time = 0;
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
                     //assert(0);
                     printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                     p=p->next;
-                    //fflush(stdout);
+                    fflush(stdout);
                 }
 
                 char null_char = '\0';
