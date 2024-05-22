@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
 
         struct timespec ts;
         ts.tv_sec = 0;
-        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
+        ts.tv_nsec = 1000000000L; // 100000000 纳秒（0.1 秒）
 
         //总时间
         double total_time = 0;
