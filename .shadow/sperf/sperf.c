@@ -199,7 +199,7 @@ int main(int argc, char *argv[]) {
                     for(int i=0;i<80;i++){
                         fwrite(&null_char, sizeof(char), 1, stdout);
                     }
-                    assert(0);
+                    //assert(0);
 
                 last_output_time = current_time;
                 
