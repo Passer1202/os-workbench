@@ -106,10 +106,11 @@ int main(int argc, char *argv[]) {
         assert(fp);
        
 
-        //struct timespec ts;
-       // ts.tv_sec = 0;
-        //ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
+        
         //总时间
         double total_time = 0;
         int run_flag=1;
@@ -175,7 +176,7 @@ int main(int argc, char *argv[]) {
                 }
                 
             }
-/*
+
             sys_* p=head;
                 for(int i=0;i<5;i++){
                     if(!p)break;
@@ -188,8 +189,8 @@ int main(int argc, char *argv[]) {
                 char null_char = '\0';
                 for(int i=0;i<80;i++){
                     fwrite(&null_char, sizeof(char), 1, stdout);
-                }
-            */
+            }
+            nanosleep(&ts, NULL);
         }
     }
     return 0;
