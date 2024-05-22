@@ -8,15 +8,9 @@
 
 //#define DEBUG 0
 
-void extract_syscall_times(const char *strace_output) {
-    
+//todo:处理数据
 
 
-    
-}
-
-
-#ifndef DEBUG
 int main(int argc, char *argv[]) {
     /*创建匿名管道，子进程写，父进程读*/
     int pipefd[2];
@@ -30,8 +24,10 @@ int main(int argc, char *argv[]) {
 
     if (pid == 0) {
         //子进程   //执行strace命令
+
         //关闭读端
         assert(close(1)!=-1);
+        //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
         assert(dup2(pipefd[1], STDERR_FILENO)!=-1);
@@ -88,7 +84,10 @@ int main(int argc, char *argv[]) {
                 char time[64];
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
                 snprintf(time, match_time.rm_eo - match_time.rm_so + 1, "%s", buf + match_time.rm_so);
+                //
+                #ifdef DEBUG
                 printf("Syscall: %s, Time: %s\n", syscall, time);
+                #endif
             }
 
             //输出是一行行来的
@@ -96,15 +95,4 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
-#else
-int main(int argc, char *argv[]) {
 
-    
-    for (int i = 0; i < argc; i++) {
-        assert(argv[i]);
-        printf("argv[%d] = %s\n", i, argv[i]);
-    }
-    assert(!argv[argc]);
-    return 0;
-}
-#endif
