@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
             
             sys_* p=head;
             for(int i=0;i<5;i++){
-                printf("%s (%0f%%)\n", p->name, p->time/total_time*100);
+                printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
             }
             nanosleep(&ts, NULL);
