@@ -94,9 +94,7 @@ int main(int argc, char *argv[]) {
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
 
-        struct timespec ts;
-        ts.tv_sec = 0;
-        ts.tv_nsec = 100000000L;
+
 
         while(1){
             fflush(stdout);
