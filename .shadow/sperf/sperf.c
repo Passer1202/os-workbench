@@ -56,8 +56,7 @@ int main(int argc, char *argv[]) {
             }
             printf("%s", buf);
         }
-        
-
+        printf("parent process\n");
     }
     return 0;
 }
