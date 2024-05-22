@@ -96,9 +96,9 @@ int main(int argc, char *argv[]) {
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
 
-        //struct timespec ts;
-        //ts.tv_sec = 0;
-        //ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
+        struct timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
         //总时间
         double total_time = 0;
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
 
                 }
             }
-            //nanosleep(&ts, NULL);
+            nanosleep(&ts, NULL);
         }
     }
     return 0;
