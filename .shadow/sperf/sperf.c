@@ -181,9 +181,10 @@ int main(int argc, char *argv[]) {
 
                 }
             }
-             assert(0);
+            
             sys_* p=head;
             for(int i=0;i<5;i++){
+                if(!p)break;
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
             }
