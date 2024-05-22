@@ -77,7 +77,7 @@ int main(int argc, char *argv[])  {
     assert(pid != -1);
   if (pid == -1) {
     // 子进程创建失败
-    debug_printf("fork failed\n");
+    //debug_printf("fork failed\n");
     exit(EXIT_FAILURE);
   } else if (pid == 0) {
     // 关闭管道读取端，并将管道写入端重定向到标准输出
