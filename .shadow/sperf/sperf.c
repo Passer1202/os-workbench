@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         //子进程   //执行strace命令
 
         //关闭读端
-        //assert(close(1)!=-1);
+        assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
         //将标准输出重定向到管道的写端
@@ -77,6 +77,7 @@ int main(int argc, char *argv[]) {
         }
         //argv和envp中间隔一个“NULL”
         exec_argv[argc+1] = NULL;
+
         char *exec_envp[] = { "PATH=/bin", NULL, };
 
         //绝对路径处理
@@ -181,6 +182,7 @@ int main(int argc, char *argv[]) {
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
             }
+
             nanosleep(&ts, NULL);
         }
     }
