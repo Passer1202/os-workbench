@@ -109,11 +109,10 @@ int main(int argc, char *argv[]) {
             {
                 fflush(stdout);
                 //正则表达式
-
+                printf("%s\n",buf);
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) 
                 {
-                    assert(0);
                     run_flag = 0;
                     break;
                 }
