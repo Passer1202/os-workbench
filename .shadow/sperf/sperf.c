@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
                 double time_elapsed = (double)(current_time - last_output_time) / CLOCKS_PER_SEC; // 计算距离上次输出经过的秒数
 
                 // 如果距离上次输出已经过了0.1秒
-                if (time_elapsed >= 0.1) {
+                if (time_elapsed > 0.1) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
                         if(!p)break;
