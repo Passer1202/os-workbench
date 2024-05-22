@@ -106,7 +106,6 @@ int main(int argc, char *argv[]) {
                 sys_* pre=NULL;
                 while(p){
                     if(strcmp(p->name,syscall)==0)break;
-                    assert(0);
                     pre=p;
                     p=p->next;
                 }
@@ -123,9 +122,7 @@ int main(int argc, char *argv[]) {
                     //更新链表
                 }
                 else{
-                    sys_* np=(sys_*)malloc(sizeof(sys_));
-                    np->name=syscall;
-                    np->time=t;
+                   
                 }
 
 
