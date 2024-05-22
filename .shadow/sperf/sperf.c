@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
         double total_time = 0;
 
         clock_t last_output_time = clock();
-        usleep(100000);
+        usleep(1000000);
         
         int run_flag=1;
 
