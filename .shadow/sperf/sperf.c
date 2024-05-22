@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
             sys_* p=head;
             for(int i=0;i<5;i++){
                 if(!p)break;
-                printf("ssss");
+                assert(0);
                 printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
                 p=p->next;
                 //fflush(stdout);
