@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         FILE *fp = fdopen(pipefd[0], "r");
         while(1){
             fflush(stdout);
-            if (!fgets(buf, sizeof(buf), pipefd[0])) {
+            if (!fgets(buf, sizeof(buf), fp)) {
                 break;
             }
             printf("%s\n", buf);
