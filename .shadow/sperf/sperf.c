@@ -24,7 +24,7 @@ sys_* renew_list(sys_* h,sys_* p){
     if (h != NULL) {
         return p;
     }
-    assert(0);
+
     if (h->time<p->time){
         p->next=h;
         return p;
@@ -38,6 +38,7 @@ sys_* renew_list(sys_* h,sys_* p){
         pre=cur;
         cur=cur->next;
     }
+    assert(0);
     assert(pre->next==cur);
     p->next = cur;
     pre->next = p;
