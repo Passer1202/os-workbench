@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
             }
 
             nanosleep(&ts, NULL);
-        
+        }
     }
     return 0;
 }
