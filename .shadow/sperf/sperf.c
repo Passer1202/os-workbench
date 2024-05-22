@@ -101,8 +101,8 @@ int main(int argc, char *argv[]) {
 
         FILE *fp = fdopen(pipefd[0], "r");
         assert(fp);
-        assert(0);
-        
+       
+
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
@@ -111,6 +111,8 @@ int main(int argc, char *argv[]) {
         double total_time = 0;
         int run_flag=1;
 
+         assert(0);
+         
         while(run_flag==1){
             while (fgets(buf, 4096, fp) > 0) 
             {
