@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) 
                 {
-                    assert(0);
+                    //assert(0);
                     run_flag = 0;
                     break;
                 }
