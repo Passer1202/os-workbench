@@ -100,11 +100,13 @@ int main(int argc, char *argv[]) {
         ts.tv_sec = 0;
         ts.tv_nsec = 100000000L; // 100000000 纳秒（0.1 秒）
 
+        //总时间
+        double total_time = 0;
 
         while(1){
             fflush(stdout);
 
-            if (!fgets(buf, sizeof(buf), fp)) {
+            if (fgets(buf, sizeof(buf), fp)>0) {
                 break;
             }
             //目前看父进程会结束，先这样写
@@ -129,6 +131,7 @@ int main(int argc, char *argv[]) {
                 snprintf(syscall, match_name.rm_eo - match_name.rm_so , "%s", buf + match_name.rm_so);
                 snprintf(time, match_time.rm_eo - match_time.rm_so -1 , "%s", buf + match_time.rm_so + 1);
                 double t = atof(time);
+                total_time=total_time+t;
                 //调试信息
                 #ifdef DEBUG
                 printf("Syscall: %s, Time: %s %f\n", syscall, time, t);
@@ -164,7 +167,8 @@ int main(int argc, char *argv[]) {
                 head=renew_list(head, p);
 
             }
-            nanosleep(&ts, NULL);
+            //nanosleep(&ts, NULL);
+
             printf("s");
             //输出是一行行来的
         }
