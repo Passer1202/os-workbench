@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         //assert(close(1)!=-1);
         //关闭读端
         assert(close(pipefd[0])!=-1);
-        //将标准输出重定向到管道的写端
+        //将标准错误输出重定向到管道的写端
         assert(dup2(pipefd[1], STDERR_FILENO)!=-1);
        
         //参考jyy,手工构建argv
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
             {
                 fflush(stdout);
                 //正则表达式
-                //printf("%s\n",buf);
+                printf("%s",buf);
                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL)
                 {
