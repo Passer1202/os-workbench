@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         assert(dup2(pipefd[1], STDERR_FILENO)!=-1);
        
         //参考jyy,手工构建argv
-        char exec_argv[argc+2];
+        char* exec_argv[argc+2];
         exec_argv[0] = "strace";
         exec_argv[1] = "-T";
         for (int i = 1; i < argc; i++) {
