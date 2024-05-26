@@ -118,17 +118,17 @@ int main(int argc, char *argv[]) {
         gettimeofday(&last_output_time, NULL); // 获取当前时间
         int run_flag=1;
         int print_flag=0;
-        while(run_flag==1){
+        //while(run_flag==1){
             //printf("ss\n");
-            while (fgets(buf, 4096, fp)>0) 
+            while (!fgets(buf, 4096, fp)) 
             {
 
                 //printf("aaaaa-----%s", buf);
-                 if (strstr(buf, "+++ exited with 0 +++") != NULL ||
+                /* if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) {
                 run_flag = 0;
                 break;
-                }
+                }*/
                 regex_t regex_name,regex_time;
                 regmatch_t match_name,match_time;
 
@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
             
             }
             
-        }
+        //}
         if(!print_flag){
                 sys_* p=head;
                     for(int i=0;i<5;i++){
