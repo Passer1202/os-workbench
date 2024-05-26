@@ -190,10 +190,10 @@ int main(int argc, char *argv[]) {
                 if (elapsed >= 100000LL) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
+                        printf("s");
                         if(!p)break;
                         //assert(0);
                         printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
-                        printf("s");
                         p=p->next;
                         
                     }
