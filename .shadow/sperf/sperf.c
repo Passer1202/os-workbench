@@ -100,8 +100,9 @@ int main(int argc, char *argv[]) {
         //关闭写端
         //assert(close(0)!=-1);
         assert(close(pipefd[1])!=-1);
-        
 
+        printf("s");
+        
         char buf[4096];
         sys_ *head=NULL;
 
