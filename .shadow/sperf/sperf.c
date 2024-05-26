@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
         int print_flag=0;
         //while(run_flag==1){
             //printf("ss\n");
-            while (fgets(buf, 4096, fp)>0) 
+            while (fgets(buf, 4096, fp)!=0) 
             {
                 //printf("s\n");
                 //printf("aaaaa-----%s", buf);
