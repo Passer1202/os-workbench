@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         //assert(close(0)!=-1);
         assert(close(pipefd[1])!=-1);
 
-        printf("s\n");
+        //printf("s\n");
 
         char buf[4096];
         sys_ *head=NULL;
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
                 if (elapsed >= 100000LL) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
-                        printf("s");
+                        printf("s\n");
                         if(!p)break;
                         //assert(0);
                         printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
         if(!print_flag){
                 sys_* p=head;
                     for(int i=0;i<5;i++){
-                        printf("s");
+                        printf("s\n");
                         if(!p)break;
                         //assert(0);
                         printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
