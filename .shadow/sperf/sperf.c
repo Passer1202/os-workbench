@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         int run_flag=1;
         int print_flag=0;
         while(run_flag==1){
-            printf("ss\n");
+            //printf("ss\n");
             while (fgets(buf, 4096, fp)>0) 
             {
 
@@ -192,7 +192,7 @@ int main(int argc, char *argv[]) {
                 if (elapsed >= 100000LL) {
                     sys_* p=head;
                     for(int i=0;i<5;i++){
-                        printf("s\n");
+                        //printf("s\n");
                         if(!p)break;
                         //assert(0);
                         printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
