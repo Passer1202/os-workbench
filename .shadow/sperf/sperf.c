@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
             //printf("ss\n");
             while (!fgets(buf, 4096, fp)) 
             {
-                printf("s");
+                printf("s\n");
                 //printf("aaaaa-----%s", buf);
                 /* if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) {
