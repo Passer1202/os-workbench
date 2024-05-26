@@ -116,13 +116,13 @@ int main(int argc, char *argv[]) {
         struct timeval current_time;
 
         gettimeofday(&last_output_time, NULL); // 获取当前时间
-        int run_flag=1;
+        //int run_flag=1;
         int print_flag=0;
         //while(run_flag==1){
             //printf("ss\n");
             while (!fgets(buf, 4096, fp)) 
             {
-
+                printf("s");
                 //printf("aaaaa-----%s", buf);
                 /* if (strstr(buf, "+++ exited with 0 +++") != NULL ||
                     strstr(buf, "+++ exited with 1 +++") != NULL) {
