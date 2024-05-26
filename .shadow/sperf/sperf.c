@@ -193,6 +193,7 @@ int main(int argc, char *argv[]) {
                         if(!p)break;
                         //assert(0);
                         printf("%s (%0.0f%%)\n", p->name, p->time/total_time*100);
+                        printf("s");
                         p=p->next;
                         
                     }
