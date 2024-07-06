@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
 
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
-                    
+
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
                         
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
-                        u32 img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
+                        int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
                         uintptr_t img_current = img_start + REST_SIZE(hdr);
                         while(img_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
