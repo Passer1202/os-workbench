@@ -173,6 +173,8 @@ int main(int argc, char *argv[]) {
                     strcpy(cmd, "sha1sum ");
                     strcat(cmd, tmp_path);
 
+                    assert(0);
+                    
                     char buf[40];
                     memset(buf, 0, 40);
 
@@ -180,7 +182,7 @@ int main(int argc, char *argv[]) {
                     FILE* fp = popen(cmd , "r");
 
                     assert(fp>0);
-                    
+
                     fscanf(fp, "%s", buf); // Get it!
                     pclose(fp);
 
