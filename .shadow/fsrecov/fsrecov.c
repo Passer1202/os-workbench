@@ -144,6 +144,7 @@ int main(int argc, char *argv[]) {
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
                     FILE *bmp_tmp_file = fopen(tmp_path, "a");
+                    printf("recovering %s\n", name);
                     assert(bmp_tmp_file != NULL);
                     //写入bmp文件头
                     uintptr_t bmp_current = (uintptr_t)bmp_hdr;
