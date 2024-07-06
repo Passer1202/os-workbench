@@ -15,8 +15,8 @@ struct fat32hdr *hdr;
 
 #define RSVD_SEC_CNT(hdr) ((hdr)->BPB_RsvdSecCnt) //保留扇区数
 
-#define FAT_SEC_CNT(hdr) ((hdr)->BPB_NumFATs)     //FAT表数量
-#define FAT_SEC(hdr) ((hdr)->BPB_FATSz32)    //FAT表所占扇区数
+#define FAT_CNT(hdr) ((hdr)->BPB_NumFATs)     //FAT表数量
+#define FAT_SEC_CNT(hdr) ((hdr)->BPB_FATSz32)    //FAT表所占扇区数
 
 #define CLUS_SEC_CNT(hdr) ((hdr)->BPB_SecPerClus) //簇所占扇区数
 #define CLUS_SIZE(hdr) ((hdr)->BPB_BytsPerSec * (hdr)->BPB_SecPerClus)//簇字节数
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     //0. get the data area
 
     //data区开始的扇区号
-    u32 data_start_sec = RSVD_SEC_CNT(hdr) + FAT_CNT(hdr) * FAT_SEC(hdr);
+    u32 data_start_sec = RSVD_SEC_CNT(hdr) + FAT_CNT(hdr) * FAT_SEC_CNT(hdr);
     //data区的簇总数
     u32 data_clu_cnt = (SEC_CNT(hdr) - data_start_sec)/CLUS_SEC_CNT(hdr);
     //data区起始地址
