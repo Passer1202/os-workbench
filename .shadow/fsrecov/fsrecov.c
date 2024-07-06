@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    const char dirpath[]="./DICM/";
+    const char dirpath[]="/tmp/DICM/";
 
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    char tmp_path[256]="./DICM/";
+                    char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
                     FILE *bmp_tmp_file = fopen(tmp_path, "a");
