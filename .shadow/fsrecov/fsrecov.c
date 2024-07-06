@@ -155,11 +155,11 @@ int main(int argc, char *argv[]) {
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
                         u32 img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
-                        void* img_current = img_start + REST_SIZE(hdr);
+                        uintptr_t img_current = img_start + REST_SIZE(hdr);
                         while(img_sz >= CLUS_SIZE(hdr)){
                             printf("name: %s\n", name);
                             printf("img_sz: %d\n", img_sz);
-                            printf("img_current: %p\n", img_current);
+                            printf("img_current: %d\n", (u32)img_current);
                             printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
 
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
