@@ -194,8 +194,8 @@ int main(int argc, char *argv[]) {
                     strcpy(cmd, "sha1sum ");
                     strcat(cmd, tmp_path);
 
-                    char buf[40];
-                    memset(buf, 0, 40);
+                    char buf[64];
+                    memset(buf, 0, 64);
 
                     //from jyy
                     FILE* fp = popen(cmd , "r");
