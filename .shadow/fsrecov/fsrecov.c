@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    const char dirpath[]="/tmp/DICM/";
+    const char dirpath[]="./DICM/";
 
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
