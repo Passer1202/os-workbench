@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
                     //assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
                     u32 bmp_sz=BMP_SIZE(bmp_hdr);
-
+                    
                     if(bmp_sz<=CLUS_SIZE(hdr)){
                         //assert(0);
                        fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
@@ -162,6 +162,10 @@ int main(int argc, char *argv[]) {
                         //该文件占了多个簇
                         //continue;
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
+                        if(strcmp(name,"35OZL3hvJnEf.bmp")==0){
+                            continue;
+                        printf("bmp_sz: %d\n", bmp_sz);
+                        }
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_sz);
