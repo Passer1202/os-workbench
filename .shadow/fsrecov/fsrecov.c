@@ -159,9 +159,9 @@ int main(int argc, char *argv[]) {
                         while(img_sz >= CLUS_SIZE(hdr)){
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
                             
-                            img_current += CLUS_SIZE(hdr);
-                            img_sz -= CLUS_SIZE(hdr);
-                            assert(0);
+                            img_current =img_current+ CLUS_SIZE(hdr);
+                            img_sz = img_sz- CLUS_SIZE(hdr);
+
                         }
                         if(img_sz > 0){
                             fwrite((void *)img_current, img_sz, 1, bmp_tmp_file);
