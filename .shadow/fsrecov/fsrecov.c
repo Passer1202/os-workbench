@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
 
                     int index_name =0;
                     char name[256];
-                    memser(name,0, 256);
+                    memset(name,0, 256);
 
                     //2.find the first cluster of .bmp
                     u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
                                 }
                             }
                         }
-                        
+
                         printf("recovering %s\n", name);
                         fflush(stdout);
 
