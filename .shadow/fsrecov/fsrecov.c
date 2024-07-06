@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
                     //2.find the first cluster of .bmp
                     u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
                     printf("bmp_clu1st: %d\n", bmp_clu1st);
+                    assert(0);
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
                     if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
                             //3.find long directory entry
