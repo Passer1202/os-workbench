@@ -134,8 +134,9 @@ int main(int argc, char *argv[]) {
                             
                     }
 
-
+                    
                     //恢复文件
+                    /*
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -176,27 +177,28 @@ int main(int argc, char *argv[]) {
                     }
                     fclose(bmp_tmp_file);
 
+                    */
 
                     //计算文件的sha1值
-                    char cmd[256];
-                    memset(cmd, 0, 256);
-                    strcpy(cmd, "sha1sum ");
-                    strcat(cmd, tmp_path);
+                    //char cmd[256];
+                    //memset(cmd, 0, 256);
+                    //strcpy(cmd, "sha1sum ");
+                    //strcat(cmd, tmp_path);
 
-                    char buf[40];
-                    memset(buf, 0, 40);
+                    //char buf[40];
+                    //memset(buf, 0, 40);
 
                     //from jyy
-                    FILE* fp = popen(cmd , "r");
+                    //FILE* fp = popen(cmd , "r");
 
-                    assert(fp>0);
+                    //assert(fp>0);
 
-                    fscanf(fp, "%s", buf); // Get it!
-                    pclose(fp);
+                    //fscanf(fp, "%s", buf); // Get it!
+                    //pclose(fp);
 
-                    if(buf[0]=='\0')
-                        printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
-                    else printf("%s %s\n",buf,name);
+                    //if(buf[0]=='\0')
+                    printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
+                    //else printf("%s %s\n",buf,name);
 
                     fflush(stdout);
 
