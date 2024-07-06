@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
                     
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
-                    remove(tmp_path);//删除文件若已有，避免出现同名文件
+                    //remove(tmp_path);//删除文件若已有，避免出现同名文件
                     FILE *bmp_tmp_file = fopen(tmp_path, "a");
                     assert(bmp_tmp_file != NULL);
                     //写入bmp文件头
