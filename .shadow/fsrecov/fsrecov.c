@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
                         while(img_sz >= CLUS_SIZE(hdr)){
                             printf("name: %s\n", name);
                             printf("img_sz: %d\n", img_sz);
-                            printf("img_current: %d\n", (u32)img_current);
+                            printf("img_current: %u\n", (u32)img_current);
                             printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
 
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
