@@ -150,34 +150,11 @@ int main(int argc, char *argv[]) {
                     //写入bmp图像数据
                     uintptr_t img_start = (uintptr_t)bmp_hdr+ IMG_OFFSET(bmp_hdr) ;
 
-                    assert(bmp_hdr->bfType != 0x4d42);//确定是bmp文件
+                    assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
-                    }else{
-                        //该文件占了多个簇
-
-                        printf("rest size: %d\n", (int)REST_SIZE(hdr));
-                        fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
-
-                        int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
-                        uintptr_t img_current = img_start + REST_SIZE(hdr);
-                        while(img_sz >= CLUS_SIZE(hdr)){
-                            //printf("name: %s\n", name);
-                            //printf("img_sz: %d\n", img_sz);
-                            //printf("img_current: %u\n", (u32)img_current);
-                            //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
-
-                            fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
-
-                            img_current += CLUS_SIZE(hdr);
-                            img_sz -= CLUS_SIZE(hdr);
-
-                        }
-                        if(img_sz > 0){
-                            fwrite((void *)img_current, img_sz, 1, bmp_tmp_file);
-                        }
                     }
                     fclose(bmp_tmp_file);
 
