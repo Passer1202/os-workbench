@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
     //data区结束地址
     uintptr_t data_end = (uintptr_t)hdr + SEC_CNT(hdr) * SEC_SIZE(hdr);
 
+
     //1. find the (short) directory entry
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
@@ -61,12 +62,60 @@ int main(int argc, char *argv[]) {
             //判断是否是短目录项（.BMP)
             if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
                 if(pd->DIR_Name[0]!=0xe5 || pd->DIR_FileSize!=0) {//不是被删除的文件
+
+                    int index_name =0;
+                    char name[256];
+                    memser(name,0, 256);
+
                     //2.find the first cluster of .bmp
                     u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
                     if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
-
                         //3.find long directory entry
+                        //手册：长目录项倒着紧放在短目录项前面
+                        
+                        uintptr_t pl = (uintptr_t)pd;
+                        while(pl>data_start && pl<data_end){
+                            pl -= sizeof(struct fat32ldent);
+                            struct fat32ldent *pld = (struct fat32ldent *)pl;
+                            if(pld->LDIR_Attr == ATTR_LONG_NAME && pld->LDIR_Type == 0 && pld->LDIR_FstClusLO == 0){//长目录项
+                                for(int r=0;r<5;r++){
+                                    if(pld->LDIR_Name1[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name1[r];
+                                    }
+                                }
+                                for(int r=0;r<6;r++){
+                                    if(pld->LDIR_Name2[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name2[r];
+                                    }
+                                }
+                                for(int r=0;r<2;r++){
+                                    if(pld->LDIR_Name3[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name3[r];
+                                    }
+                                }
+
+                            }else{
+                                break;
+                            }
+                        }
+                        if(index_name==0){
+                            //short name
+                            for(int r=0;r<8;r++){
+                                if(pd->DIR_Name[r] != ' '){
+                                    name[index_name++] = pd->DIR_Name[r];
+                                }
+                            }
+                            name[index_name++] = '.';
+                            for(int r=0;r<3;r++){
+                                if(pd->DIR_Name[8+r] != ' '){
+                                    name[index_name++] = pd->DIR_Name[8+r];
+                                }
+                            }
+                        }
+                        
+                        printf("recovering %s\n", name);
+                        fflush(stdout);
 
                         //4.recover the file
                         //5.write the file

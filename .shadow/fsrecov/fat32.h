@@ -107,7 +107,7 @@ struct fat32ldent {
     u16 LDIR_Name2[6];
     //长文件名第2部分
     u16 LDIR_FstClusLO;
-    //簇号的低16位
+    //簇号的低16位,必须为0
     u16 LDIR_Name3[2];
     //长文件名第3部分
 } __attribute__((packed));
@@ -141,3 +141,4 @@ struct bmp_info_header{
 #define ATTR_VOLUME_ID 0x08
 #define ATTR_DIRECTORY 0x10
 #define ATTR_ARCHIVE   0x20
+#define ATTR_LONG_NAME 0x0f
