@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                     uintptr_t bmp_current = (uintptr_t)bmp_hdr;
                     
 
-                    if((bmp_hdr->bfType != 0x4d42)||(bmp_current>=data_end)){
+                    if(bmp_current>=data_end){
                         printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
                         continue;
                     }
