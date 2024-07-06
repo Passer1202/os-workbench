@@ -23,7 +23,7 @@ struct fat32hdr *hdr;
 #define CLUS_SIZE(hdr) ((hdr)->BPB_BytsPerSec * (hdr)->BPB_SecPerClus)//簇字节数
 
 #define IMG_OFFSET(hdr) ((hdr)->bfOffBits)//图像数据偏移量
-#define IMG_SIZE(hdr) ((hdr)->biSizeImage /3)//图像数据大小
+#define IMG_SIZE(hdr) ((hdr)->biSizeImage)//图像数据大小
 
 #define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
 
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
-                            img_current += CLUS_SIZE(hdr);
+                            //img_current += CLUS_SIZE(hdr);
                             img_sz -= CLUS_SIZE(hdr);
 
                         }
