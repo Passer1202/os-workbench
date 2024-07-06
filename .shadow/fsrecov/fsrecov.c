@@ -37,9 +37,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <disk image>\n", argv[0]);
         exit(1);
     }
-    while(1){
-        
-    }
     setbuf(stdout, NULL);
 
     assert(sizeof(struct fat32hdr) == 512);
