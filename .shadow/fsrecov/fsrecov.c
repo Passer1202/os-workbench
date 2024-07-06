@@ -147,6 +147,7 @@ int main(int argc, char *argv[]) {
                     //写入bmp图像数据
                     uintptr_t img_start = (uintptr_t)bmp_hdr + IMG_OFFSET(bmp_hdr);
 
+                    assert(0);
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
@@ -173,8 +174,6 @@ int main(int argc, char *argv[]) {
                     strcpy(cmd, "sha1sum ");
                     strcat(cmd, tmp_path);
 
-                    assert(0);
-                    
                     char buf[40];
                     memset(buf, 0, 40);
 
