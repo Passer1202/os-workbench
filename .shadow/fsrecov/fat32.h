@@ -122,8 +122,8 @@ struct bmp_file_header{
 
 struct bmp_info_header{
     u32 biSize;//信息头大小,40
-    u32 biWidth;//图像宽度
-    u32 biHeight;//图像高度
+    int biWidth;//图像宽度
+    int biHeight;//图像高度
     u16 biPlanes;//颜色平面数，必须为1
     u16 biBitCount;//每个像素的位数
     u32 biCompression;//压缩类型
