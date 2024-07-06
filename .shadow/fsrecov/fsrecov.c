@@ -167,16 +167,16 @@ int main(int argc, char *argv[]) {
                             //printf("img_sz: %d\n", img_sz);
                             //printf("img_current: %u\n", (u32)img_current);
                             //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
-                            assert((void *)bmp_current < (void *)data_end);
-                            assert((void *)bmp_current !=NULL);
-                            assert((void *)bmp_current >= (void *)data_start);
+                            if(bmp_current>=data_end){
+                                break;
+                            }
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
                             bmp_current += CLUS_SIZE(hdr);
                             bmp_sz -= CLUS_SIZE(hdr);
 
                         }
-                        if(bmp_sz > 0){
+                        if(bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                         }
                     }
