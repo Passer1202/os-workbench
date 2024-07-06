@@ -154,14 +154,14 @@ int main(int argc, char *argv[]) {
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
-                        assert(0);
+                        //assert(0);
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
                         //该文件占了多个簇
-                        continue;
-                        printf("rest size: %d\n", (int)REST_SIZE(hdr));
+                        //continue;
+                        //printf("rest size: %d\n", (int)REST_SIZE(hdr));
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
-
+                        continue;
                         int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
                         uintptr_t img_current = img_start + REST_SIZE(hdr);
                         while(img_sz >= CLUS_SIZE(hdr)){
