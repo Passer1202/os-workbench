@@ -150,8 +150,7 @@ int main(int argc, char *argv[]) {
                     //写入bmp图像数据
                     uintptr_t img_start = (uintptr_t)bmp_hdr+ IMG_OFFSET(bmp_hdr);
 
-                    printf("height: %d\n", bmp_ihdr->biHeight);
-                    assert(0);
+                    
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
