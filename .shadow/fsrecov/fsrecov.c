@@ -139,6 +139,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
+                    /*
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -182,8 +183,8 @@ int main(int argc, char *argv[]) {
                     }
                     fclose(bmp_tmp_file);
 
-                    
-
+                    */
+                    /*
                     //计算文件的sha1值
                     char cmd[256];
                     memset(cmd, 0, 256);
@@ -200,10 +201,10 @@ int main(int argc, char *argv[]) {
 
                     fscanf(fp, "%s", buf); // Get it!
                     pclose(fp);
-
-                    if(buf[0]=='\0')
+                    */
+                    //if(buf[0]=='\0')
                     printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
-                    else printf("%s %s\n",buf,name);
+                    //else printf("%s %s\n",buf,name);
 
                     fflush(stdout);
 
