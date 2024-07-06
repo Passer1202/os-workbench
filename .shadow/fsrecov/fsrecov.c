@@ -159,12 +159,13 @@ int main(int argc, char *argv[]) {
                         while(img_sz >= CLUS_SIZE(hdr)){
                             printf("name: %s\n", name);
                             printf("img_sz: %d\n", img_sz);
+                            printf("img_current: %p\n", img_current);
                             printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
 
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
-                            img_current =img_current+ CLUS_SIZE(hdr);
-                            img_sz = img_sz- CLUS_SIZE(hdr);
+                            img_current =img_current+ 4096;
+                            img_sz = img_sz- 4096;
 
                         }
                         if(img_sz > 0){
