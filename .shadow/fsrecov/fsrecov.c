@@ -178,7 +178,9 @@ int main(int argc, char *argv[]) {
 
                     //from jyy
                     FILE* fp = popen(cmd , "r");
-                    panic_on(fp < 0, "popen");
+
+                    assert(fp>0);
+                    
                     fscanf(fp, "%s", buf); // Get it!
                     pclose(fp);
 
