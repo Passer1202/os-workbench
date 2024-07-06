@@ -22,6 +22,11 @@ struct fat32hdr *hdr;
 #define CLUS_SEC_CNT(hdr) ((hdr)->BPB_SecPerClus) //簇所占扇区数
 #define CLUS_SIZE(hdr) ((hdr)->BPB_BytsPerSec * (hdr)->BPB_SecPerClus)//簇字节数
 
+#define IMG_OFFSET(hdr) ((hdr)->bfOffBits)//图像数据偏移量
+#define IMG_SIZE(hdr) ((hdr)->biSizeImage)//图像数据大小
+
+#define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
+
 void *mmap_disk(const char *fname);
 
 int main(int argc, char *argv[]) {
@@ -39,7 +44,8 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    char dirpath[]="/tmp/DICM/";
+    const char dirpath[]="/tmp/DICM/";
+
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
 
@@ -68,67 +74,120 @@ int main(int argc, char *argv[]) {
             if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
                 if(pd->DIR_Name[0]!=0xe5 || pd->DIR_FileSize!=0) {//不是被删除的文件
                     //恢复文件名到name,得到.bmp文件的起始簇号bmp_clu1st
-                    {
-                        int index_name =0;
-                        char name[256];
-                        memset(name,0, 256);
+                    
+                    int index_name =0;
+                    char name[256];
+                    memset(name,0, 256);
 
-                        //2.find the first cluster of .bmp
-                        u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
-                        struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
-                        if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
+                    //2.find the first cluster of .bmp
+                    u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
+                    struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
+                    if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
                             //3.find long directory entry
                             //手册：长目录项倒着紧放在短目录项前面
                             
-                            uintptr_t pl = (uintptr_t)pd;
-                            while(pl>data_start && pl<data_end){
-                                pl -= sizeof(struct fat32ldent);
-                                struct fat32ldent *pld = (struct fat32ldent *)pl;
-                                if(pld->LDIR_Attr == ATTR_LONG_NAME && pld->LDIR_Type == 0 && pld->LDIR_FstClusLO == 0){//长目录项
-                                    for(int r=0;r<5;r++){
-                                        if(pld->LDIR_Name1[r] != 0xffff){
-                                            name[index_name++] = pld->LDIR_Name1[r];
-                                        }
+                        uintptr_t pl = (uintptr_t)pd;
+                        while(pl>data_start && pl<data_end){
+                            pl -= sizeof(struct fat32ldent);
+                            struct fat32ldent *pld = (struct fat32ldent *)pl;
+                            if(pld->LDIR_Attr == ATTR_LONG_NAME && pld->LDIR_Type == 0 && pld->LDIR_FstClusLO == 0){//长目录项
+                                for(int r=0;r<5;r++){
+                                    if(pld->LDIR_Name1[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name1[r];
                                     }
-                                    for(int r=0;r<6;r++){
-                                        if(pld->LDIR_Name2[r] != 0xffff){
-                                            name[index_name++] = pld->LDIR_Name2[r];
-                                        }
+                                }
+                                for(int r=0;r<6;r++){
+                                    if(pld->LDIR_Name2[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name2[r];
                                     }
-                                    for(int r=0;r<2;r++){
-                                        if(pld->LDIR_Name3[r] != 0xffff){
-                                            name[index_name++] = pld->LDIR_Name3[r];
-                                        }
+                                }
+                                for(int r=0;r<2;r++){
+                                    if(pld->LDIR_Name3[r] != 0xffff){
+                                        name[index_name++] = pld->LDIR_Name3[r];
                                     }
+                                }
 
-                                }else{
-                                    break;
+                            }else{
+                                break;
+                            }
+                        }
+                        if(index_name==0){
+                            //short name
+                            for(int r=0;r<8;r++){
+                                if(pd->DIR_Name[r] != ' '){
+                                    name[index_name++] = pd->DIR_Name[r];
                                 }
                             }
-                            if(index_name==0){
-                                //short name
-                                for(int r=0;r<8;r++){
-                                    if(pd->DIR_Name[r] != ' '){
-                                        name[index_name++] = pd->DIR_Name[r];
-                                    }
-                                }
-                                name[index_name++] = '.';
-                                for(int r=0;r<3;r++){
-                                    if(pd->DIR_Name[8+r] != ' '){
-                                        name[index_name++] = pd->DIR_Name[8+r];
-                                    }
+                            name[index_name++] = '.';
+                            for(int r=0;r<3;r++){
+                                if(pd->DIR_Name[8+r] != ' '){
+                                    name[index_name++] = pd->DIR_Name[8+r];
                                 }
                             }
-
-                            printf("recovering %s\n", name);
-                            fflush(stdout);
-
-                            
                         }
 
+                            //printf("recovering %s\n", name);
+                           //fflush(stdout);
+
+                            
                     }
 
+
                     //恢复文件
+                    char tmp_path[256]="/tmp/DICM/";
+                    strcat(tmp_path, name);
+                    remove(tmp_path);//删除文件若已有，避免出现同名文件
+                    FILE *bmp_tmp_file = fopen(tmp_path, "a");
+                    assert(bmp_tmp_file != NULL);
+                    //写入bmp文件头
+                    fwrite(bmp_hdr, sizeof(struct bmp_file_header), 1, bmp_tmp_file);
+                    //写入bmp信息头
+                    struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
+                    fwrite(bmp_ihdr, sizeof(struct bmp_info_header), 1, bmp_tmp_file);
+                    //写入bmp图像数据
+                    uintptr_t img_start = (uintptr_t)bmp_hdr + IMG_OFFSET(bmp_hdr);
+
+                    if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
+                       fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
+                    }else{
+                        //该文件占了多个簇
+                        fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
+
+                        u32 img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
+                        uintptr_t img_current = img_start + REST_SIZE(hdr);
+                        while(img_sz >= CLUS_SIZE(hdr)){
+                            fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
+                            img_current += CLUS_SIZE(hdr);
+                            img_sz -= CLUS_SIZE(hdr);
+                        }
+                        if(img_sz > 0){
+                            fwrite((void *)img_current, img_sz, 1, bmp_tmp_file);
+                        }
+                    }
+                    fclose(bmp_tmp_file);
+
+
+                    //计算文件的sha1值
+                    char cmd[256];
+                    memset(cmd, 0, 256);
+                    strcpy(cmd, "sha1sum ");
+                    strcat(cmd, tmp_path);
+
+                    char buf[40];
+                    memset(buf, 0, 40);
+
+                    //from jyy
+                    FILE* fp = popen(cmd , "r");
+                    panic_on(fp < 0, "popen");
+                    fscanf(fp, "%s", buf); // Get it!
+                    pclose(fp);
+
+                    if(buf[0]=='\0')
+                        printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
+                    else printf("%s %s\n",buf,name);
+
+                    fflush(stdout);
+
                 }
             }
         }
