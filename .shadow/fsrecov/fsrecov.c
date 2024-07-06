@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
             //遍历当前簇的每个目录项
             struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
             //判断是否是短目录项（.BMP)
-            if(pd->DIR_Name[8]=='b' && pd->DIR_Name[9]=='m' && pd->DIR_Name[10]=='p'){
+            if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
                 if(pd->DIR_Name[0]!=0xe5 && pd->DIR_FileSize!=0) {//不是被删除的文件
                     //恢复文件名到name,得到.bmp文件的起始簇号bmp_clu1st
                     
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
                     //printf("bmp_clu1st: %d\n", bmp_clu1st);
                     //assert(0);
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
-                    if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
+                    if(1||bmp_hdr->bfType == 0x4d42){//确定是bmp文件
                             //3.find long directory entry
                             //手册：长目录项倒着紧放在短目录项前面
                             
