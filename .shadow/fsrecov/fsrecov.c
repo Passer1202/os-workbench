@@ -147,8 +147,8 @@ int main(int argc, char *argv[]) {
                     //写入bmp图像数据
                     uintptr_t img_start = (uintptr_t)bmp_hdr + IMG_OFFSET(bmp_hdr);
 
-                    assert(0);
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
+                        assert(0);
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
                         //该文件占了多个簇
