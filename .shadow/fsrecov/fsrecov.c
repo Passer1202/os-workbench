@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
                     struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
                     fwrite(bmp_ihdr, sizeof(struct bmp_info_header), 1, bmp_tmp_file);
                     //写入bmp图像数据
-                    uintptr_t img_start = (uintptr_t)bmp_hdr ;
+                    uintptr_t img_start = (uintptr_t)bmp_ihdr+ IMG_OFFSET(bmp_hdr) ;
 
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
