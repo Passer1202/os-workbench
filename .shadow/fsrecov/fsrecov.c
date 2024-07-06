@@ -158,7 +158,7 @@ int main(int argc, char *argv[]) {
                     }else{
                         //该文件占了多个簇
 
-                        printf("rest size: %u\n", REST_SIZE(hdr));
+                        printf("rest size: %d\n", (int)REST_SIZE(hdr));
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
                         int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
