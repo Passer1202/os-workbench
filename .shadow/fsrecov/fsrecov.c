@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    const char dirpath[]="/tmp/DICM/";
+    const char dirpath[]="./DICM/";
 
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    char tmp_path[256]="/tmp/DICM/";
+                    char tmp_path[256]="./DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
                     FILE *bmp_tmp_file = fopen(tmp_path, "a");
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
                         int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
-                        uintptr_t img_current = img_start + REST_SIZE(hdr);
+                        uintptr_t img_current = img_start;
                         while(img_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_sz);
