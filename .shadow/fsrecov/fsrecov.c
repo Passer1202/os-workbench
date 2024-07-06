@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
 
                     
                     //恢复文件
-                    
+
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -150,6 +150,9 @@ int main(int argc, char *argv[]) {
                     //写入bmp图像数据
                     uintptr_t img_start = (uintptr_t)bmp_hdr + IMG_OFFSET(bmp_hdr);
 
+                    assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
+                    assert(bmp_ihdr->biSize == 40);//信息头大小为40
+                    
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
