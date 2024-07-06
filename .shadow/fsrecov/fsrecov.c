@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    const char dirpath[]="./DICM/";
+    const char dirpath[]="/tmp/DICM/";
 
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
             struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
             //判断是否是短目录项（.BMP)
             if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
-                if(pd->DIR_Name[0]!=0xe5 || pd->DIR_FileSize!=0) {//不是被删除的文件
+                if(pd->DIR_Name[0]!=0xe5 && pd->DIR_FileSize!=0) {//不是被删除的文件
                     //恢复文件名到name,得到.bmp文件的起始簇号bmp_clu1st
                     
                     int index_name =0;
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
                     //2.find the first cluster of .bmp
                     u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
-                    if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
+                    if(bmp_hdr->bfType == 0x4d42&&(uintptr_t)bmp_hdr<data_end){//确定是bmp文件
                             //3.find long directory entry
                             //手册：长目录项倒着紧放在短目录项前面
                             
