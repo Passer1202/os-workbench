@@ -152,6 +152,7 @@ int main(int argc, char *argv[]) {
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
                         //该文件占了多个簇
+                        assert(0);
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
                         u32 img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
