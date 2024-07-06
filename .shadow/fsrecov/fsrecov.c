@@ -154,13 +154,14 @@ int main(int argc, char *argv[]) {
                         
                         fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
 
-                        int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
+                        u32 img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
                         uintptr_t img_current = img_start + REST_SIZE(hdr);
                         while(img_sz >= CLUS_SIZE(hdr)){
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
                             img_current += CLUS_SIZE(hdr);
                             img_sz -= CLUS_SIZE(hdr);
                         }
+                        assert(0);
                         if(img_sz > 0){
                             fwrite((void *)img_current, img_sz, 1, bmp_tmp_file);
                         }
