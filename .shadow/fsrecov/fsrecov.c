@@ -23,7 +23,7 @@ struct fat32hdr *hdr;
 #define CLUS_SIZE(hdr) ((hdr)->BPB_BytsPerSec * (hdr)->BPB_SecPerClus)//簇字节数
 
 #define IMG_OFFSET(hdr) ((hdr)->bfOffBits)//图像数据偏移量
-#define IMG_SIZE(hdr) ((hdr)->biSizeImage)//图像数据大小
+#define IMG_SIZE(hdr) ((hdr)->biSizeImage /8)//图像数据大小
 
 #define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
 
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
                     struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
                     fwrite(bmp_ihdr, sizeof(struct bmp_info_header), 1, bmp_tmp_file);
                     //写入bmp图像数据
-                    uintptr_t img_start = IMG_OFFSET(bmp_hdr) ;
+                    uintptr_t img_start = (uintptr_t)bmp_hdr+ IMG_OFFSET(bmp_hdr) ;
 
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
