@@ -154,6 +154,7 @@ int main(int argc, char *argv[]) {
                     assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
                     if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
+                        assert(0);
                        fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
                     }else{
                         //该文件占了多个簇
