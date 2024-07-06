@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 
                             fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
-                            //img_current += CLUS_SIZE(hdr);
+                            img_current += CLUS_SIZE(hdr);
                             img_sz -= CLUS_SIZE(hdr);
 
                         }
