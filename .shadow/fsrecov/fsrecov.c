@@ -25,6 +25,8 @@ struct fat32hdr *hdr;
 #define IMG_OFFSET(hdr) ((hdr)->bfOffBits)//图像数据偏移量
 #define IMG_SIZE(hdr) ((hdr)->biSizeImage)//图像数据大小
 
+#define BMP_SIZE(hdr) ((hdr)->bfSize)//bmp文件大小
+
 #define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
 
 void *mmap_disk(const char *fname);
@@ -143,42 +145,37 @@ int main(int argc, char *argv[]) {
                     FILE *bmp_tmp_file = fopen(tmp_path, "a");
                     assert(bmp_tmp_file != NULL);
                     //写入bmp文件头
-                    fwrite(bmp_hdr, sizeof(struct bmp_file_header), 1, bmp_tmp_file);
-                    //写入bmp信息头
-                    struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
-                    fwrite(bmp_ihdr, sizeof(struct bmp_info_header), 1, bmp_tmp_file);
-                    //写入bmp图像数据
-                    uintptr_t img_start = (uintptr_t)bmp_hdr+ IMG_OFFSET(bmp_hdr);
+                    uintptr_t bmp_current = (uintptr_t)bmp_hdr;
 
-                    
+
+
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     
-                    assert(bmp_ihdr->biSize == 40);//信息头大小为40
+                    //assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
-                    if(IMG_SIZE(bmp_ihdr)<=REST_SIZE(hdr)){
+                    u32 bmp_sz=BMP_SIZE(bmp_hdr);
+
+                    if(bmp_sz<=CLUS_SIZE(hdr)){
                         //assert(0);
-                       fwrite((void *)img_start, IMG_SIZE(bmp_ihdr), 1, bmp_tmp_file);
+                       fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                     }else{
                         //该文件占了多个簇
                         //continue;
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
-                        fwrite((void *)img_start, REST_SIZE(hdr), 1, bmp_tmp_file);
-                        int img_sz = IMG_SIZE(bmp_ihdr) - REST_SIZE(hdr);
-                        uintptr_t img_current = img_start + REST_SIZE(hdr);
-                        while(img_sz >= CLUS_SIZE(hdr)){
+                        while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_sz);
                             //printf("img_current: %u\n", (u32)img_current);
                             //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
 
-                            fwrite((void *)img_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
+                            fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
-                            img_current += CLUS_SIZE(hdr);
-                            img_sz -= CLUS_SIZE(hdr);
+                            bmp_current += CLUS_SIZE(hdr);
+                            bmp_sz -= CLUS_SIZE(hdr);
 
                         }
-                        if(img_sz > 0){
-                            fwrite((void *)img_current, img_sz, 1, bmp_tmp_file);
+                        if(bmp_sz > 0){
+                            fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                         }
                     }
                     fclose(bmp_tmp_file);
