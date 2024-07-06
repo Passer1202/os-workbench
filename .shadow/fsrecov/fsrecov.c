@@ -162,16 +162,14 @@ int main(int argc, char *argv[]) {
                         //该文件占了多个簇
                         //continue;
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
-                        if(strcmp(name,"35OZL3hvJnEf.bmp")==0){
-                            continue;
-                        printf("bmp_sz: %d\n", bmp_sz);
-                        }
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_sz);
                             //printf("img_current: %u\n", (u32)img_current);
                             //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
-
+                            assert((void *)bmp_current < (void *)data_end);
+                            assert((void *)bmp_current !=NULL);
+                            assert((void *)bmp_current >= (void *)data_start);
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
                             bmp_current += CLUS_SIZE(hdr);
