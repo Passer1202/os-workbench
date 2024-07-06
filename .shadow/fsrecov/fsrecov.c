@@ -1,2 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include "fat32.h"
+
+
+struct fat32hdr *hdr;
+
+#define SEC_SIZE(hdr) ((hdr)->BPB_BytsPerSec) //扇区字节数
+#define SEC_CNT(hdr) ((hdr)->BPB_TotSec32)    //扇区总数
+
+#define RSVD_SEC_CNT(hdr) ((hdr)->BPB_RsvdSecCnt) //保留扇区数
+
+#define FAT_SEC_CNT(hdr) ((hdr)->BPB_NumFATs)     //FAT表数量
+#define FAT_SEC(hdr) ((hdr)->BPB_FATSz32)    //FAT表所占扇区数
+
+#define CLUS_SEC_CNT(hdr) ((hdr)->BPB_SecPerClus) //簇所占扇区数
+#define CLUS_SIZE(hdr) ((hdr)->BPB_BytsPerSec * (hdr)->BPB_SecPerClus)//簇字节数
+
+void *mmap_disk(const char *fname);
+
 int main(int argc, char *argv[]) {
+
+    if(argc < 2){
+        fprintf(stderr, "Usage: %s <disk image>\n", argv[0]);
+        exit(1);
+    }
+
+    setbuf(stdout, NULL);
+
+    assert(sizeof(struct fat32hdr) == 512);
+    assert(sizeof(struct fat32dent) == 32);
+    assert(sizeof(struct fat32ldent) == 32);
+
+    hdr=mmap_disk(argv[1]);
+
+    //TODO: fsrecov
+
+    //0. get the data area
+
+    //data区开始的扇区号
+    u32 data_start_sec = RSVD_SEC_CNT(hdr) + FAT_CNT(hdr) * FAT_SEC(hdr);
+    //data区的簇总数
+    u32 data_clu_cnt = (SEC_CNT(hdr) - data_start_sec)/CLUS_SEC_CNT(hdr);
+    //data区起始地址
+    uintptr_t data_start = (uintptr_t)hdr + data_start_sec * SEC_SIZE(hdr);
+    //data区结束地址
+    uintptr_t data_end = (uintptr_t)hdr + SEC_CNT(hdr) * SEC_SIZE(hdr);
+
+    //1. find the (short) directory entry
+    for(int i=0;i<data_clu_cnt;i++){
+        //遍历data区的每个簇
+        uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
+        for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
+            //遍历当前簇的每个目录项
+            struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
+            //判断是否是短目录项（.BMP)
+            if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
+                if(pd->DIR_Name[0]!=0xe5 || pd->DIR_FileSize!=0) {//不是被删除的文件
+                    //2.find the first cluster of .bmp
+                    u32 bmp_clu1st = ((u32)pd->DIR_FstClusLO | ((u32)(pd->DIR_FstClusHI) << 16))-2;//起始簇号，-2由于簇号从2开始
+                    struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
+                    if(bmp_hdr->bfType == 0x4d42){//确定是bmp文件
+
+                        //3.find long directory entry
+
+                        //4.recover the file
+                        //5.write the file
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    //unmap disk
+    munmap(hdr, hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec);
+
+}
+
+//referenced from jyy
+void *mmap_disk(const char *fname) {
+    int fd = open(fname, O_RDWR);
+
+    if (fd < 0) {
+        perror("open disk");
+        goto release;
+    }
+
+    off_t size = lseek(fd, 0, SEEK_END);
+    if (size < 0) {
+        perror("lseek disk");
+        goto release;
+    }
+
+    struct fat32hdr *hdr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+    if (hdr == MAP_FAILED) {
+        goto release;
+    }
+
+    close(fd);
+
+    assert(hdr->Signature_word == 0xaa55); // this is an MBR
+    assert(hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec == size);
+
+    return hdr;
+
+release:
+    perror("map disk");
+    if (fd > 0) {
+        close(fd);
+    }
+    exit(1);
 }
