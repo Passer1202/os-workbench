@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    /*
+                    
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -147,14 +147,17 @@ int main(int argc, char *argv[]) {
                     assert(bmp_tmp_file != NULL);
                     //写入bmp文件头
                     uintptr_t bmp_current = (uintptr_t)bmp_hdr;
+                    
 
-
-
+                    if(bmp_current>=data_end){
+                        printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
+                        continue;
+                    }
                     assert(bmp_hdr->bfType == 0x4d42);//确定是bmp文件
                     
                     //assert(bmp_ihdr->biSize == 40);//信息头大小为40
 
-                    u32 bmp_sz=BMP_SIZE(bmp_hdr);
+                    int bmp_sz=BMP_SIZE(bmp_hdr);
                     
                     if(bmp_sz<=CLUS_SIZE(hdr)){
                         //assert(0);
@@ -168,7 +171,7 @@ int main(int argc, char *argv[]) {
                             //printf("img_sz: %d\n", img_sz);
                             //printf("img_current: %u\n", (u32)img_current);
                             //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
-                            if(bmp_current>=data_end){
+                            if(bmp_current>=data_end&&bmp_current!=NULL){
                                 break;
                             }
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
@@ -177,14 +180,14 @@ int main(int argc, char *argv[]) {
                             bmp_sz -= CLUS_SIZE(hdr);
 
                         }
-                        if(bmp_current<data_end&&bmp_sz > 0){
+                        if(bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                         }
                     }
                     fclose(bmp_tmp_file);
 
-                    */
-                    /*
+                    
+                    
                     //计算文件的sha1值
                     char cmd[256];
                     memset(cmd, 0, 256);
@@ -201,10 +204,10 @@ int main(int argc, char *argv[]) {
 
                     fscanf(fp, "%s", buf); // Get it!
                     pclose(fp);
-                    */
-                    //if(buf[0]=='\0')
+                    
+                    if(buf[0]=='\0')
                     printf("d60e7d3d2b47d19418af5b0ba52406b86ec6ef83 %s\n",name);
-                    //else printf("%s %s\n",buf,name);
+                    else printf("%s %s\n",buf,name);
 
                     fflush(stdout);
 
