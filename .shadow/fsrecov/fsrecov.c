@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
     hdr=mmap_disk(argv[1]);
 
-    char dirpath[]="./DICM/";
+    char dirpath[]="/tmp/DICM/";
     if(access(dirpath,0)==-1)
         assert(mkdir(dirpath,0755)!=-1);
 
