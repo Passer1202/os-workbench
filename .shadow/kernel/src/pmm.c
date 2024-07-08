@@ -153,7 +153,7 @@ static void kfree(void *ptr) {
 static void pmm_init() {
     uintptr_t pmsize = ((uintptr_t)heap.end - (uintptr_t)heap.start);
     int cpu_cnt=cpu_count();
-    intptr_t cpu_sz=(pmsize/2)/cpu_cnt;
+    intptr_t cpu_sz=(pmsize/4)/cpu_cnt;
 
     h_ptr=heap.start+cpu_cnt*cpu_sz;
 
