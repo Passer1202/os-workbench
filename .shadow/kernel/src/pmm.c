@@ -84,7 +84,7 @@ static void *kalloc(size_t size) {
     
    
 
-    if((void*)(p+sz)>cpu_ptr_end[cpu_now]){
+    if((uintptr_t)(p+sz)>(uintptr_t)cpu_ptr_end[cpu_now]){
         release_lock(&cpu_lock[cpu_now]);
         return NULL;
     }
@@ -121,7 +121,7 @@ static void pmm_init() {
     init_lock(&heap_lock);
     for(int i=0;i<cpu_cnt;i++){
         init_lock(&cpu_lock[i]);
-        printf("CPU #%d : [%p, %p)\n", i, cpu_ptr[i], cpu_ptr_end[i]);
+        //printf("CPU #%d : [%p, %p)\n", i, cpu_ptr[i], cpu_ptr_end[i]);
     }
     
     //printf("PMM: init done\n");
