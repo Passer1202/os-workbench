@@ -134,6 +134,7 @@ static void pmm_init() {
 void alloc(int sz){
     
     uintptr_t a=(uintptr_t)kalloc(sz);
+    
 
     uintptr_t align=a & -a ;
 
