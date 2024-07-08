@@ -2,5 +2,5 @@
 #include <klib.h>
 #include <klib-macros.h>
 
-void test_pmm();
+//void test_pmm();
 
