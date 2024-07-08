@@ -14,6 +14,8 @@ typedef int lock_t;
 char *cpu_ptr[8]; 
 char *cpu_ptr_end[8];
 
+char *h_ptr; 
+
 
 /*锁的状态*/
 enum LOCK_STATE {
@@ -52,7 +54,46 @@ static void release_lock(int * lock){
     for (int _cnt = (acquire_lock(&heap_lock),0); _cnt < 1; _cnt++ , release_lock(&heap_lock))
 
 
+static void* heap_alloc(size_t size){
+    size_t sz=1;
+    
+    acquire_lock(&heap_lock);
 
+    while(sz<size){
+        sz*=2;
+    }
+
+    if(sz>(1<<24)){
+        release_lock(&heap_lock);
+        return NULL;
+    }
+
+    
+
+    char* p=h_ptr;
+
+    
+    while((intptr_t)p%sz!=0){
+        p++;
+    }
+
+
+    char* ret=p;
+    p+=sz;
+
+    if((uintptr_t)p>(uintptr_t)heap.end){
+        release_lock(&heap_lock);
+
+        return NULL;
+
+    }
+
+
+    h_ptr=p;
+    
+    release_lock(&heap_lock);
+    return ret;
+}
 
 
 
@@ -87,8 +128,12 @@ static void *kalloc(size_t size) {
 
     if(p>cpu_ptr_end[cpu_now]){
         release_lock(&cpu_lock[cpu_now]);
-        return NULL;
+
+        ret=heap_alloc(sz);
+        return ret;
+
     }
+
 
     cpu_ptr[cpu_now]=p;
     
@@ -108,7 +153,9 @@ static void kfree(void *ptr) {
 static void pmm_init() {
     uintptr_t pmsize = ((uintptr_t)heap.end - (uintptr_t)heap.start);
     int cpu_cnt=cpu_count();
-    intptr_t cpu_sz=pmsize/cpu_cnt;
+    intptr_t cpu_sz=(pmsize/2)/cpu_cnt;
+
+    h_ptr=heap.start+cpu_cnt*cpu_sz;
 
     for(int i=0;i<cpu_cnt;i++){
         cpu_ptr[i]=heap.start+i*cpu_sz;
