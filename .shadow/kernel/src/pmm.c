@@ -85,8 +85,8 @@ static void *kalloc(size_t size) {
    
 
     if((void*)(p+sz)>cpu_ptr_end[cpu_now]){
-        //release_lock(&cpu_lock[cpu_now]);
-        //return NULL;
+        release_lock(&cpu_lock[cpu_now]);
+        return NULL;
     }
 
 
