@@ -69,10 +69,7 @@ static void *kalloc(size_t size) {
         return NULL;
     }
 
-    if(cpu_ptr[cpu_now]+sz>cpu_ptr_end[cpu_now]){
-        release_lock(&cpu_lock[cpu_now]);
-        return NULL;
-    }
+    
 
     static char* p;
     
@@ -85,8 +82,17 @@ static void *kalloc(size_t size) {
         p++;
     }
     
+   
+
+    if((void*)(p+sz)>cpu_ptr_end[cpu_now]){
+        release_lock(&cpu_lock[cpu_now]);
+        return NULL;
+    }
+
+
     char* ret=p;
     p+=sz;
+    
     release_lock(&cpu_lock[cpu_now]);
     return ret;
     
