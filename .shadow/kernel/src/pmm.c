@@ -54,18 +54,18 @@ static void release_lock(int * lock){
 
 
 static void *kalloc(size_t size) {
-    int cpu_now=cpu_current();
+    //int cpu_now=cpu_current();
 
     size_t sz=1;
     
-    acquire_lock(&cpu_lock[cpu_now]);
+    acquire_lock(&cpu_lock[cpu_current()]);
 
     while(sz<size){
         sz*=2;
     }
 
     if(sz>(1<<24)){
-        release_lock(&cpu_lock[cpu_now]);
+        release_lock(&cpu_lock[cpu_current()]);
         return NULL;
     }
 
@@ -74,7 +74,7 @@ static void *kalloc(size_t size) {
     static char* p;
     
     if(!p){
-        p=cpu_ptr[cpu_now];
+        p=cpu_ptr[cpu_current()];
     }
 
     
@@ -84,8 +84,8 @@ static void *kalloc(size_t size) {
     
    
 
-    if((uintptr_t)(p+sz)>(uintptr_t)cpu_ptr_end[cpu_now]){
-        release_lock(&cpu_lock[cpu_now]);
+    if((uintptr_t)(p+sz)>(uintptr_t)cpu_ptr_end[cpu_current()]){
+        release_lock(&cpu_lock[cpu_current()]);
         return NULL;
     }
 
@@ -93,7 +93,7 @@ static void *kalloc(size_t size) {
     char* ret=p;
     p+=sz;
     
-    release_lock(&cpu_lock[cpu_now]);
+    release_lock(&cpu_lock[cpu_current()]);
     return ret;
     
 
