@@ -11,8 +11,8 @@
 /*定义锁lock_t*/
 typedef int lock_t;
 
-void *cpu_ptr[8]; 
-void *cpu_ptr_end[8];
+char *cpu_ptr[8]; 
+char *cpu_ptr_end[8];
 
 
 /*锁的状态*/
@@ -53,47 +53,46 @@ static void release_lock(int * lock){
 
 
 
+
+
+
 static void *kalloc(size_t size) {
-    //int cpu_now=cpu_current();
+    int cpu_now=cpu_current();
 
     size_t sz=1;
     
-    acquire_lock(&cpu_lock[cpu_current()]);
+    acquire_lock(&cpu_lock[cpu_now]);
 
     while(sz<size){
         sz*=2;
     }
 
     if(sz>(1<<24)){
-        release_lock(&cpu_lock[cpu_current()]);
+        release_lock(&cpu_lock[cpu_now]);
         return NULL;
     }
 
     
 
-    static char* p;
-    
-    if(!p){
-        p=cpu_ptr[cpu_current()];
-    }
+    char* p=cpu_ptr[cpu_now];
 
     
     while((intptr_t)p%sz!=0){
         p++;
     }
-    
-   
-
-    //if((uintptr_t)(p+sz)>(uintptr_t)cpu_ptr_end[cpu_current()]){
-        //release_lock(&cpu_lock[cpu_current()]);
-        //return NULL;
-    //}
 
 
     char* ret=p;
     p+=sz;
+
+    if(p>cpu_ptr_end[cpu_now]){
+        release_lock(&cpu_lock[cpu_now]);
+        return NULL;
+    }
+
+    cpu_ptr[cpu_now]=p;
     
-    release_lock(&cpu_lock[cpu_current()]);
+    release_lock(&cpu_lock[cpu_now]);
     return ret;
     
 
