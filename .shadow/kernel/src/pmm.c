@@ -70,6 +70,49 @@ typedef struct{
 
 static cpu_local_t cpu_local[CPU_MAX];
 
+static char* h_ptr;
+
+static void* heap_alloc(size_t size){
+    size_t sz=1;
+    
+    acquire_lock(&heap_lock);
+
+    while(sz<size){
+        sz*=2;
+    }
+
+    if(sz>(1<<24)){
+        release_lock(&heap_lock);
+        return NULL;
+    }
+
+    
+
+    char* p=h_ptr;
+
+    
+    while((intptr_t)p%sz!=0){
+        p++;
+    }
+
+
+    char* ret=p;
+    p+=sz;
+
+    if((uintptr_t)p>(uintptr_t)heap.end){
+        release_lock(&heap_lock);
+
+        return NULL;
+
+    }
+
+
+    h_ptr=p;
+    
+    release_lock(&heap_lock);
+    return ret;
+}
+
 
 static void *kalloc(size_t size) {
     //先将size对齐到2的幂次
@@ -89,7 +132,7 @@ static void *kalloc(size_t size) {
         //slowpath
         acquire_lock(&heap_lock);
         //TODO:buddy分配
-        uintptr_t ret=(uintptr_t)buddy_alloc(sz);
+        uintptr_t ret=(uintptr_t)heap_alloc(sz);
         release_lock(&heap_lock);
         return (void*)ret;
     }
@@ -101,7 +144,7 @@ static void *kalloc(size_t size) {
         if(!page){
             //分配新的slab_page
             acquire_lock(&heap_lock);
-            page=buddy_alloc(_64KB);
+            page=heap_alloc(_64KB);
             release_lock(&heap_lock);
             if(page==NULL){
                 release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
@@ -144,7 +187,7 @@ static void *kalloc(size_t size) {
             if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
-                page=buddy_alloc(_64KB);
+                page=heap_alloc(_64KB);
                 release_lock(&heap_lock);
                 if(page==NULL){
                     
@@ -227,8 +270,8 @@ static void pmm_init() {
     }
 
     //初始化buddy系统
-    
-    buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
+    h_ptr=heap.start;
+    //buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
     
 }
