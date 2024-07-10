@@ -75,14 +75,14 @@ static char* h_ptr;
 static void* heap_alloc(size_t size){
     size_t sz=1;
     
-    acquire_lock(&heap_lock);
+    //acquire_lock(&heap_lock);
 
     while(sz<size){
         sz*=2;
     }
 
     if(sz>(1<<24)){
-        release_lock(&heap_lock);
+        //release_lock(&heap_lock);
         return NULL;
     }
 
@@ -100,7 +100,7 @@ static void* heap_alloc(size_t size){
     p+=sz;
 
     if((uintptr_t)p>(uintptr_t)heap.end){
-        release_lock(&heap_lock);
+        //release_lock(&heap_lock);
 
         return NULL;
 
@@ -109,7 +109,7 @@ static void* heap_alloc(size_t size){
 
     h_ptr=p;
     
-    release_lock(&heap_lock);
+    //release_lock(&heap_lock);
     return ret;
 }
 
