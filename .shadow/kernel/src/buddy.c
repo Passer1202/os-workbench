@@ -169,6 +169,7 @@ void* buddy_alloc(size_t size){
     }
     else{//空闲列表里无
         uintptr_t ret=(uintptr_t)buddy_alloc(size<<1);
+        printf("size: %d , ret: %d\n",size,ret);
         if((void*)ret!=NULL){
             //分配了一块大的空间
             uintptr_t offset=ret-buddy_start;
