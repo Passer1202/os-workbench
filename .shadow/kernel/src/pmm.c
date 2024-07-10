@@ -174,9 +174,10 @@ static void pmm_init() {
     }
 
     //初始化buddy系统
+    printf("PMM: init done\n");
     buddy_init((uintptr_t)heap.end , (uintptr_t)heap.end);
     
-    printf("PMM: init done\n");
+    
 }
 
 
