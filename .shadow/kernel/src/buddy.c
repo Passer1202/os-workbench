@@ -1,5 +1,6 @@
 #include<buddy.h>
-#include<assert.h>
+//#include<assert.h>
+#include<stdio.h>
 
 //将信息头和数据区分开
 //信息头用于存储信息，数据区用于存储数据
@@ -90,6 +91,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     bhdr->pages[cnt*256].next=NULL;
     bhdr->free_nodes[_16MB]=&bhdr->pages[0];
     //assert(0);
+    printf("buddy ready\n");
 }
 
 void* buddy_alloc(size_t size){
