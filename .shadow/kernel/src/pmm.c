@@ -71,7 +71,7 @@ typedef struct{
 static cpu_local_t cpu_local[CPU_MAX];
 
 static char* h_ptr;
-
+/*
 static void* heap_alloc(size_t size){
     size_t sz=1;
     
@@ -112,7 +112,7 @@ static void* heap_alloc(size_t size){
     release_lock(&heap_lock);
     return ret;
 }
-
+*/
 
 static void *kalloc(size_t size) {
     //先将size对齐到2的幂次
@@ -132,7 +132,7 @@ static void *kalloc(size_t size) {
         //slowpath
         acquire_lock(&heap_lock);
         //TODO:buddy分配
-        uintptr_t ret=(uintptr_t)heap_alloc(sz);
+        uintptr_t ret=(uintptr_t)buddy_alloc(sz);
         release_lock(&heap_lock);
         return (void*)ret;
     }
@@ -271,7 +271,7 @@ static void pmm_init() {
 
     //初始化buddy系统
     h_ptr=heap.start;
-    //buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
+    buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
     
 }
