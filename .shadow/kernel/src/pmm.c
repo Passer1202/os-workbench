@@ -70,7 +70,7 @@ typedef struct{
 
 static cpu_local_t cpu_local[CPU_MAX];
 
-static char* h_ptr;
+//static char* h_ptr;
 /*
 static void* heap_alloc(size_t size){
     size_t sz=1;
@@ -155,26 +155,11 @@ static void *kalloc(size_t size) {
             page->cnt=0;
             page->cpu=cpu_now;
             page->next=NULL;
-            //release_lock(&heap_lock);
 
-            
-            /*acquire_lock(&heap_lock);
-                printf("sz:%d\n",sz);
-                printf("DATA_SIZE:%d\n",DATA_SIZE);
-                printf("page->val:%d %d\n",(DATA_SIZE/sz),page->val);
-                page->val=(DATA_SIZE/sz);
-                assert(page->val>0);
-            release_lock(&heap_lock);
-            */
-
-            
-            //assert(page->val>0);
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
-            //acquire_lock(&heap_lock);
-            //assert(page->val>0);
-            //release_lock(&heap_lock);
+
         }
         else{
             //遍历slab_pages
@@ -196,36 +181,16 @@ static void *kalloc(size_t size) {
                 }
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
-                //printf(sz)
-                //assert(sz<=DATA_SIZE);
                 
                 page->val=DATA_SIZE/sz;
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
-                //release_lock(&heap_lock);
-
-                
                 
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
             }
-            //acquire_lock(&heap_lock);
-            //assert(page->val>0);
-            //release_lock(&heap_lock);
         }
-        //分配slab
-        //if(page->val<=0){
-        //    acquire_lock(&page->slab_lock);
-        //    printf("page->val:%d\n",page->val);
-        //    assert(0);
-        //}
-        
-        //acquire_lock(&heap_lock);
-        //        printf("Page->val:%d\n",(DATA_SIZE/sz));
-        //        release_lock(&heap_lock);assert(page->val>0);
-        //assert(page!=NULL);
-        //assert(page->val>0);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
@@ -270,7 +235,7 @@ static void pmm_init() {
     }
 
     //初始化buddy系统
-    h_ptr=heap.start;
+    //h_ptr=heap.start;
     buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
     
