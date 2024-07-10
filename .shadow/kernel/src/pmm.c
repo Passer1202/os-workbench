@@ -173,12 +173,14 @@ static void *kalloc(size_t size) {
         }
         else{
             //遍历slab_pages
+            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             while(page!=NULL){
                 if(page->cnt<page->val){
                     break;
                 }
                 page=page->next;
             }
+            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
@@ -251,8 +253,8 @@ static void kfree(void *ptr) {
         index/=temp_page->sz;
         //printf("Free %p index = %d\n",ptr,index);
         acquire_lock(&temp_page->slab_lock);
-        temp_page->used[index]=0;
-        temp_page->cnt--;
+        //temp_page->used[index]=0;
+        //temp_page->cnt--;
         release_lock(&temp_page->slab_lock);
         return;
     }
