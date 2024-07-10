@@ -271,7 +271,7 @@ static void pmm_init() {
 
     //初始化buddy系统
     h_ptr=heap.start;
-    //buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
+    buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
     
 }
