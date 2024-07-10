@@ -1,147 +1,153 @@
 #include <common.h>
+#include <buddy.h>
+#include <plock.h>
 
-//TODO：提速
-//
-//bug:虚拟机会神秘重启
-//目前来看是kfree存在问题
+//修改jyy的速通版本，为每个cpu分配领地可有概率ac
+//继续修改，将一把大锁分配给每个cpu,会导致分配出错
+//问题所在：每个cpu的内存空间太小了
 
+//TODO：重构代码
 
+//初步设想：
+//利用slab和buddy系统，将内存分配给每个cpu
+//fastpath：slab
+//slowpath：大内存分配，buddy
 
+#define _4KB  4096
+#define _64KB 65536
 
-/*定义锁lock_t*/
-typedef int lock_t;
+#define _16MB 16777216
 
-char *cpu_ptr[8]; 
-char *cpu_ptr_end[8];
+#define MIN_SIZE 16//最小分配16字节
 
-char *h_ptr; 
+#define DATA_SIZE (_64KB-_4KB)//每个slab_page的data大小
+#define SLAB_MAX (DATA_SIZE/MIN_SIZE)//slab_page最多有多少个slab
 
+#define MAGIC_NUM 0x12345678
 
-/*锁的状态*/
-enum LOCK_STATE {
-    UNLOCKED=0, LOCKED
+enum slab_kinds{
+    _16B=0,
+    _32B,
+    _64B,
+    _128B,
+    _256B,
+    _512B,
+    _1024B,//1KB
+    _2048B,//2KB
+    _4096B,//4KB
+    SLAB_KINDS
 };
 
-/*锁们*/
-//堆区的大锁，slowpath
-lock_t cpu_lock[8];
-
-lock_t heap_lock;
-
-/*锁的API*/
-//int atomic_xchg(volatile int *addr, int newval);
-//原子 (不会被其他处理器的原子操作打断) 地交换内存地址中的数值,返回原来的值
-
-//初始化锁
-static void init_lock(int * lock){
-    atomic_xchg(lock, UNLOCKED);
-}
-//自旋直到获取锁
-static void acquire_lock(int * lock){
-    while(atomic_xchg(lock, LOCKED) == LOCKED);
-}
-//释放锁
-static void release_lock(int * lock){
-    assert(atomic_xchg(lock, UNLOCKED)==LOCKED);
-}
-//尝试获取锁
-//static int try_lock(int * lock){
-//    return atomic_xchg(lock, PMM_LOCKED);
-//}
-
-//一把大锁保平安（速通版）
-#define atomic \
-    for (int _cnt = (acquire_lock(&heap_lock),0); _cnt < 1; _cnt++ , release_lock(&heap_lock))
+/*slab_page的结构*/
+//参考了学长的设计
+typedef union{
+    struct{
+        int magic;
+        int cnt;//计数
+        int val;//容量
+        int cpu;//所属cpu编号
+        void* next;
+        int slab_lock;
+        uint8_t used[SLAB_MAX];
+    };
+    struct{
+        uint8_t header[_4KB];
+        uint8_t data[_64KB-_4KB];
+    };
+    uint8_t slabs[_64KB];//每个slab_page大小64KB，前4KB为header，后60KB为data
+}slab_page;
 
 
-static void* heap_alloc(size_t size){
-    size_t sz=1;
-    
-    acquire_lock(&heap_lock);
+//堆区大锁
+static lock_t heap_lock;
 
-    while(sz<size){
-        sz*=2;
-    }
+//cpu内存空间
+//一个slab一个锁
+typedef struct{
+    slab_page* slab_ptr[SLAB_KINDS];
+    lock_t page_lock[SLAB_KINDS];
+}cpu_local_t;
 
-    if(sz>(1<<24)){
-        release_lock(&heap_lock);
-        return NULL;
-    }
-
-    
-
-    char* p=h_ptr;
-
-    
-    while((intptr_t)p%sz!=0){
-        p++;
-    }
-
-
-    char* ret=p;
-    p+=sz;
-
-    if((uintptr_t)p>(uintptr_t)heap.end){
-        release_lock(&heap_lock);
-
-        return NULL;
-
-    }
-
-
-    h_ptr=p;
-    
-    release_lock(&heap_lock);
-    return ret;
-}
-
+cpu_local_t cpu_local[CPU_MAX];
 
 
 static void *kalloc(size_t size) {
-    int cpu_now=cpu_current();
-
-    size_t sz=1;
-    
-    acquire_lock(&cpu_lock[cpu_now]);
-
-    while(sz<size){
-        sz*=2;
+    //先将size对齐到2的幂次
+    int sz=MIN_SIZE;
+    int slab_index=0;
+    while(sz<size&&sz<_16MB){
+        sz<<=1;
+        slab_index++;
     }
 
-    if(sz>(1<<24)){
-        release_lock(&cpu_lock[cpu_now]);
+    if(sz>=_16MB){
+         //拒绝分配16MB以上的内存
         return NULL;
     }
 
-    
-
-    char* p=cpu_ptr[cpu_now];
-
-    
-    while((intptr_t)p%sz!=0){
-        p++;
+    if(sz>_4KB){
+        //slowpath
+        acquire_lock(&heap_lock);
+        //TODO:buddy分配
+        uintptr_t ret=(uintptr_t)buddy_alloc(sz);
+        release_lock(&heap_lock);
+        return (void*)ret;
     }
+    else{
+        //fastpath
+        int cpu_now=cpu_current();
+        acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+        slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
+        if(!page){
+            //分配新的slab_page
+            page=(slab_page*)buddy_alloc(_64KB);
+            page->magic=MAGIC_NUM;
+            page->cnt=0;
+            page->val=(DATA_SIZE/sz);
+            page->cpu=cpu_now;
+            page->next=NULL;
+            init_lock(&page->slab_lock);
+            memset(page->used,0,SLAB_MAX);
+            cpu_local[cpu_now].slab_ptr[slab_index]=page;
+        }
+        else{
+            //遍历slab_pages
+            while(page!=NULL){
+                if(page->cnt<page->val){
+                    break;
+                }
+                page=page->next;
+            }
+            if(!page){
+                //分配新的slab_page
+                page=(slab_page*)buddy_alloc(_64KB);
+                page->magic=MAGIC_NUM;
+                page->cnt=0;
+                page->val=(DATA_SIZE/sz);
+                page->cpu=cpu_now;
+                page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
+                init_lock(&page->slab_lock);
+                memset(page->used,0,SLAB_MAX);
+                cpu_local[cpu_now].slab_ptr[slab_index]=page;
+            }
+        }
+        //分配slab
+        for(int i=0;i<page->val;i++){
+            if(page->used[i]==0){
+                page->used[i]=1;
+                page->cnt++;
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
+                return (void*)(page->data+i*sz);
+            }
+        }
 
-    char* ret=p;
-    p+=sz;
-
-    if(p>cpu_ptr_end[cpu_now]){
-        release_lock(&cpu_lock[cpu_now]);
-
-        ret=heap_alloc(sz);
-        return ret;
-
+        assert(0);
+        //return NULL;
     }
-
-
-    cpu_ptr[cpu_now]=p;
-    
-    release_lock(&cpu_lock[cpu_now]);
-    return ret;
-    
 
 }
+   
 
 static void kfree(void *ptr) {
    
@@ -151,29 +157,23 @@ static void kfree(void *ptr) {
 
 // 框架代码中的 pmm_init (在 AbstractMachine 中运行)
 static void pmm_init() {
+
     uintptr_t pmsize = ((uintptr_t)heap.end - (uintptr_t)heap.start);
-    int cpu_cnt=cpu_count();
-    intptr_t cpu_sz=(pmsize/4)/cpu_cnt;
-
-    h_ptr=heap.start+cpu_cnt*cpu_sz;
-
-    for(int i=0;i<cpu_cnt;i++){
-        cpu_ptr[i]=heap.start+i*cpu_sz;
-        cpu_ptr_end[i]=heap.start+(i+1)*cpu_sz;
-    }
-
     printf("Got %d MiB heap: [%p, %p)\n", pmsize >> 20, heap.start, heap.end);
 
+    //初始化锁
     init_lock(&heap_lock);
+
+    int cpu_cnt=cpu_count();
+
     for(int i=0;i<cpu_cnt;i++){
-        init_lock(&cpu_lock[i]);
-        //printf("CPU #%d : [%p, %p)\n", i, cpu_ptr[i], cpu_ptr_end[i]);
+        for(int j=0;j<SLAB_KINDS;j++){
+            cpu_local[i].slab_ptr[j]=NULL;
+            init_lock(&cpu_local[i].page_lock[j]);
+        }
     }
     
-    //printf("PMM: init done\n");
-    //锁不分配给CPU，分配给slab_page.
-
-
+    printf("PMM: init done\n");
 }
 
 
@@ -184,9 +184,9 @@ void alloc(int sz){
 
     uintptr_t align=a & -a ;
 
-    atomic{
+    //atomic{
     printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
-    }
+//}
 
     assert(a&&align>=sz);
 }
@@ -201,9 +201,9 @@ void test_pmm() {
     alloc(4096);
     alloc(5000);
     alloc(5000);
-    atomic{
+    //atomic{
     printf("PMM: test passed\n");
-    }
+    //}
 }
 
 MODULE_DEF(pmm) = {

@@ -4,3 +4,5 @@
 
 void test_pmm();
 
+#define CPU_MAX 8//最大CPU数量
+
