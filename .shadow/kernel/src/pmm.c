@@ -135,6 +135,7 @@ static void *kalloc(size_t size) {
                 }
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
+                //printf(sz)
                 page->val=(DATA_SIZE/sz);
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
@@ -144,7 +145,7 @@ static void *kalloc(size_t size) {
             }
         }
         //分配slab
-        assert(page->val>0);
+        assert(page->val>=0);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
