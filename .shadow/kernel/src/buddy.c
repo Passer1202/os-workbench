@@ -73,7 +73,7 @@ void print_mem_tree(){
         uintptr_t num=buddy_start+offset*__64KB;
 
         //uintptr_t num=map2addr((uintptr_t)tmp);
-        printf("%x(%d)->",num,tmp->size);
+        printf("->%x(%d)",num,tmp->size);
         tmp=tmp->next;
     }
     printf("\n");
