@@ -223,12 +223,27 @@ static void kfree(void *ptr) {
     else{
         //fastpath
         acquire_lock(&temp_page->slab_lock);
+        uintptr_t p=(uintptr_t)ptr;
+        slab_page* page=temp_page;
+        p=p%_64KB;
+        p=p-_4KB;
+        p=p/page->sz;
 
-        int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
-        index/=temp_page->sz;
-        temp_page->used[index]=0;
+        //int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
+        //index/=temp_page->sz;
+        temp_page->used[p]=0;
         temp_page->cnt--;
         release_lock(&temp_page->slab_lock);
+
+        /*
+        uintptr_t addr=(uintptr_t)ptr;
+        apage_t* header=(apage_t*)(addr&(~(PAGE_SIZE-1)));
+        addr=addr%PAGE_SIZE;addr=(addr-HEAD_SIZE)/header->type;
+        pmm_lock(&(header->page_lock));
+        header->map[addr]=0;
+        header->now--;
+        pmm_unlock(&(header->page_lock));
+        */
     }
    
 }
