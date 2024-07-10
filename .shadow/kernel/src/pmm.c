@@ -110,6 +110,13 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->cnt=0;
             page->val=(DATA_SIZE/sz);
+
+            acquire_lock(&heap_lock);
+                printf("sz:%d\n",sz);
+                printf("DATA_SIZE:%d\n",DATA_SIZE);
+                printf("page->val:%d\n",(DATA_SIZE/sz));
+                release_lock(&heap_lock);
+                
             //assert(page->val>0);
             page->cpu=cpu_now;
             page->next=NULL;
@@ -138,12 +145,15 @@ static void *kalloc(size_t size) {
                 page->cnt=0;
                 //printf(sz)
                 //assert(sz<=DATA_SIZE);
+                
+                page->val=(DATA_SIZE/sz);
+
                 acquire_lock(&heap_lock);
                 printf("sz:%d\n",sz);
                 printf("DATA_SIZE:%d\n",DATA_SIZE);
                 printf("page->val:%d\n",(DATA_SIZE/sz));
                 release_lock(&heap_lock);
-                page->val=(DATA_SIZE/sz);
+
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
                 init_lock(&page->slab_lock);
