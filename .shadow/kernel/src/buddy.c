@@ -11,8 +11,10 @@
 #define BUDDY_PAGE_SIZE (1<<16)
 
 
+
 //__16MB才是真的16MB!!!!!!!!
 #define __16MB 16777216
+#define __64KB 65536
 
 enum BUDDY_STATE{
     FREE=0,
@@ -89,7 +91,66 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
 }
 
 void* buddy_alloc(size_t size){
-    return NULL;
+
+    if(size>__16MB){
+        return NULL;
+    }
+    //必然有size<16MB
+    //assert(size<=__16MB);
+    //assert(size>=__64KB);
+
+    size_t sz=__64KB;
+
+    int index=0;
+    while(sz<size){
+        sz<<=1;
+        index++;
+    }
+
+    //两种情况
+    //空闲列表里刚好有
+    if(bhdr->free_nodes[index]!=NULL){
+        uintptr_t offset=(uintptr_t)bhdr->free_nodes[index]-(uintptr_t)bhdr->pages;
+        offset/=sizeof(bpage);
+
+        uintptr_t ret=buddy_start+offset*__64KB;
+
+        //更新空闲链表
+        bpage* node=bhdr->free_nodes[index];
+        bhdr->free_nodes[index]=node->next;
+
+        node->next=NULL;
+        node->used=USED;
+
+        return (void*)ret;
+    }
+    else{//空闲列表里无
+        void* ret=buddy_alloc(size<<1);
+        if(ret!=NULL){
+            //分配了一块大的空间
+            uintptr_t offset=(uintptr_t)ret-buddy_start;
+            offset/=__64KB;
+
+            bpage* node=bhdr->pages+offset*sizeof(bpage);
+            node->size=index;
+            node->next=NULL;
+            node->used=USED;
+
+            offset=(uintptr_t)ret+size-buddy_start;
+            offset/=__64KB;
+
+            node=bhdr->pages+offset*sizeof(bpage);
+            node->size=index;
+            node->next=NULL;
+            node->used=FREE;
+            
+            bhdr->free_nodes[index]=node;
+         
+        }
+        return ret;
+    }
+    
+    
 }
 
 void buddy_free(void* ptr){
