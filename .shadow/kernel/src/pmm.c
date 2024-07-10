@@ -170,7 +170,7 @@ static void *kalloc(size_t size) {
             
             //assert(page->val>0);
             init_lock(&page->slab_lock);
-            //memset(page->used,0,SLAB_MAX);
+            memset(page->used,0,SLAB_MAX);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
             //acquire_lock(&heap_lock);
             //assert(page->val>0);
@@ -207,7 +207,7 @@ static void *kalloc(size_t size) {
                 
                 
                 init_lock(&page->slab_lock);
-                //memset(page->used,0,SLAB_MAX);
+                memset(page->used,0,SLAB_MAX);
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
             }
             //acquire_lock(&heap_lock);
