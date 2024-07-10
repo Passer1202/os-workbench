@@ -223,26 +223,20 @@ static void kfree(void *ptr) {
     else{
         //fastpath
         acquire_lock(&temp_page->slab_lock);
+
+        int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
+        index/=temp_page->sz;
+        printf("index = %d\n",index);
+        temp_page->used[index]=0;
+        temp_page->cnt--;
+        release_lock(&temp_page->slab_lock);
+        /*
         uintptr_t p=(uintptr_t)ptr;
         slab_page* page=temp_page;
         p=p%_64KB;
         p=p-_4KB;
+        assert(page->sz>0);
         p=p/page->sz;
-
-        //int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
-        //index/=temp_page->sz;
-        temp_page->used[p]=0;
-        temp_page->cnt--;
-        release_lock(&temp_page->slab_lock);
-
-        /*
-        uintptr_t addr=(uintptr_t)ptr;
-        apage_t* header=(apage_t*)(addr&(~(PAGE_SIZE-1)));
-        addr=addr%PAGE_SIZE;addr=(addr-HEAD_SIZE)/header->type;
-        pmm_lock(&(header->page_lock));
-        header->map[addr]=0;
-        header->now--;
-        pmm_unlock(&(header->page_lock));
         */
     }
    
@@ -278,7 +272,7 @@ static void pmm_init() {
 }
 
 
-void alloc(int sz){
+void* alloc(int sz){
     
     uintptr_t a=(uintptr_t)kalloc(sz);
 
@@ -292,17 +286,25 @@ void alloc(int sz){
 //}
 
     assert(a&&align>=sz);
+    return (void*)a;
 }
 
 
 void test_pmm() {
    
-    alloc(1);
-    alloc(5);
-    alloc(10);
-    alloc(32);
-    alloc(16777216);
-    alloc(4096);
+    //alloc(1);
+    void* p[16];
+    for(int i=0;i<10;i++){
+        p[i]=alloc(16);
+    }
+    for(int i=0;i<10;i++){
+        kfree(p[i]);
+    }
+    //alloc(5);
+    //alloc(10);
+    //alloc(32);
+    //alloc(16777216);
+    //alloc(4096);
     ////alloc(4096);
     //alloc(4096);
     //alloc(4096);
