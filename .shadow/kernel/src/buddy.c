@@ -9,8 +9,8 @@
 //如果buddy_header占用空间太大，试着见效下面两个参数
 
 
-#define BUDDY_HEADER_SIZE (1<<21)//(1<<21)
-#define BUDDY_PAGE_SIZE (1<<16)//(1<<16)
+#define BUDDY_HEADER_SIZE (1<<21)
+#define BUDDY_PAGE_SIZE (1<<16)
 
 
 
@@ -82,7 +82,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     //printf("heap_start:%p\n",heap_start);
     //printf("heap_end:%p\n",heap_end);
     int cnt=heap_size/__16MB;
-    printf("cnt:%d\n",cnt);
+    //printf("cnt:%d\n",cnt);
 
     for(int i=0;i<cnt;i++){
         int index=i*256;//256:=16MB/64KB
