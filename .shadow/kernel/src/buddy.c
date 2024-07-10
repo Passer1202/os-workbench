@@ -61,6 +61,8 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     bhdr=(buddy_header*)heap_start;
     memset(bhdr,0,sizeof(buddy_header));
 
+    printf("buddy ready\n");
+
     //使heap_start指向数据区、
     heap_start+=sizeof(buddy_header);
     //使heap_start对齐到16MB
@@ -91,7 +93,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     bhdr->pages[cnt*256].next=NULL;
     bhdr->free_nodes[_16MB]=&bhdr->pages[0];
     //assert(0);
-    printf("buddy ready\n");
+    
 }
 
 void* buddy_alloc(size_t size){
