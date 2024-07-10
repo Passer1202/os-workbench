@@ -141,6 +141,7 @@ static void *kalloc(size_t size) {
         //fastpath
         int cpu_now=cpu_current();
         slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
+        acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
         if(!page){
             //分配新的slab_page
             
@@ -150,6 +151,7 @@ static void *kalloc(size_t size) {
 
             
             if(page==NULL){
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
             page->magic=MAGIC_NUM;
@@ -162,7 +164,7 @@ static void *kalloc(size_t size) {
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
 
-            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+           
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
             release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
@@ -195,10 +197,10 @@ static void *kalloc(size_t size) {
 
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
 
-                acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
-                page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
             }
+            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
         }
         acquire_lock(&page->slab_lock);
         for(int i=0;i<page->val;i++){
