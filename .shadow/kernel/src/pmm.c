@@ -310,7 +310,8 @@ void test_pmm() {
     //    kfree(p[i]);
     //}
     alloc(5);
-    alloc(10);
+    void* p=alloc(10);
+    kfree(p);
     alloc(32);
     alloc(16777216);
     alloc(4096);
