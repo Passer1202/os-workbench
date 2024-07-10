@@ -226,9 +226,9 @@ static void kfree(void *ptr) {
 
         uintptr_t index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
         index/=temp_page->sz;
-        printf("index = %d\n",index);
-        temp_page->used[index]=0;
-        temp_page->cnt--;
+        //printf("index = %d\n",index);
+        //temp_page->used[index]=0;
+        //temp_page->cnt--;
         release_lock(&temp_page->slab_lock);
         /*
         uintptr_t p=(uintptr_t)ptr;
