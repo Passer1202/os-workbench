@@ -81,8 +81,8 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     
     uintptr_t heap_size=(heap_end-heap_start);
 
-    //printf("heap_start:%p\n",heap_start);
-    //printf("heap_end:%p\n",heap_end);
+    printf("heap_start:%p\n",heap_start);
+    printf("heap_end:%p\n",heap_end);
     int cnt=heap_size/__16MB;
     //printf("cnt:%d\n",cnt);
 
