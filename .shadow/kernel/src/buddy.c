@@ -14,8 +14,6 @@
 #define BUDDY_HEADER_SIZE (1<<21)
 #define BUDDY_PAGE_SIZE (1<<16)
 
-
-
 //__16MB才是真的16MB!!!!!!!!
 #define __16MB 16777216
 #define __64KB 65536
@@ -24,8 +22,6 @@ enum BUDDY_STATE{
     FREE=0,
     USED
 };
-
-
 
 
 enum BUDDY_KIND{

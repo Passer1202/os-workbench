@@ -45,7 +45,7 @@ typedef union{
         int magic;
         int cnt;//计数
         int val;//容量
-        int cpu;//所属cpu编号
+        int sz;//每个slab的大小
         void* next;
         int slab_lock;
         uint8_t used[SLAB_MAX];
@@ -153,7 +153,7 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->val=DATA_SIZE/sz;
             page->cnt=0;
-            page->cpu=cpu_now;
+            page->sz=size;
             page->next=NULL;
 
             init_lock(&page->slab_lock);
@@ -183,7 +183,7 @@ static void *kalloc(size_t size) {
                 page->cnt=0;
                 
                 page->val=DATA_SIZE/sz;
-                page->cpu=cpu_now;
+                page->sz=size;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
                 
                 init_lock(&page->slab_lock);
@@ -209,6 +209,27 @@ static void *kalloc(size_t size) {
    
 
 static void kfree(void *ptr) {
+
+    //对齐到64KB
+    slab_page* temp_page=(slab_page*)((uintptr_t)ptr&(~0xFFFF));
+
+    if(temp_page->magic!=MAGIC_NUM){
+        //slowpath
+        acquire_lock(&heap_lock);
+        buddy_free(ptr);
+        release_lock(&heap_lock);
+        return;
+    }
+    else{
+        //fastpath
+        acquire_lock(&temp_page->slab_lock);
+
+        int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
+        index/=temp_page->sz;
+        temp_page->used[index]=0;
+        temp_page->cnt--;
+        release_lock(&temp_page->slab_lock);
+    }
    
 }
 
