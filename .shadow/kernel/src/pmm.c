@@ -112,7 +112,7 @@ static void *kalloc(size_t size) {
             page->val=(DATA_SIZE/sz);
             release_lock(&heap_lock);
 
-            
+            /*
             acquire_lock(&heap_lock);
                 printf("sz:%d\n",sz);
                 printf("DATA_SIZE:%d\n",DATA_SIZE);
@@ -120,6 +120,7 @@ static void *kalloc(size_t size) {
                 //page->val=(DATA_SIZE/sz);
                 assert(page->val>0);
             release_lock(&heap_lock);
+            */
 
             
             //assert(page->val>0);
@@ -144,8 +145,9 @@ static void *kalloc(size_t size) {
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
                 page=(slab_page*)buddy_alloc(_64KB);
-                release_lock(&heap_lock);
+                
                 if(page==NULL){
+                    release_lock(&heap_lock);
                     release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
@@ -155,11 +157,6 @@ static void *kalloc(size_t size) {
                 //assert(sz<=DATA_SIZE);
                 
                 page->val=(DATA_SIZE/sz);
-
-                acquire_lock(&heap_lock);
-                printf("sz:%d\n",sz);
-                printf("DATA_SIZE:%d\n",DATA_SIZE);
-                printf("page->val:%d\n",(DATA_SIZE/sz));
                 release_lock(&heap_lock);
 
                 page->cpu=cpu_now;
