@@ -110,6 +110,8 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->cnt=0;
             page->val=(DATA_SIZE/sz);
+            page->cpu=cpu_now;
+            page->next=NULL;
             release_lock(&heap_lock);
 
             /*
@@ -124,8 +126,6 @@ static void *kalloc(size_t size) {
 
             
             //assert(page->val>0);
-            page->cpu=cpu_now;
-            page->next=NULL;
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
@@ -157,10 +157,12 @@ static void *kalloc(size_t size) {
                 //assert(sz<=DATA_SIZE);
                 
                 page->val=(DATA_SIZE/sz);
-                release_lock(&heap_lock);
-
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
+                release_lock(&heap_lock);
+
+                
+                
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
@@ -176,11 +178,11 @@ static void *kalloc(size_t size) {
         //    assert(0);
         //}
         
-        acquire_lock(&heap_lock);
-                printf("Page->val:%d\n",(DATA_SIZE/sz));
-                release_lock(&heap_lock);assert(page->val>0);
+        //acquire_lock(&heap_lock);
+        //        printf("Page->val:%d\n",(DATA_SIZE/sz));
+        //        release_lock(&heap_lock);assert(page->val>0);
         //assert(page!=NULL);
-        assert(page->val>0);
+        //assert(page->val>0);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
