@@ -164,13 +164,14 @@ void* buddy_alloc(size_t size){
         node->next=NULL;
         node->used=USED;
 
+        print_mem_tree();
         return (void*)ret;
     }
     else{//空闲列表里无
-        void* ret=buddy_alloc(size<<1);
-        if(ret!=NULL){
+        uintptr_t ret=(uintptr_t)buddy_alloc(size<<1);
+        if((void*)ret!=NULL){
             //分配了一块大的空间
-            uintptr_t offset=(uintptr_t)ret-buddy_start;
+            uintptr_t offset=ret-buddy_start;
             offset/=__64KB;
 
             bpage* node=bhdr->pages+offset*sizeof(bpage);
@@ -178,7 +179,7 @@ void* buddy_alloc(size_t size){
             node->next=NULL;
             node->used=USED;
 
-            offset=(uintptr_t)ret+size-buddy_start;
+            offset=ret+size-buddy_start;
             offset/=__64KB;
 
             node=bhdr->pages+offset*sizeof(bpage);
@@ -189,7 +190,8 @@ void* buddy_alloc(size_t size){
             bhdr->free_nodes[index]=node;
          
         }
-        return ret;
+        print_mem_tree();
+        return (void*)ret;
     }
     
     
