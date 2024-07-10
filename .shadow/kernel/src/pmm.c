@@ -100,7 +100,13 @@ static void *kalloc(size_t size) {
         slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
         if(!page){
             //分配新的slab_page
+            acquire_lock(&heap_lock);
             page=(slab_page*)buddy_alloc(_64KB);
+            release_lock(&heap_lock);
+            if(page==NULL){
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                return NULL;
+            }
             page->magic=MAGIC_NUM;
             page->cnt=0;
             page->val=(DATA_SIZE/sz);
@@ -120,7 +126,13 @@ static void *kalloc(size_t size) {
             }
             if(!page){
                 //分配新的slab_page
+                acquire_lock(&heap_lock);
                 page=(slab_page*)buddy_alloc(_64KB);
+                release_lock(&heap_lock);
+                if(page==NULL){
+                    release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                    return NULL;
+                }
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
                 page->val=(DATA_SIZE/sz);
@@ -143,7 +155,7 @@ static void *kalloc(size_t size) {
         }
 
         assert(0);
-        //return NULL;
+        return NULL;
     }
 
 }
