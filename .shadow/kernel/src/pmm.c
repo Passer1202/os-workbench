@@ -216,6 +216,8 @@ static void kfree(void *ptr) {
     //对齐到64KB
     slab_page* temp_page=(slab_page*)((uintptr_t)ptr&(~0xFFFF));
 
+    
+
     if(temp_page->magic!=MAGIC_NUM){
         //slowpath
         acquire_lock(&heap_lock);
@@ -225,15 +227,25 @@ static void kfree(void *ptr) {
     }
     else{
         //fastpath
-        acquire_lock(&temp_page->slab_lock);
+        int cpu=temp_page->cpu;
+
+        uintptr_t lock_index=0;
+        size_t sz=MIN_SIZE;
+        while(sz<temp_page->sz){
+            sz<<=1;
+            lock_index++;
+        }
+        assert(sz==temp_page->sz);
+        acquire_lock(&cpu_local[cpu].page_lock[lock_index]);
 
         uintptr_t index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
-        index/=temp_page->sz;
-        printf("size = %d\n",temp_page->sz);
+        index/=sz;
+        printf("size = %d\n",sz);
         printf("index = %d\n",index);
+
         //temp_page->used[index]=0;
         //temp_page->cnt--;
-        release_lock(&temp_page->slab_lock);
+        release_lock(&cpu_local[cpu].page_lock[lock_index]);
         /*
         uintptr_t p=(uintptr_t)ptr;
         slab_page* page=temp_page;
