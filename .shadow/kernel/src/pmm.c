@@ -193,7 +193,7 @@ static void *kalloc(size_t size) {
             }
         }
 
-        assert(0);
+        //assert(0);
         return NULL;
     }
 
