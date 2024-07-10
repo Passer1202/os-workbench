@@ -77,7 +77,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     uintptr_t heap_size = heap_end-heap_start;
 
     
-    size_t cnt=heap_size>>24;
+    int cnt=(heap_size>>20)/16;
     printf("cnt:%d\n",cnt);
 
     for(int i=0;i<cnt;i++){
