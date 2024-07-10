@@ -297,23 +297,23 @@ void* alloc(int sz){
 
 void test_pmm() {
    
-    //alloc(1);
-    void* p[4096];
-    int max=64<<10;
-    max-=(4<<10);
-    max/=16;
-    for(int i=0;i<max;i++){
-        p[i]=alloc(16);
-    }
-    for(int i=1;i<max;i++){
-        if(i%2==0)
-        kfree(p[i]);
-    }
-    //alloc(5);
-    //alloc(10);
-    //alloc(32);
-    //alloc(16777216);
-    //alloc(4096);
+    alloc(1);
+    //void* p[4096];
+    //int max=64<<10;
+   // max-=(4<<10);
+    //max/=16;
+    //for(int i=0;i<max;i++){
+    //    p[i]=alloc(16);
+    //}
+    //for(int i=1;i<max;i++){
+    //    if(i%2==0)
+    //    kfree(p[i]);
+    //}
+    alloc(5);
+    alloc(10);
+    alloc(32);
+    alloc(16777216);
+    alloc(4096);
     ////alloc(4096);
     //alloc(4096);
     //alloc(4096);
