@@ -80,7 +80,7 @@ static void *kalloc(size_t size) {
         slab_index++;
     }
 
-    if(sz>=_16MB){
+    if(sz>_16MB){
          //拒绝分配16MB以上的内存
         return NULL;
     }
