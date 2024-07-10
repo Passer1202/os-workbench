@@ -64,7 +64,7 @@ static lock_t heap_lock;
 //cpu内存空间
 //一个slab一个锁
 typedef struct{
-    slab_page* slab_ptr[SLAB_KINDS];
+    void* slab_ptr[SLAB_KINDS];
     lock_t page_lock[SLAB_KINDS];
 }cpu_local_t;
 
@@ -101,18 +101,18 @@ static void *kalloc(size_t size) {
         if(!page){
             //分配新的slab_page
             acquire_lock(&heap_lock);
-            page=(slab_page*)buddy_alloc(_64KB);
+            page=buddy_alloc(_64KB);
+            release_lock(&heap_lock);
             if(page==NULL){
-                release_lock(&heap_lock);
                 release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
             page->magic=MAGIC_NUM;
+            page->val=DATA_SIZE/sz;
             page->cnt=0;
-            page->val=(DATA_SIZE/sz);
             page->cpu=cpu_now;
             page->next=NULL;
-            release_lock(&heap_lock);
+            //release_lock(&heap_lock);
 
             
             /*acquire_lock(&heap_lock);
@@ -127,11 +127,11 @@ static void *kalloc(size_t size) {
             
             //assert(page->val>0);
             init_lock(&page->slab_lock);
-            memset(page->used,0,SLAB_MAX);
+            //memset(page->used,0,SLAB_MAX);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
-            acquire_lock(&heap_lock);
-            assert(page->val>0);
-            release_lock(&heap_lock);
+            //acquire_lock(&heap_lock);
+            //assert(page->val>0);
+            //release_lock(&heap_lock);
         }
         else{
             //遍历slab_pages
@@ -141,13 +141,13 @@ static void *kalloc(size_t size) {
                 }
                 page=page->next;
             }
-            if(!page){
+            if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
-                page=(slab_page*)buddy_alloc(_64KB);
-                
+                page=buddy_alloc(_64KB);
+                release_lock(&heap_lock);
                 if(page==NULL){
-                    release_lock(&heap_lock);
+                    
                     release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
@@ -156,20 +156,20 @@ static void *kalloc(size_t size) {
                 //printf(sz)
                 //assert(sz<=DATA_SIZE);
                 
-                page->val=(DATA_SIZE/sz);
+                page->val=DATA_SIZE/sz;
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
-                release_lock(&heap_lock);
+                //release_lock(&heap_lock);
 
                 
                 
                 init_lock(&page->slab_lock);
-                memset(page->used,0,SLAB_MAX);
+                //memset(page->used,0,SLAB_MAX);
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
             }
-            acquire_lock(&heap_lock);
-            assert(page->val>0);
-            release_lock(&heap_lock);
+            //acquire_lock(&heap_lock);
+            //assert(page->val>0);
+            //release_lock(&heap_lock);
         }
         //分配slab
         //if(page->val<=0){
@@ -193,7 +193,7 @@ static void *kalloc(size_t size) {
             }
         }
 
-        //assert(0);
+        assert(0);
         return NULL;
     }
 
