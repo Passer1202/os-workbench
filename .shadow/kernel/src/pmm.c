@@ -109,7 +109,10 @@ static void *kalloc(size_t size) {
             }
             page->magic=MAGIC_NUM;
             page->cnt=0;
+            acquire_lock(&heap_lock);
             page->val=(DATA_SIZE/sz);
+            release_lock(&heap_lock);
+            
             
             acquire_lock(&heap_lock);
                 printf("sz:%d\n",sz);
