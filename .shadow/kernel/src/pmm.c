@@ -51,7 +51,7 @@ typedef union{
         uint8_t used[SLAB_MAX];
     };
     struct{
-        uint8_t header[_4KB];
+        uint8_t header[2048];
         uint8_t data[_64KB-_4KB];
     };
     uint8_t slabs[_64KB];//每个slab_page大小64KB，前4KB为header，后60KB为data
@@ -253,9 +253,9 @@ void alloc(int sz){
 
 void test_pmm() {
    
-    alloc(1);
-    alloc(5);
-    alloc(10);
+    //alloc(1);
+    //alloc(5);
+    //alloc(10);
     alloc(32);
     //alloc(16777216);
     alloc(4096);
