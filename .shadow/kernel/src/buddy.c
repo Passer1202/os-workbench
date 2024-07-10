@@ -64,9 +64,9 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     
 
     //使heap_start指向数据区、
-    printf("heap_start:%p\n",heap_start);
+    //printf("heap_start:%p\n",heap_start);
     heap_start+=sizeof(buddy_header);
-    printf("heap_start:%p\n",heap_start);
+    //printf("heap_start:%p\n",heap_start);
     //使heap_start对齐到16MB
     heap_start=(heap_start+__16MB-1)&~(__16MB-1);
     //使heap_end对齐到16MB//貌似没啥用？
@@ -79,8 +79,8 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     
     uintptr_t heap_size=(heap_end-heap_start);
 
-    printf("heap_start:%p\n",heap_start);
-    printf("heap_end:%p\n",heap_end);
+    //printf("heap_start:%p\n",heap_start);
+    //printf("heap_end:%p\n",heap_end);
     int cnt=heap_size/__16MB;
     printf("cnt:%d\n",cnt);
 
