@@ -227,33 +227,15 @@ static void kfree(void *ptr) {
     }
     else{
         //fastpath
-        int cpu=temp_page->cpu;
-
-        uintptr_t lock_index=0;
-        size_t sz=MIN_SIZE;
-        while(sz<temp_page->sz){
-            sz<<=1;
-            lock_index++;
-        }
-        assert(sz==temp_page->sz);
-        acquire_lock(&cpu_local[cpu].page_lock[lock_index]);
-
-        uintptr_t index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
+        //int cpu_now=cpu_current();
+        acquire_lock(&temp_page->slab_lock);
+        int sz=temp_page->sz;
+        int index=(uintptr_t)temp_page->data-(uintptr_t)temp_page;
         index/=sz;
-        //printf("size = %d\n",sz);
-        //printf("index = %d\n",index);
-
-        //temp_page->used[index]=0;
-        //temp_page->cnt--;
-        release_lock(&cpu_local[cpu].page_lock[lock_index]);
-        /*
-        uintptr_t p=(uintptr_t)ptr;
-        slab_page* page=temp_page;
-        p=p%_64KB;
-        p=p-_4KB;
-        assert(page->sz>0);
-        p=p/page->sz;
-        */
+        temp_page->used[index]=0;
+        temp_page->cnt--;
+        release_lock(&temp_page->slab_lock);
+        return;
     }
    
 }
