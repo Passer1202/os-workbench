@@ -175,7 +175,7 @@ void* buddy_alloc(size_t size){
             uintptr_t offset=ret-buddy_start;
             offset/=__64KB;
 
-            bpage* node=bhdr->pages+offset*sizeof(bpage);
+            bpage* node=(bpage*)((uintptr_t)bhdr->pages+offset*sizeof(bpage));
             node->size=index;
             node->next=NULL;
             node->used=USED;
@@ -183,7 +183,7 @@ void* buddy_alloc(size_t size){
             offset=ret+size-buddy_start;
             offset/=__64KB;
 
-            node=bhdr->pages+offset*sizeof(bpage);
+            node=(bpage*)((uintptr_t)bhdr->pages+offset*sizeof(bpage));
             node->size=index;
             node->next=NULL;
             node->used=FREE;
