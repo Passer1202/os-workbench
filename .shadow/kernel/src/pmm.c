@@ -115,16 +115,19 @@ static void *kalloc(size_t size) {
                 printf("sz:%d\n",sz);
                 printf("DATA_SIZE:%d\n",DATA_SIZE);
                 printf("page->val:%d\n",(DATA_SIZE/sz));
-                release_lock(&heap_lock);
+                assert(page->val>0);
+            release_lock(&heap_lock);
 
-            assert(page->val>0);
+            
             //assert(page->val>0);
             page->cpu=cpu_now;
             page->next=NULL;
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
+            acquire_lock(&heap_lock);
             assert(page->val>0);
+            release_lock(&heap_lock);
         }
         else{
             //遍历slab_pages
@@ -162,7 +165,9 @@ static void *kalloc(size_t size) {
                 memset(page->used,0,SLAB_MAX);
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
             }
+            acquire_lock(&heap_lock);
             assert(page->val>0);
+            release_lock(&heap_lock);
         }
         //分配slab
         //if(page->val<=0){
