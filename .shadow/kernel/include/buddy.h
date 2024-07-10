@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 void buddy_init(uintptr_t heap_start,uintptr_t heap_end);
 

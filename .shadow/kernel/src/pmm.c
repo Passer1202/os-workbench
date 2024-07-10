@@ -172,6 +172,9 @@ static void pmm_init() {
             init_lock(&cpu_local[i].page_lock[j]);
         }
     }
+
+    //初始化buddy系统
+    buddy_init((uintptr_t)heap.end , (uintptr_t)heap.end);
     
     printf("PMM: init done\n");
 }
