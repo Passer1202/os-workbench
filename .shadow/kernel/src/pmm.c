@@ -64,7 +64,7 @@ static lock_t heap_lock;
 
 //cpu内存空间
 //一个slab一个锁
-typedef struct{
+typedef struct cpu_local_t{
     void* slab_ptr[SLAB_KINDS];
     lock_t page_lock[SLAB_KINDS];
 }cpu_local_t;
@@ -140,15 +140,16 @@ static void *kalloc(size_t size) {
     else{
         //fastpath
         int cpu_now=cpu_current();
-        acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
         slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
         if(!page){
             //分配新的slab_page
+            
             acquire_lock(&heap_lock);
             page=(slab_page*)buddy_alloc(_64KB);
             release_lock(&heap_lock);
+
+            
             if(page==NULL){
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
             page->magic=MAGIC_NUM;
@@ -157,10 +158,13 @@ static void *kalloc(size_t size) {
             page->sz=size;
             page->next=NULL;
             page->cpu=cpu_now;
-
+    
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
+
+            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
+            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
         }
         else{
@@ -178,7 +182,6 @@ static void *kalloc(size_t size) {
                 release_lock(&heap_lock);
                 if(page==NULL){
                     
-                    release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
                 page->magic=MAGIC_NUM;
@@ -187,19 +190,22 @@ static void *kalloc(size_t size) {
                 page->val=DATA_SIZE/sz;
                 page->sz=size;
                 page->cpu=cpu_now;
-                page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
-                
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
+
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
+
+                acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             }
         }
+        acquire_lock(&page->slab_lock);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
                 page->cnt++;
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
-
+                release_lock(&page->slab_lock);
                 return (void*)(page->data+i*sz);
             }
         }
