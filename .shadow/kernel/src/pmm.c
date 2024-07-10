@@ -177,7 +177,7 @@ static void pmm_init() {
     
     buddy_init((uintptr_t)heap.end , (uintptr_t)heap.end);
     printf("PMM: init done\n");
-     assert(0);
+    assert(0);
     
 }
 

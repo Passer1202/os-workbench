@@ -8,8 +8,8 @@
 //如果buddy_header占用空间太大，试着见效下面两个参数
 
 
-#define BUDDY_HEADER_SIZE (1<<21)
-#define BUDDY_PAGE_SIZE (1<<16)
+#define BUDDY_HEADER_SIZE (1<<18)//(1<<21)
+#define BUDDY_PAGE_SIZE (1<<13)//(1<<16)
 
 
 
@@ -89,7 +89,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
 
     bhdr->pages[cnt*256].next=NULL;
     bhdr->free_nodes[_16MB]=&bhdr->pages[0];
-   
+    //assert(0);
 }
 
 void* buddy_alloc(size_t size){
