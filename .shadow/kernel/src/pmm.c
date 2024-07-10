@@ -136,6 +136,7 @@ static void *kalloc(size_t size) {
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
                 //printf(sz)
+                assert(sz<=DATA_SIZE);
                 page->val=(DATA_SIZE/sz);
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
