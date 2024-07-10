@@ -224,7 +224,7 @@ static void kfree(void *ptr) {
         //fastpath
         acquire_lock(&temp_page->slab_lock);
 
-        int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
+        uintptr_t index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
         index/=temp_page->sz;
         printf("index = %d\n",index);
         temp_page->used[index]=0;
@@ -297,7 +297,7 @@ void test_pmm() {
     for(int i=0;i<10;i++){
         p[i]=alloc(16);
     }
-    for(int i=0;i<10;i++){
+    for(int i=1;i<10;i++){
         kfree(p[i]);
     }
     //alloc(5);
