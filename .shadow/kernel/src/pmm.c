@@ -144,6 +144,7 @@ static void *kalloc(size_t size) {
             }
         }
         //分配slab
+        assert(page->val>0);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
