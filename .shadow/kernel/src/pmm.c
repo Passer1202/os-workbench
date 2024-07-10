@@ -295,7 +295,7 @@ void test_pmm() {
     //alloc(1);
     void* p[16];
     for(int i=0;i<10;i++){
-        p[i]=alloc(16);
+        p[i]=alloc(4096);
     }
     for(int i=1;i<10;i++){
         kfree(p[i]);
