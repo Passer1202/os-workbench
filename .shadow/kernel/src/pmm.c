@@ -119,7 +119,7 @@ static void *kalloc(size_t size) {
                 printf("sz:%d\n",sz);
                 printf("DATA_SIZE:%d\n",DATA_SIZE);
                 printf("page->val:%d %d\n",(DATA_SIZE/sz),page->val);
-                //page->val=(DATA_SIZE/sz);
+                page->val=(DATA_SIZE/sz);
                 assert(page->val>0);
             release_lock(&heap_lock);
             
