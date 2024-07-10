@@ -68,7 +68,7 @@ typedef struct{
     lock_t page_lock[SLAB_KINDS];
 }cpu_local_t;
 
-cpu_local_t cpu_local[CPU_MAX];
+static cpu_local_t cpu_local[CPU_MAX];
 
 
 static void *kalloc(size_t size) {
@@ -215,6 +215,7 @@ static void pmm_init() {
     init_lock(&heap_lock);
 
     int cpu_cnt=cpu_count();
+    memset(cpu_local,0,sizeof(cpu_local));
 
     for(int i=0;i<cpu_cnt;i++){
         for(int j=0;j<SLAB_KINDS;j++){
