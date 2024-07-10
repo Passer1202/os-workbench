@@ -139,9 +139,10 @@ static void *kalloc(size_t size) {
     }
     else{
         //fastpath
+        
         int cpu_now=cpu_current();
         slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
-        acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+        
         if(!page){
             //分配新的slab_page
             
@@ -151,7 +152,7 @@ static void *kalloc(size_t size) {
 
             
             if(page==NULL){
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
             page->magic=MAGIC_NUM;
@@ -164,7 +165,7 @@ static void *kalloc(size_t size) {
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
 
-           
+            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
             release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
@@ -182,8 +183,9 @@ static void *kalloc(size_t size) {
                 acquire_lock(&heap_lock);
                 page=(slab_page*)buddy_alloc(_64KB);
                 release_lock(&heap_lock);
+                
                 if(page==NULL){
-                    
+                    //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
                 page->magic=MAGIC_NUM;
@@ -195,19 +197,22 @@ static void *kalloc(size_t size) {
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
 
-                cpu_local[cpu_now].slab_ptr[slab_index]=page;
+                
 
-                //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
+
+                cpu_local[cpu_now].slab_ptr[slab_index]=page;
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             }
             
         }
-        //acquire_lock(&page->slab_lock);
+        acquire_lock(&page->slab_lock);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
                 page->cnt++;
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                release_lock(&page->slab_lock);
                 return (void*)(page->data+i*sz);
             }
         }
