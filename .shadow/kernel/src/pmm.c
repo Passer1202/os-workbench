@@ -200,19 +200,19 @@ static void *kalloc(size_t size) {
                 //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
             }
-            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            
         }
-        acquire_lock(&page->slab_lock);
+        //acquire_lock(&page->slab_lock);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
                 page->cnt++;
-                release_lock(&page->slab_lock);
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return (void*)(page->data+i*sz);
             }
         }
 
-        assert(0);
+        //assert(0);
         return NULL;
     }
 
