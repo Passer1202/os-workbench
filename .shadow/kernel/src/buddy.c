@@ -9,8 +9,8 @@
 //如果buddy_header占用空间太大，试着见效下面两个参数
 
 
-#define BUDDY_HEADER_SIZE (1<<21)
-#define BUDDY_PAGE_SIZE (1<<16)
+#define BUDDY_HEADER_SIZE (1<<18)
+#define BUDDY_PAGE_SIZE (1<<13)
 
 
 
