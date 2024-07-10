@@ -110,7 +110,7 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->cnt=0;
             page->val=(DATA_SIZE/sz);
-            assert(page->val>0);
+            //assert(page->val>0);
             page->cpu=cpu_now;
             page->next=NULL;
             init_lock(&page->slab_lock);
@@ -147,7 +147,12 @@ static void *kalloc(size_t size) {
             }
         }
         //分配slab
-        assert(page->val>=0);
+        if(page->val<=0){
+            acquire_lock(&page->slab_lock);
+            printf("page->val:%d\n",page->val);
+            assert(0);
+            
+        }
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
