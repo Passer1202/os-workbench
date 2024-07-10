@@ -299,7 +299,7 @@ void test_pmm() {
     max-=(4<<10);
     max/=16;
     for(int i=0;i<max;i++){
-        p[i]=alloc(4096);
+        p[i]=alloc(16);
     }
     for(int i=1;i<max;i++){
         kfree(p[i]);
