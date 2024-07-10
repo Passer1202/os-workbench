@@ -138,6 +138,11 @@ static void *kalloc(size_t size) {
                 page->cnt=0;
                 //printf(sz)
                 //assert(sz<=DATA_SIZE);
+                acquire_lock(&heap_lock);
+                printf("sz:%d\n",sz);
+                printf("DATA_SIZE:%d\n",DATA_SIZE);
+                printf("page->val:%d\n",(DATA_SIZE/sz));
+                release_lock(&heap_lock);
                 page->val=(DATA_SIZE/sz);
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
@@ -147,12 +152,11 @@ static void *kalloc(size_t size) {
             }
         }
         //分配slab
-        if(page->val<=0){
-            acquire_lock(&page->slab_lock);
-            printf("page->val:%d\n",page->val);
-            assert(0);
-            
-        }
+        //if(page->val<=0){
+        //    acquire_lock(&page->slab_lock);
+        //    printf("page->val:%d\n",page->val);
+        //    assert(0);
+        //}
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
                 page->used[i]=1;
