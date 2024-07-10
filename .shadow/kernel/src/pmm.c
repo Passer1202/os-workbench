@@ -232,9 +232,9 @@ void alloc(int sz){
     uintptr_t align=a & -a ;
 
     //atomic{
-    acquire_lock(&heap_lock);
-    printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
-    release_lock(&heap_lock);
+    //acquire_lock(&heap_lock);
+    //printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
+    //release_lock(&heap_lock);
 //}
 
     assert(a&&align>=sz);
