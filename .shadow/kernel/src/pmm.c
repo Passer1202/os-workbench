@@ -82,7 +82,6 @@ static void *kalloc(size_t size) {
 
     if(sz>_16MB){
          //拒绝分配16MB以上的内存
-        assert(0);
         return NULL;
     }
 

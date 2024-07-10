@@ -75,6 +75,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
 
     //将16MB的头给更新好
     uintptr_t heap_size = heap_end-heap_start;
+    printf("heap_size:%d\n",heap_size);
     int cnt=heap_size>>24;
 
     for(int i=0;i<cnt;i++){
