@@ -297,11 +297,11 @@ void alloc(int sz){
 void test_pmm() {
    
     alloc(1);
-    //alloc(5);
-    //alloc(10);
-    //alloc(32);
-    //alloc(16777216);
-    //alloc(4096);
+    alloc(5);
+    alloc(10);
+    alloc(32);
+    alloc(16777216);
+    alloc(4096);
     ////alloc(4096);
     //alloc(4096);
     //alloc(4096);

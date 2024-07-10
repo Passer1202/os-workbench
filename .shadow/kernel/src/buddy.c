@@ -60,7 +60,7 @@ typedef union buddy_header_t{
 buddy_header* bhdr=NULL;
 
 
-
+/*
 void print_mem_tree(){
     for(int i=0;i<BUDDY_KINDS;i++){
     bpage* tmp=bhdr->free_nodes[i];
@@ -79,6 +79,7 @@ void print_mem_tree(){
     printf("\n");
     }
 }
+*/
 
 
 void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
@@ -128,7 +129,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     //assert(0);
 
     printf("Buddy ready\n");
-    print_mem_tree();
+    //print_mem_tree();
     
 }
 
@@ -164,7 +165,7 @@ void* buddy_alloc(size_t size){
         node->next=NULL;
         node->used=USED;
 
-        print_mem_tree();
+        //print_mem_tree();
         return (void*)ret;
     }
     else{//空闲列表里无
@@ -191,7 +192,7 @@ void* buddy_alloc(size_t size){
             bhdr->free_nodes[index]=node;
          
         }
-        print_mem_tree();
+        //print_mem_tree();
         return (void*)ret;
     }
     
