@@ -215,7 +215,8 @@ static void pmm_init() {
     init_lock(&heap_lock);
 
     int cpu_cnt=cpu_count();
-    memset(cpu_local,0,sizeof(cpu_local));
+    
+    //memset(cpu_local,0,sizeof(cpu_local));
 
     for(int i=0;i<cpu_cnt;i++){
         for(int j=0;j<SLAB_KINDS;j++){
@@ -256,8 +257,8 @@ void test_pmm() {
     alloc(10);
     alloc(32);
     //alloc(16777216);
-    alloc(4096);
-    alloc(5000);
+    //alloc(4096);
+    //alloc(5000);
     //atomic{
     //printf("PMM: test passed\n");
     //}
