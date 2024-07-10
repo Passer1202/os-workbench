@@ -117,7 +117,7 @@ static void *kalloc(size_t size) {
                 printf("page->val:%d\n",(DATA_SIZE/sz));
                 release_lock(&heap_lock);
 
-            //assert(page->val>0);
+            assert(page->val>0);
             page->cpu=cpu_now;
             page->next=NULL;
             init_lock(&page->slab_lock);
