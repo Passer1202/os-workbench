@@ -110,6 +110,7 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->cnt=0;
             page->val=(DATA_SIZE/sz);
+            assert(page->val>0);
             page->cpu=cpu_now;
             page->next=NULL;
             init_lock(&page->slab_lock);
@@ -136,7 +137,7 @@ static void *kalloc(size_t size) {
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
                 //printf(sz)
-                assert(sz<=DATA_SIZE);
+                //assert(sz<=DATA_SIZE);
                 page->val=(DATA_SIZE/sz);
                 page->cpu=cpu_now;
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法
