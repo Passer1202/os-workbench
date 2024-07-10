@@ -144,7 +144,7 @@ static void *kalloc(size_t size) {
         if(!page){
             //分配新的slab_page
             acquire_lock(&heap_lock);
-            page=heap_alloc(_64KB);
+            page=buddy_alloc(_64KB);
             release_lock(&heap_lock);
             if(page==NULL){
                 release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
@@ -187,7 +187,7 @@ static void *kalloc(size_t size) {
             if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
-                page=heap_alloc(_64KB);
+                page=buddy_alloc(_64KB);
                 release_lock(&heap_lock);
                 if(page==NULL){
                     
