@@ -26,6 +26,8 @@ enum BUDDY_STATE{
 };
 
 
+
+
 enum BUDDY_KIND{
     _64KB=0,
     _128KB,
@@ -56,6 +58,28 @@ typedef union buddy_header_t{
 }buddy_header;
 
 buddy_header* bhdr=NULL;
+
+
+
+void print_mem_tree(){
+    for(int i=0;i<BUDDY_KINDS;i++){
+    bpage* tmp=bhdr->free_nodes[i];
+    printf("%d:",i);
+    while(tmp!=NULL){
+        
+        uintptr_t offset=(uintptr_t)tmp-(uintptr_t)bhdr->pages;
+        offset/=sizeof(bpage);
+
+        uintptr_t num=buddy_start+offset*__64KB;
+
+        //uintptr_t num=map2addr((uintptr_t)tmp);
+        printf("%x(%d)->",num,tmp->size);
+        tmp=tmp->next;
+    }
+    printf("\n");
+    }
+}
+
 
 void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     
@@ -104,6 +128,7 @@ void buddy_init(uintptr_t heap_start,uintptr_t heap_end){
     //assert(0);
 
     printf("Buddy ready\n");
+    print_mem_tree();
     
 }
 
