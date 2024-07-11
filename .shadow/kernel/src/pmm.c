@@ -169,7 +169,7 @@ static void *kalloc(size_t size) {
 
             
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
-            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
         }
         else{
@@ -206,7 +206,7 @@ static void *kalloc(size_t size) {
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
 
                 cpu_local[cpu_now].slab_ptr[slab_index]=page;
-                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             }
             
         }
@@ -216,6 +216,7 @@ static void *kalloc(size_t size) {
                 acquire_lock(&page->slab_lock);
                 page->used[i]=1;
                 page->cnt++;
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 release_lock(&page->slab_lock);
                 return (void*)(page->data+i*sz);
             }
@@ -237,9 +238,9 @@ static void kfree(void *ptr) {
 
     if(temp_page->magic!=MAGIC_NUM){
         //slowpath
-        acquire_lock(&heap_lock);
-        buddy_free(ptr);
-        release_lock(&heap_lock);
+        //acquire_lock(&heap_lock);
+        //buddy_free(ptr);
+        //release_lock(&heap_lock);
         return;
     }
     else{
