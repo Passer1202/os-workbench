@@ -46,7 +46,7 @@ typedef union{
         int cnt;//计数
         int val;//容量
         int sz;//每个slab的大小
-        int cpu;
+        //int cpu;
         void* next;
         lock_t slab_lock;
         uint8_t used[SLAB_MAX];
@@ -164,7 +164,7 @@ static void *kalloc(size_t size) {
             page->cnt=0;
             page->sz=sz;
             page->next=NULL;
-            page->cpu=cpu_now;
+            //page->cpu=cpu_now;
     
             init_lock(&page->slab_lock);
             memset(page->used,0,SLAB_MAX);
@@ -201,7 +201,7 @@ static void *kalloc(size_t size) {
                 
                 page->val=DATA_SIZE/sz;
                 page->sz=sz;
-                page->cpu=cpu_now;
+                //page->cpu=cpu_now;
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
                 
