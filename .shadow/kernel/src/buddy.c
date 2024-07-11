@@ -209,15 +209,6 @@ void buddy_free(void* ptr){
         //注意到：i是相对于64KB的幂次差
 
         bpage* node2=NULL;
-        //printf("i:%d\n",i);
-        //if(i!=node1->size){
-            //printf("i:%d\n",i);
-            //while(1);
-        //}
-        //printf("i:%d\n",i);
-        //assert(i==node1->size);
-
-
         if(offset%(1<<(i+1))==0){
             //说明来的是左边的
             node2=node1+(1<<i);
