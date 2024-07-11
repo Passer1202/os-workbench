@@ -322,8 +322,9 @@ void test_pmm() {
     //}
     alloc(5000);
     void* p=alloc(5000);
-    printf("PMM: test passed\n");
+    
     kfree(p);
+    printf("PMM: test passed\n");
     alloc(32);
     alloc(16777216);
     alloc(4096);
