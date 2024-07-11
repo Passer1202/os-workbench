@@ -331,7 +331,7 @@ void test_pmm() {
     //alloc(4096);
    // alloc(5000);
     //atomic{
-    //printf("PMM: test passed\n");
+    printf("PMM: test passed\n");
     //}
 }
 
