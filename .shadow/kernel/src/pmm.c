@@ -215,7 +215,7 @@ static void *kalloc(size_t size) {
                 acquire_lock(&page->slab_lock);
                 page->used[i]=1;
                 page->cnt++;
-                release_lock(&cpu_local[page->cpu].page_lock[slab_index]);
+                release_lock(&page->slab_lock);
                 return (void*)(page->data+i*sz);
             }
         }
