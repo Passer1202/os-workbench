@@ -141,6 +141,7 @@ static void *kalloc(size_t size) {
         //fastpath
         
         int cpu_now=cpu_current();
+        acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
         slab_page* page=cpu_local[cpu_now].slab_ptr[slab_index];
         
         if(!page){
@@ -152,10 +153,10 @@ static void *kalloc(size_t size) {
 
             
             if(page==NULL){
-                //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
-            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+           
             page->magic=MAGIC_NUM;
             page->val=DATA_SIZE/sz;
             page->cnt=0;
@@ -173,14 +174,14 @@ static void *kalloc(size_t size) {
         }
         else{
             //遍历slab_pages
-            acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             while(page!=NULL){
                 if(page->cnt<page->val){
                     break;
                 }
                 page=page->next;
             }
-            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
@@ -188,10 +189,10 @@ static void *kalloc(size_t size) {
                 release_lock(&heap_lock);
                 
                 if(page==NULL){
-                    //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                    release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
-                acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
