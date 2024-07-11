@@ -180,7 +180,7 @@ static void *kalloc(size_t size) {
                 }
                 page=page->next;
             }
-            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             if(page==NULL){
                 //分配新的slab_page
                 acquire_lock(&heap_lock);
@@ -191,7 +191,7 @@ static void *kalloc(size_t size) {
                     //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                     return NULL;
                 }
-                acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
                 page->magic=MAGIC_NUM;
                 page->cnt=0;
