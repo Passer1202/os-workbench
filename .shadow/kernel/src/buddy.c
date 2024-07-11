@@ -210,10 +210,10 @@ void buddy_free(void* ptr){
 
         bpage* node2=NULL;
         //printf("i:%d\n",i);
-        if(i!=node1->size){
-            printf("i:%d\n",i);
-            while(1);
-        }
+        //if(i!=node1->size){
+            //printf("i:%d\n",i);
+            //while(1);
+        //}
         //printf("i:%d\n",i);
         //assert(i==node1->size);
 
