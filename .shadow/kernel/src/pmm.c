@@ -164,7 +164,7 @@ static void *kalloc(size_t size) {
             page->cpu=cpu_now;
     
             init_lock(&page->slab_lock);
-            //memset(page->used,0,SLAB_MAX);
+            memset(page->used,0,SLAB_MAX);
 
             
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
@@ -200,7 +200,7 @@ static void *kalloc(size_t size) {
                 page->sz=size;
                 page->cpu=cpu_now;
                 init_lock(&page->slab_lock);
-                //memset(page->used,0,SLAB_MAX);
+                memset(page->used,0,SLAB_MAX);
                 
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
 
