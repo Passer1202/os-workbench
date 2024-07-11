@@ -214,6 +214,7 @@ void buddy_free(void* ptr){
             printf("i:%d\n",i);
             while(1);
         }
+        printf("i:%d\n",i);
         //assert(i==node1->size);
 
 
