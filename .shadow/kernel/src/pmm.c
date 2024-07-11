@@ -162,7 +162,7 @@ static void *kalloc(size_t size) {
             page->magic=MAGIC_NUM;
             page->val=DATA_SIZE/sz;
             page->cnt=0;
-            page->sz=size;
+            page->sz=sz;
             page->next=NULL;
             page->cpu=cpu_now;
     
@@ -200,7 +200,7 @@ static void *kalloc(size_t size) {
                 page->cnt=0;
                 
                 page->val=DATA_SIZE/sz;
-                page->sz=size;
+                page->sz=sz;
                 page->cpu=cpu_now;
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
@@ -215,11 +215,12 @@ static void *kalloc(size_t size) {
         //acquire_lock(&cpu_local[page->cpu].page_lock[slab_index]);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
-                //acquire_lock(&page->slab_lock);
+                acquire_lock(&page->slab_lock);
                 page->used[i]=1;
                 page->cnt++;
-                //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                release_lock(&page->slab_lock);
                 release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+                //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return (void*)(page->data+i*sz);
             }
         }
@@ -249,20 +250,14 @@ static void kfree(void *ptr) {
         //fastpath
         //int cpu_now=cpu_current();
 
-         int sz=MIN_SIZE;
-        int slab_index=0;
-        while(sz<temp_page->sz){
-            sz<<=1;
-            slab_index++;
-        }
-
+       
         int index=(uintptr_t)ptr-(uintptr_t)temp_page->data;
         index/=temp_page->sz;
         //printf("Free %p index = %d\n",ptr,index);
-        acquire_lock(&cpu_local[temp_page->cpu].page_lock[slab_index]);
+        acquire_lock(&temp_page->slab_lock);
         temp_page->used[index]=0;
         temp_page->cnt--;
-        release_lock(&cpu_local[temp_page->cpu].page_lock[slab_index]);
+        release_lock(&temp_page->slab_lock);
         return;
     }
    
