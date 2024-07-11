@@ -233,6 +233,7 @@ void buddy_free(void* ptr){
                             freenode->next=node2->next;
                             break;
                         }
+                        freenode=freenode->next;
                     }
                 }
                 //合并
@@ -250,7 +251,7 @@ void buddy_free(void* ptr){
             else{
                 break;
             }
-           printf("i:%d\n",i);
+           //printf("i:%d\n",i);
         }
         else{
             //说明来的是右边的
@@ -267,6 +268,7 @@ void buddy_free(void* ptr){
                             freenode->next=node2->next;
                             break;
                         }
+                        freenode=freenode->next;
                     }
                 }
                 //合并
