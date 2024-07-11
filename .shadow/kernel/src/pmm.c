@@ -241,9 +241,9 @@ static void kfree(void *ptr) {
 
     if(temp_page->magic!=MAGIC_NUM){
         //slowpath
-        //acquire_lock(&heap_lock);
-        //buddy_free(ptr);
-        //release_lock(&heap_lock);
+        acquire_lock(&heap_lock);
+        buddy_free(ptr);
+        release_lock(&heap_lock);
         return;
     }
     else{
