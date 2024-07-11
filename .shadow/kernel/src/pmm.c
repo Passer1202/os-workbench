@@ -163,7 +163,7 @@ static void *kalloc(size_t size) {
             page->next=NULL;
             page->cpu=cpu_now;
     
-            //init_lock(&page->slab_lock);
+            init_lock(&page->slab_lock);
             //memset(page->used,0,SLAB_MAX);
 
             
@@ -199,7 +199,7 @@ static void *kalloc(size_t size) {
                 page->val=DATA_SIZE/sz;
                 page->sz=size;
                 page->cpu=cpu_now;
-                //init_lock(&page->slab_lock);
+                init_lock(&page->slab_lock);
                 //memset(page->used,0,SLAB_MAX);
                 
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
@@ -209,10 +209,10 @@ static void *kalloc(size_t size) {
             }
             
         }
-        acquire_lock(&cpu_local[page->cpu].page_lock[slab_index]);
+        //acquire_lock(&cpu_local[page->cpu].page_lock[slab_index]);
         for(int i=0;i<page->val;i++){
             if(page->used[i]==0){
-                //acquire_lock(&page->slab_lock);
+                acquire_lock(&page->slab_lock);
                 page->used[i]=1;
                 page->cnt++;
                 release_lock(&cpu_local[page->cpu].page_lock[slab_index]);
