@@ -250,8 +250,8 @@ static void kfree(void *ptr) {
         index/=temp_page->sz;
         //printf("Free %p index = %d\n",ptr,index);
         acquire_lock(&temp_page->slab_lock);
-        //temp_page->used[index]=0;
-        //temp_page->cnt--;
+        temp_page->used[index]=0;
+        temp_page->cnt--;
         release_lock(&temp_page->slab_lock);
         return;
     }
