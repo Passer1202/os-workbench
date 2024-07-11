@@ -209,7 +209,7 @@ void buddy_free(void* ptr){
         //注意到：i是相对于64KB的幂次差
 
         bpage* node2=NULL;
-
+        printf("i:%d\n",i);
         if(i!=node1->size){
             printf("i:%d\n",i);
             while(1);
