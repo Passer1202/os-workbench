@@ -2,6 +2,8 @@
 //#include<assert.h>
 #include<stdio.h>
 
+//AC:4/6 Too slow 
+
 //此部分实现有问题
 
 //将信息头和数据区分开
@@ -196,5 +198,93 @@ void* buddy_alloc(size_t size){
 }
 
 void buddy_free(void* ptr){
+    //TODO
+    uintptr_t offset=(uintptr_t)ptr-buddy_start;
+    offset/=__64KB;
+
+    bpage* node1=(bpage*)((uintptr_t)bhdr->pages+offset*sizeof(bpage));
+    node1->used=FREE;
+
+    for(int i=node1->size;i<_16MB;i++){
+        //注意到：i是相对于64KB的幂次差
+
+        bpage* node2=NULL;
+
+        if(i!=node1->size){
+            printf("i:%d\n",i);
+            while(1);
+        }
+        //assert(i==node1->size);
+
+
+        if(offset%(1<<(i+1))==0){
+            //说明来的是左边的
+            node2=node1+(1<<i);
+            if(node2->used==FREE && node2->size==i){
+                //从空闲列表中删除node2
+                bpage* freenode=bhdr->free_nodes[i];
+                if(freenode==node2){
+                    bhdr->free_nodes[i]=node2->next;
+                }
+                else{
+                    while(freenode!=NULL){
+                        if(freenode->next==node2){
+                            freenode->next=node2->next;
+                            break;
+                        }
+                    }
+                }
+                //合并
+                //清空node2的头
+                node2->next=NULL;
+                node2->size=0;
+
+                node1->size++;
+
+                node1->next=bhdr->free_nodes[node1->size];
+
+                bhdr->free_nodes[node1->size]=node1;
+
+            }
+            else{
+                break;
+            }
+           
+        }
+        else{
+            //说明来的是右边的
+            bpage* node2=node1-(1<<i);
+            if(node2->used==FREE && node2->size==i){
+                //从空闲列表中删除node2
+                bpage* freenode=bhdr->free_nodes[i];
+                if(freenode==node2){
+                    bhdr->free_nodes[i]=node2->next;
+                }
+                else{
+                    while(freenode!=NULL){
+                        if(freenode->next==node2){
+                            freenode->next=node2->next;
+                            break;
+                        }
+                    }
+                }
+                //合并
+                //清空node1的头
+                node1->next=NULL;
+                node1->size=0;
+
+                node2->size++;
+
+                node2->next=bhdr->free_nodes[node2->size];
+
+                bhdr->free_nodes[node2->size]=node2;
+                node1=node2;
+
+            }
+            else{
+                break;
+            }
+        }
+    }
 
 }

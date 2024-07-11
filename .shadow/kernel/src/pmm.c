@@ -48,7 +48,7 @@ typedef union{
         int sz;//每个slab的大小
         int cpu;
         void* next;
-        int slab_lock;
+        lock_t slab_lock;
         uint8_t used[SLAB_MAX];
     };
     struct{
@@ -201,9 +201,6 @@ static void *kalloc(size_t size) {
                 page->cpu=cpu_now;
                 init_lock(&page->slab_lock);
                 memset(page->used,0,SLAB_MAX);
-
-                
-
                 
                 page->next=cpu_local[cpu_now].slab_ptr[slab_index];//头插法 
 
