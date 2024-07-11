@@ -171,7 +171,7 @@ static void *kalloc(size_t size) {
 
             //acquire_lock(&cpu_local[cpu_now].page_lock[slab_index]);
             cpu_local[cpu_now].slab_ptr[slab_index]=page;
-            release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
+            //release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
 
         }
         else{
