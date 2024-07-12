@@ -151,14 +151,12 @@ static void *kalloc(size_t size) {
             page=(slab_page*)buddy_alloc(_64KB);
             release_lock(&heap_lock);
 
-            
             if(page==NULL){
                 release_lock(&cpu_local[cpu_now].page_lock[slab_index]);
                 return NULL;
             }
 
             
-           
             page->magic=MAGIC_NUM;
             page->val=DATA_SIZE/sz;
             page->cnt=0;

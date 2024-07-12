@@ -51,7 +51,7 @@ int strncmp(const char *s1, const char *s2, size_t n) {
   }
   return s1[i] - s2[i];
 }
-/*
+
 int strcmp(const char *s1, const char *s2) {
    int ret=0;
   while(*s1 && *s2){
@@ -71,7 +71,7 @@ int strcmp(const char *s1, const char *s2) {
   return ret;
  
 }
-*/
+
 
 void *memset(void *s, int c, size_t n) {
   unsigned char *p = s;

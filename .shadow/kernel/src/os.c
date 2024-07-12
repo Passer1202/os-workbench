@@ -2,6 +2,8 @@
 
 static void os_init() {
     pmm->init();
+    kmt->init();
+    //dev->init();
 }
 //#define TEST 
 
