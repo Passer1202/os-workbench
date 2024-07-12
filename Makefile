@@ -1,3 +1,4 @@
+export TOKEN   := Q3QAMJ0J
 # ----- DO NOT MODIFY -----
 
 ifeq ($(NAME),)

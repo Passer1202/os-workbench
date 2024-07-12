@@ -1,6 +1,8 @@
 // Original Author: Andrej Karpathy
 // https://github.com/karpathy/llm.c
 
+//这是一份投机的代码:D
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +13,19 @@
 
 #include "thread.h"
 #include "thread-sync.h"
+
+/*定义一组全局变量方便并行*/
+float* Mout;
+float* Minp;
+float* Mweight;
+float* Mbias;
+int MB; 
+int MT;
+int MC;
+int MOC;
+
+
+
 
 // ----------------------------------------------------------------------------
 // all the individual layers' forward passes
@@ -83,6 +98,30 @@ void layernorm_forward(float* out, float* mean, float* rstd,
     }
 }
 
+void* tmatmul_forward(void* fn){
+
+    intptr_t x=(intptr_t)fn;
+    int MT2=MT*(x+1)/4; 
+    int MT1=MT*x/4;
+
+    for (int b = 0; b < MB; b++) {
+        for (int t = MT1; t < MT2; t++) {
+            float* out_bt = Mout + b * MT1 * MOC + t * MOC;
+            float* inp_bt = Minp + b * MT1 * MC + t * MC;
+            for (int o = 0; o < MOC; o++) {
+                float val = (Mbias != NULL) ? Mbias[o] : 0.0f;
+                float* wrow = Mweight + o*MC;
+                for (int i = 0; i < MC; i++) {
+                    val += inp_bt[i] * wrow[i];
+                }
+                out_bt[o] = val;
+                }
+            }
+    }
+    return NULL;
+}
+
+
 void matmul_forward(float* out,
                     float* inp, float* weight, float* bias,
                     int B, int T, int C, int OC) {
@@ -90,6 +129,50 @@ void matmul_forward(float* out,
     // OC is short for "output channels"
     // inp is (B,T,C), weight is (OC, C), bias is (OC)
     // out will be (B,T,OC)
+
+
+    //#pragma omp parallel for collapse(2)
+    Mout=out;
+    Minp=inp;
+    Mweight=weight;
+    Mbias=bias;
+    MB=B; 
+    MT=T;
+    MOC=OC;
+    MC=C;
+
+    pthread_t mythread[4];
+
+    pthread_create(
+        &(mythread[0]),  
+        NULL,  
+        tmatmul_forward, 
+        (void*)0
+    );
+    pthread_create(
+        &(mythread[1]),  
+        NULL,  
+        tmatmul_forward, 
+        (void*)1
+    );
+    pthread_create(
+        &(mythread[2]),  
+        NULL,  
+        tmatmul_forward, 
+        (void*)2
+    );
+    pthread_create(
+        &(mythread[3]),  
+        NULL,  
+        tmatmul_forward, 
+        (void*)3
+    );
+    
+    pthread_join(mythread[0],NULL);
+    pthread_join(mythread[1],NULL); 
+    pthread_join(mythread[2],NULL);
+    pthread_join(mythread[3],NULL);
+    /*
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             float* out_bt = out + b * T * OC + t * OC;
@@ -104,6 +187,7 @@ void matmul_forward(float* out,
             }
         }
     }
+    */
 }
 
 void attention_forward(float* out, float* preatt, float* att,
@@ -120,6 +204,7 @@ void attention_forward(float* out, float* preatt, float* att,
     int hs = C / NH; // head size
     float scale = 1.0 / sqrtf(hs);
 
+    //#pragma omp parallel for collapse(3)
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             for (int h = 0; h < NH; h++) {
@@ -200,6 +285,8 @@ void residual_forward(float* out, float* inp1, float* inp2, int N) {
 void softmax_forward(float* probs, float* logits, int B, int T, int V) {
     // output: probs are (B,T,V) of the probabilities (sums to 1.0 in each b,t position)
     // input: logits is (B,T,V) of the unnormalized log probabilities
+
+    //#pragma omp parallel for collapse(2)
     for (int b = 0; b < B; b++) {
         for (int t = 0; t < T; t++) {
             // probs <- softmax(logits)
@@ -513,6 +600,9 @@ void gpt2_forward(GPT2 *model, int* inputs, int B, int T) {
         float* l_residual3 = acts.residual3 + l * B * T * C;
 
         // now do the forward pass
+
+        //先来试一下只并行matmul_forward
+
         layernorm_forward(l_ln1, l_ln1_mean, l_ln1_rstd, residual, l_ln1w, l_ln1b, B, T, C);
         matmul_forward(l_qkv, l_ln1, l_qkvw, l_qkvb, B, T, C, 3*C);
         attention_forward(l_atty, l_preatt, l_att, l_qkv, B, T, C, NH);
@@ -586,6 +676,10 @@ int main(int argc, char** argv) {
         }
     }
 
+
+    //cnt=n-argc+1;
+
+
     for (int t = argc - 1; t < n; t++) {
         gpt2_forward(&model, tokens, 1, t);
         float* probs = model.acts.probs + (t-1) * model.config.vocab_size;
@@ -596,7 +690,12 @@ int main(int argc, char** argv) {
         fflush(stdout);
     }
 
+    
+
     gpt2_free(&model);
+
+    //join();
+    
 
     return 0;
 }
