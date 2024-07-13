@@ -6,6 +6,28 @@
 //本次实验的主要任务是实现 kmt 模块中的函数，
 //需要完成 struct task, struct spinlock, struct semaphore 的定义，并实现 kmt 的全部 API。
 
+spinlock_t task_lock;
+
+static task_t *current[CPU_MAX];//CPU当前任务指针
+
+static task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
+
+
+static void spin_init(spinlock_t *lk, const char *name){
+
+}
+
+static void spin_lock(spinlock_t *lk){
+
+}
+
+
+static void spin_unlock(spinlock_t *lk){
+
+}
+
+
+
 
 static Context *kmt_context_save(Event ev, Context *ctx){
     
@@ -17,10 +39,38 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     return NULL;
 }
 
+static void current_init(){
+
+    int cpu_cnt=cpu_count();
+
+    for(int i=0;i<cpu_cnt;i++){
+        
+        current[i]=&cpu_idle[i];
+        current[i]->status=RUNNING;
+        current[i]->name="idle";
+        current[i]->entry=NULL;
+        current[i]->next=NULL;
+        current[i]->context=*kcontext(
+            (Area){current[i]->end, current[i]+1}, //from thread-os
+            NULL, NULL
+        );
+
+    }
+
+}
+
 static void kmt_init(){
 
+    //注册中断处理函数
     os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
     os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
+
+    //初始化current
+    current_init();
+
+    //初始化锁
+    spin_init(&task_lock, "task_lock");
+
 
 }
 
@@ -30,18 +80,6 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 }
 
 static void kmt_teardown(task_t *task){
-
-}
-static void spin_init(spinlock_t *lk, const char *name){
-
-}
-
-static void spin_lock(spinlock_t *lk){
-
-}
-
-
-static void spin_unlock(spinlock_t *lk){
 
 }
 

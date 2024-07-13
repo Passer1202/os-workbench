@@ -29,6 +29,7 @@ enum TASK_STATUS
 {
     BLOCKED=0,
     RUNNABLE,
+    RUNNING,
 };
 
 //from thread-os
