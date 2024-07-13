@@ -315,58 +315,6 @@ static void pmm_init() {
     
 }
 
-
-void* alloc(int sz){
-    
-    uintptr_t a=(uintptr_t)kalloc(sz);
-
-
-    uintptr_t align=a & -a ;
-
-    //atomic{
-    //acquire_lock(&heap_lock);
-    //printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
-    //release_lock(&heap_lock);
-//}
-
-    assert(a&&align>=sz);
-    return (void*)a;
-}
-
-
-
-void test_pmm() {
-   
-    alloc(1);
-    //void* p[4096];
-    //int max=64<<10;
-   // max-=(4<<10);
-    //max/=16;
-    //for(int i=0;i<max;i++){
-    //    p[i]=alloc(16);
-    //}
-    //for(int i=1;i<max;i++){
-    //    if(i%2==0)
-    //    kfree(p[i]);
-    //}
-    alloc(100);
-    void* p=alloc(100);
-    
-    kfree(p);
-    //printf("PMM: test passed\n");
-    alloc(32);
-    alloc(16777216);
-    alloc(4096);
-    ////alloc(4096);
-    //alloc(4096);
-    //alloc(4096);
-   // alloc(5000);
-    //atomic{
-    //printf("PMM: test passed\n");
-    //}
-}
-
-
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
     .alloc = kmt_kalloc,
