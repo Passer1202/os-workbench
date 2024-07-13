@@ -2,13 +2,18 @@
 #include <klib.h>
 #include <klib-macros.h>
 
+
+/********** pmm **********/
 #define CPU_MAX 8//最大CPU数量
+
+
+/********** kmt **********/
 
 #define STACK_SIZE 8192//栈大小
 
 
-
-/********** kmt **********/
+#define INT_MIN 0x80000000
+#define INT_MAX 0x7fffffff
 
 //from xv6
 struct spinlock {
