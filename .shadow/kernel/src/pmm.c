@@ -2,6 +2,8 @@
 #include <buddy.h>
 #include <plock.h>
 
+//L2:=在线程安全的基础上实现中断安全
+
 //修改jyy的速通版本，为每个cpu分配领地可有概率ac
 //继续修改，将一把大锁分配给每个cpu,会导致分配出错
 //问题所在：每个cpu的内存空间太小了
@@ -261,6 +263,29 @@ static void kfree(void *ptr) {
    
 }
 
+//实现中断安全的kalloc和kfree
+//那就关掉中断
+
+static void* kmt_kalloc(size_t size){
+
+    //保存中断状态
+    bool intr_flag=ienabled();
+
+    //关中断
+    iset(false);
+
+    void* ret=kalloc(size);
+
+    //恢复中断状态
+    iset(intr_flag);
+
+    return ret;
+}
+
+static void kmt_kfree(void* ptr){
+    kfree(ptr);
+}
+
 
 
 // 框架代码中的 pmm_init (在 AbstractMachine 中运行)
@@ -309,6 +334,7 @@ void* alloc(int sz){
 }
 
 
+
 void test_pmm() {
    
     alloc(1);
@@ -340,8 +366,9 @@ void test_pmm() {
     //}
 }
 
+
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
-    .alloc = kalloc,
-    .free  = kfree,
+    .alloc = kmt_kalloc,
+    .free  = kmt_kfree,
 };
