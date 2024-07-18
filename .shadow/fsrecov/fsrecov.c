@@ -8,6 +8,8 @@
 #include <sys/stat.h>
 #include "fat32.h"
 
+#define EASY 0
+
 enum CLUS_CLASS{
     CLUS_DENT=0,
     CLUS_UNUSE,
@@ -80,6 +82,9 @@ int main(int argc, char *argv[]) {
     uintptr_t data_start = (uintptr_t)hdr + data_start_sec * SEC_SIZE(hdr);
     //data区结束地址
     uintptr_t data_end = (uintptr_t)hdr + SEC_CNT(hdr) * SEC_SIZE(hdr);
+
+
+    
 
 
 
@@ -299,9 +304,14 @@ int main(int argc, char *argv[]) {
                                             break;
                                         }
                                     }
+
+                                    
+
                                     if(tmp_min_rgb<min_rgb){
                                         min_rgb=tmp_min_rgb;
+                                        #ifndef EASY
                                         next_clu=(void*)tmp_clu;
+                                        #endif
                                         no=z;
                                     }
                                 }
@@ -313,6 +323,7 @@ int main(int argc, char *argv[]) {
                             bmp_sz -= CLUS_SIZE(hdr);
                              
                         }
+                        
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                             
