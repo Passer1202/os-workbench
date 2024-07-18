@@ -310,11 +310,12 @@ int main(int argc, char *argv[]) {
                         }
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
+                            assert(0);
                         }
                     }
                     fclose(bmp_tmp_file);
 
-                    assert(0);
+                    
                     
                     //计算文件的sha1值
                     char cmd[256];
