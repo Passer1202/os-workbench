@@ -109,6 +109,7 @@ int main(int argc, char *argv[]) {
                 }
                 else if(cluses[i]=='B'&&cluses[i+1]=='M'&&cluses[i+2]=='P'){
                     dent_flag++;
+                    assert(0);
                 }
             }
 
@@ -118,7 +119,7 @@ int main(int argc, char *argv[]) {
             }
             else if(unuse_flag==CLUS_SIZE(hdr)-2){
                 clus_type[clus_index]=CLUS_UNUSE;
-                assert(0);
+                //assert(0);
             }
             else{
                 clus_type[clus_index]=CLUS_BMP_DATA;
