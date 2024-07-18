@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include "fat32.h"
 
-#define EASY 0
+//#define EASY 0
 
 enum CLUS_CLASS{
     CLUS_DENT=0,
@@ -249,25 +249,32 @@ int main(int argc, char *argv[]) {
 
                             u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
 
+                            int next_flag=0;
                             if((uintptr_t)next_clu>=data_end){
-                                break;
+                                next_flag=1;
                             }
 
                             u32 min_rgb=0;
                             uintptr_t no=(uintptr_t)next_clu-data_start;
                             no/=CLUS_SIZE(hdr);
                             no+=2;
+                            if(next_flag==1){
+                                min_rgb=0x7fffffff;
+                            }
                             //(struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)))
-                            for(int k=0;k<bmp_row;k++){
-                                u8* rgb1=next_clu+k;
-                                u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
-                                if(*rgb1>*rgb2){
-                                    min_rgb=min_rgb+(*rgb1-*rgb2);
-                                }
-                                else{
-                                    min_rgb=min_rgb+(*rgb2-*rgb1);
+                            else{
+                                for(int k=0;k<bmp_row;k++){
+                                    u8* rgb1=next_clu+k;
+                                    u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
+                                    if(*rgb1>*rgb2){
+                                        min_rgb=min_rgb+(*rgb1-*rgb2);
+                                    }
+                                    else{
+                                        min_rgb=min_rgb+(*rgb2-*rgb1);
+                                    }
                                 }
                             }
+                            
 
                             // printf("index: %d\n",clus_index);
                             for(int z=2;z<clus_index;z++){
