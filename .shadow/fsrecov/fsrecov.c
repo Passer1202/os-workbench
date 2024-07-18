@@ -6,9 +6,58 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include "fat32.h"
 
+
+
+
+
+
+/*
+// 假设这些全局变量和数据结构已被定义和初始化
+u8 *clus_type;
+u8 *data_start;
+u8 *bmp_current;
+u32 min_rgb;
+int pk;
+void *next_clu;
+int no;
+
+
+
+void *thread_func(void *arg) {
+    int *range = (int *)arg;
+    process_range(range[0], range[1]);
+    return NULL;
+}
+
+int main() {
+    pthread_t thread1, thread2;
+    int range1[2] = {2, CLUS_INDEX / 2};
+    int range2[2] = {CLUS_INDEX / 2, CLUS_INDEX};
+
+    
+
+    pthread_create(&thread1, NULL, thread_func, range1);
+    pthread_create(&thread2, NULL, thread_func, range2);
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+
+    pthread_mutex_destroy(&mutex);
+
+    // 打印或使用结果
+    printf("Min RGB: %u, Next Cluster: %p, No: %d\n", min_rgb, next_clu, no);
+
+    return 0;
+}
+*/
+
 //#define EASY 0
+
+
+pthread_mutex_t mutex;
 
 enum CLUS_CLASS{
     CLUS_DENT=0,
@@ -47,9 +96,23 @@ struct fat32hdr *hdr;
 #define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
 
 
-
+struct poss{
+    int start;
+    int end;
+    u32 min_rgb;
+    uintptr_t data_start;
+    uintptr_t bmp_current;
+    struct fat32hdr* hdr;
+    u32 pk;
+    u32 bmp_wid;
+    u32 bmp_row;
+    u8 *next_clu;
+    uintptr_t no;
+};
 
 void *mmap_disk(const char *fname);
+
+void process_range(struct poss* x);
 
 int main(int argc, char *argv[]) {
 
@@ -58,6 +121,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     setbuf(stdout, NULL);
+
+    pthread_mutex_init(&mutex, NULL);
 
     assert(sizeof(struct fat32hdr) == 512);
     assert(sizeof(struct fat32dent) == 32);
@@ -308,53 +373,72 @@ int main(int argc, char *argv[]) {
                             
 
                             // printf("index: %d\n",clus_index);
-                            for(int z=2;z<clus_index;z++){
-                                //1 2 3 4 5 6 7
-                                if(clus_type[z]==CLUS_BMP_DATA){
-                                    u32 tmp_min_rgb=0;
+                            //创建两个线程，一个线程跑一半的循环
+                          /*
+                          
+                        struct poss{
+                            int start;
+                            int end;
+                            u32 min_rgb;
+                            uintptr_t data_start;
+                            uintptr_t bmp_current;
+                            struct fat32hdr* hdr;
+                            u32 pk;
+                            u32 bmp_wid;
+                            u32 bmp_row;
+                            u8 *next_clu;
+                            uintptr_t no;
+                        };
 
-                                    //int invalid_flag=0;
+                          */
+                            struct poss x1;
+                            x1.start=2;
+                            x1.end=clus_index/2;
+                            x1.min_rgb=min_rgb;
+                            x1.data_start=data_start;
+                            x1.bmp_current=(uintptr_t)bmp_current;
+                            x1.hdr=hdr;
+                            x1.pk=pk;
+                            x1.bmp_wid=bmp_wid;
+                            x1.bmp_row=bmp_row;
+                            x1.next_clu=next_clu;
+                            x1.no=no;
 
-                                    u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
 
+                            struct poss x2;
+                            x2.start=clus_index/2;
+                            x2.end=clus_index;
+                            x2.min_rgb=min_rgb;
+                            x2.data_start=data_start;
+                            x2.bmp_current=(uintptr_t)bmp_current;
+                            x2.hdr=hdr;
+                            x2.pk=pk;
+                            x2.bmp_wid=bmp_wid;
+                            x2.bmp_row=bmp_row;
+                            x2.next_clu=next_clu;
+                            x2.no=no;
 
-                                    if((pk<bmp_wid) && (*(tmp_clu+bmp_wid-pk)!=0)){
-                                        //invalid_flag=1;
-                                        continue;
-                                    }
-                                    if((pk>=bmp_wid) && (*(tmp_clu)!=0)){
-                                        //invalid_flag=1;
-                                        continue;
-                                    }
-            
-                                    for(int k=0;k<bmp_row;k++){
-                                        u8* rgb1=(u8*)tmp_clu+k;
-                                        u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
-                                        if(*rgb1>*rgb2){
-                                            tmp_min_rgb=tmp_min_rgb+(*rgb1-*rgb2);
-                                        }
-                                        else{
-                                            tmp_min_rgb=tmp_min_rgb+(*rgb2-*rgb1);
-                                        }
-                                        if(tmp_min_rgb>min_rgb){
-                                            break;
-                                        }
-                                    }
+                            pthread_t thread1, thread2;
 
-                                    
+                            pthread_create(&thread1, NULL, process_range, &x1);
 
-                                    if(tmp_min_rgb<min_rgb){
-                                        min_rgb=tmp_min_rgb;
-                                        #ifndef EASY
-                                        next_clu=(void*)tmp_clu;
-                                        #endif
-                                        no=z;
-                                    }
-                                }
+                            pthread_create(&thread2, NULL, process_range, &x2);
+
+                            pthread_join(thread1, NULL);
+
+                            pthread_join(thread2, NULL);
+
+                            if(x1.min_rgb<x2.min_rgb){
+                                min_rgb=x1.min_rgb;
+                                next_clu=x1.next_clu;
+                                no=x1.no;
                             }
-                            //clus_type[no]=CLUS_OTHER;
+                            else{
+                                min_rgb=x2.min_rgb;
+                                next_clu=x2.next_clu;
+                                no=x2.no;
+                            }
 
-                            //if((uintptr_t)next_clu!=bmp_current+CLUS_SIZE(hdr)) assert(0);
                             bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
                              
@@ -401,6 +485,44 @@ int main(int argc, char *argv[]) {
     //unmap disk
     munmap(hdr, hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec);
 
+}
+
+void process_range(struct poss* x) {
+
+    for (int z = x->start; z < x->end; z++) {
+        if (clus_type[z] == CLUS_BMP_DATA) {
+            u32 tmp_min_rgb = 0;
+            u8 *tmp_clu = (u8 *)(x->data_start + (z - 2) * CLUS_SIZE(hdr));
+
+            if ((x->pk < x->bmp_wid) && (*(tmp_clu + x->bmp_wid - x->pk) != 0)) {
+                continue;
+            }
+            if ((x->pk >= x->bmp_wid) && (*(tmp_clu) != 0)) {
+                continue;
+            }
+
+            for (int k = 0; k < x->bmp_row; k++) {
+                u8 *rgb1 = (u8 *)tmp_clu + k;
+                u8 *rgb2 = (u8 *)x->bmp_current + CLUS_SIZE(hdr) - x->bmp_row + k;
+                if (*rgb1 > *rgb2) {
+                    tmp_min_rgb += (*rgb1 - *rgb2);
+                } else {
+                    tmp_min_rgb += (*rgb2 - *rgb1);
+                }
+                if (tmp_min_rgb > x->min_rgb) {
+                    break;
+                }
+            }
+
+            //pthread_mutex_lock(&mutex);
+            if (tmp_min_rgb < x->min_rgb) {
+                x->min_rgb = tmp_min_rgb;
+                x->next_clu = (void *)tmp_clu;
+                x->no = z;
+            }
+            //pthread_mutex_unlock(&mutex);
+        }
+    }
 }
 
 //referenced from jyy
