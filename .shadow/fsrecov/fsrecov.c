@@ -94,37 +94,44 @@ int main(int argc, char *argv[]) {
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
         uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
-        //memcpy(cluses, (void *)pc, CLUS_SIZE(hdr));
+        memcpy(cluses, (void *)pc, CLUS_SIZE(hdr));
         struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(pc);
 
         if(bmp_hdr->bfType == 0x4d42){
             clus_type[clus_index]=CLUS_BMP_HEAD;
-            assert(0);
+            //assert(0);
         }
         else{
-            int dent_flag=0;
+            
             int unuse_flag=0;
             for(int i=0;i<CLUS_SIZE(hdr)-2;i++){
                 if(cluses[i]==0x00){
                     unuse_flag++;
                 }
-                else if(cluses[i]=='B'&&cluses[i+1]=='M'&&cluses[i+2]=='P'){
-                    //dent_flag++;
-                    assert(0);
+                else{
+                    break;
+                
                 }
             }
-
-            if(dent_flag>4){
-                clus_type[clus_index]=CLUS_DENT;
-                //assert(0);
-            }
-            else if(unuse_flag==CLUS_SIZE(hdr)-2){
-                clus_type[clus_index]=CLUS_UNUSE;
-                //assert(0);
+            if(unuse_flag==CLUS_SIZE(hdr)-2){
+            clus_type[clus_index]=CLUS_UNUSE;
             }
             else{
                 clus_type[clus_index]=CLUS_BMP_DATA;
+
+                for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
+                //遍历当前簇的每个目录项
+                    struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
+                    //判断是否是短目录项（.BMP)
+                    if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
+                        if(pd->DIR_NTRes==0){
+                            clus_type[clus_index]=CLUS_DENT;
+                            break;
+                        }
+                    }
+                }
             }
+
         }
         clus_index++;
     }
