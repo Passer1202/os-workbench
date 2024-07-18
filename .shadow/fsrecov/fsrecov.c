@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
                                 }
                             }
 
-                            assert(0);
+                           
                             for(int z=2;z<clus_index;z++){
                                 //1 2 3 4 5 6 7
                                 if(clus_type[z]==CLUS_BMP_DATA){
@@ -306,6 +306,7 @@ int main(int argc, char *argv[]) {
 
                             bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
+                             assert(0);
                         }
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
