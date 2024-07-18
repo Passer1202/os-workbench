@@ -163,7 +163,8 @@ int main(int argc, char *argv[]) {
         struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(pc);
 
         if(bmp_hdr->bfType == 0x4d42){
-            clus_type[clus_index]=CLUS_BMP_HEAD;
+            //clus_type[clus_index]=CLUS_BMP_HEAD;
+             clus_type[clus_index]=CLUS_BMP_DATA;
             //assert(0);
         }
         else{
