@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include "fat32.h"
 
-//#define EASY 0
+#define EASY 0
 
 enum CLUS_CLASS{
     CLUS_DENT=0,
@@ -301,7 +301,6 @@ int main(int argc, char *argv[]) {
 
                                     u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
 
-                                    
 
                                     if((pk<bmp_wid) && (*(tmp_clu+bmp_wid-pk)!=0)){
                                         //invalid_flag=1;
