@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
 
                             u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
 
-                            if(next_clu>=data_end){
+                            if((uintptr_t)next_clu>=data_end){
                                 break;
                             }
 
