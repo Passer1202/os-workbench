@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
 
                             bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
-                             assert(0);
+                             
                         }
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
@@ -314,7 +314,7 @@ int main(int argc, char *argv[]) {
                     }
                     fclose(bmp_tmp_file);
 
-                    
+                    assert(0);
                     
                     //计算文件的sha1值
                     char cmd[256];
