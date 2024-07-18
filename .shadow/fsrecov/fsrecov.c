@@ -128,6 +128,7 @@ int main(int argc, char *argv[]) {
     //1. find the (short) directory entry
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
+        if(clus_type[i+2]!=CLUS_DENT) continue;
         uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
         for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
             //遍历当前簇的每个目录项
