@@ -276,6 +276,7 @@ int main(int argc, char *argv[]) {
                             uintptr_t no=(uintptr_t)next_clu-data_start;
                             no/=CLUS_SIZE(hdr);
                             no+=2;
+
                             if(next_flag==1){
                                 min_rgb=0xffffffff;
                             }
@@ -310,7 +311,7 @@ int main(int argc, char *argv[]) {
                                         //invalid_flag=1;
                                         continue;
                                     }
-                                    if((pk>=bmp_wid) && (*(tmp_clu+pk)!=0)){
+                                    if((pk>=bmp_wid) && (*(tmp_clu)!=0)){
                                         //invalid_flag=1;
                                         continue;
                                     }
