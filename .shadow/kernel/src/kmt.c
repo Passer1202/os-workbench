@@ -51,7 +51,7 @@ static void current_init(){
         current[i]->entry=NULL;
         current[i]->next=NULL;
         current[i]->context=*kcontext(
-            (Area){current[i]->end, current[i]+1}, //from thread-os
+            (Area){current[i]->end+1, current[i]+1}, //+1？//from thread-os
             NULL, NULL
         );
 
