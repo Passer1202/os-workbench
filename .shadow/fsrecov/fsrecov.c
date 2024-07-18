@@ -420,9 +420,9 @@ int main(int argc, char *argv[]) {
 
                             pthread_t thread1, thread2;
 
-                            pthread_create(&thread1, NULL, process_range, &x1);
+                            pthread_create(&thread1, NULL, (void*)process_range, &x1);
 
-                            pthread_create(&thread2, NULL, process_range, &x2);
+                            pthread_create(&thread2, NULL, (void*)process_range, &x2);
 
                             pthread_join(thread1, NULL);
 
