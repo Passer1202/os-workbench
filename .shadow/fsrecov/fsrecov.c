@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
                         struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
 
-                        
+                        assert(bmp_ihdr->biSize == 40);
                         
                         u32 bmp_wid=3*(bmp_ihdr->biWidth);
                         u32 bmp_row=(8*bmp_wid+31)/32*4;
