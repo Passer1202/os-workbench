@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    assert(0);
+                    //assert(0);
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -223,6 +223,8 @@ int main(int argc, char *argv[]) {
                         //continue;
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
                         struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
+
+                        assert(0);
                         
                         int bmp_wid=3*(bmp_ihdr->biWidth);
                         int bmp_row=(8*bmp_wid+31)/32*4;
