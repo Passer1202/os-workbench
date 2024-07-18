@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         clus_index++;
     }
 
-    assert(0);
+    //assert(0);
     //1. find the (short) directory entry
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
