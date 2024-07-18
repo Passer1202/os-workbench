@@ -235,6 +235,8 @@ int main(int argc, char *argv[]) {
                         int bmp_wid=3*(bmp_ihdr->biWidth);
                         int bmp_row=(8*bmp_wid+31)/32*4;
 
+                        int pk_flag=0;
+
                         //assert(0);
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
@@ -246,7 +248,17 @@ int main(int argc, char *argv[]) {
 
                             //assert(0);
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
+                            u32 pk=0;
+                            if(pk_flag==0){
+                                pk=bmp_hdr->bfSize-bmp_hdr->bfOffBits;
+                                pk%=bmp_row;
+                            }
+                            else{
+                                pk=pk+CLUS_SIZE(hdr);
+                                pk%=bmp_row;
+                            }
                             
+                            pk_flag=1;
 
 
                             u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
@@ -277,6 +289,7 @@ int main(int argc, char *argv[]) {
                                 }
                             }
                             
+                            
 
                             // printf("index: %d\n",clus_index);
                             for(int z=2;z<clus_index;z++){
@@ -288,8 +301,8 @@ int main(int argc, char *argv[]) {
 
                                     u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
 
-                                    u32 pk=bmp_hdr->bfSize-bmp_hdr->bfOffBits;
-                                    pk%=bmp_row;
+                                    
+
                                     if((pk<bmp_wid) && (*(tmp_clu+bmp_wid-pk)!=0)){
                                         //invalid_flag=1;
                                         continue;
