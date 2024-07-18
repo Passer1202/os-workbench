@@ -246,6 +246,8 @@ int main(int argc, char *argv[]) {
 
                             //assert(0);
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
+                            
+
 
                             u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
 
@@ -282,26 +284,21 @@ int main(int argc, char *argv[]) {
                                 if(clus_type[z]==CLUS_BMP_DATA){
                                     u32 tmp_min_rgb=0;
 
-                                    int invalid_flag=0;
+                                    //int invalid_flag=0;
 
                                     u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
 
-                                    for(uintptr_t k=0;k<bmp_row;k++){
-                                        //if((k<bmp_wid) && (*(tmp_clu+bmp_wid-k)!=0)){
-                                        //    invalid_flag=1;
-                                        //    break;
-                                        //}
-                                        if((k>=bmp_wid) && (*(tmp_clu+k)!=0)){
-                                            invalid_flag=1;
-                                            break;
-                                        }
-                                    }
-                                    if(invalid_flag==1){
-                                        clus_type[z]=CLUS_OTHER;
+                                    u32 pk=bmp_hdr->bfSize-bmp_hdr->bfOffBits;
+                                    pk%=bmp_row;
+                                    if((pk<bmp_wid) && (*(tmp_clu+bmp_wid-pk)!=0)){
+                                        //invalid_flag=1;
                                         continue;
                                     }
-
-                                    
+                                    if((pk>=bmp_wid) && (*(tmp_clu+pk)!=0)){
+                                        //invalid_flag=1;
+                                        continue;
+                                    }
+            
                                     for(int k=0;k<bmp_row;k++){
                                         u8* rgb1=(u8*)tmp_clu+k;
                                         u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
