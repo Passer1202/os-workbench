@@ -163,9 +163,9 @@ int main(int argc, char *argv[]) {
         struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(pc);
 
         if(bmp_hdr->bfType == 0x4d42&&bmp_hdr->bfReserved1==0&&bmp_hdr->bfReserved2==0&&bmp_hdr->bfOffBits==54){
-            clus_type[clus_index]=CLUS_BMP_DATA;
-            assert(0);
-            //clus_type[clus_index]=CLUS_BMP_HEAD;
+            //clus_type[clus_index]=CLUS_BMP_DATA;
+            //assert(0);
+            clus_type[clus_index]=CLUS_BMP_HEAD;
             //assert(0);
         }
         else{
