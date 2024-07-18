@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include "fat32.h"
 
-//#define EASY 0
+#define EASY 0
 
 enum CLUS_CLASS{
     CLUS_DENT=0,
