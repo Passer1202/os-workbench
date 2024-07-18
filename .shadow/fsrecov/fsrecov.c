@@ -251,16 +251,13 @@ int main(int argc, char *argv[]) {
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
                             
                             if(pk_flag==0){
-                                for(int ii=0;ii<CLUS_SIZE(hdr)-bmp_hdr->bfOffBits;ii++){
-                                    pk++;
-                                    pk%=bmp_row;
-                                }
+                                pk+=(CLUS_SIZE(hdr)-bmp_hdr->bfOffBits);
+                                pk%=bmp_row;
+                                
                             }
                             else{
-                               for(int ii=0;ii<CLUS_SIZE(hdr);ii++){
-                                    pk++;
-                                    pk%=bmp_row;
-                                }
+                               pk+=CLUS_SIZE(hdr);
+                               pk%=bmp_row;
                             }
 
                             pk_flag=1;
