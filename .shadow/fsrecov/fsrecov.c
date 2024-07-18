@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
                                 }
                             }
 
-                           
+                           printf("index: %d\n",clus_index);
                             for(int z=2;z<clus_index;z++){
                                 //1 2 3 4 5 6 7
                                 if(clus_type[z]==CLUS_BMP_DATA){
