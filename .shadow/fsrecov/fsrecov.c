@@ -232,8 +232,8 @@ int main(int argc, char *argv[]) {
 
                         
                         
-                        int bmp_wid=3*(bmp_ihdr->biWidth);
-                        int bmp_row=(8*bmp_wid+31)/32*4;
+                        u32 bmp_wid=3*(bmp_ihdr->biWidth);
+                        u32 bmp_row=(8*bmp_wid+31)/32*4;
 
                         int pk_flag=0;
 
