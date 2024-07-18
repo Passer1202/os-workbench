@@ -250,14 +250,14 @@ int main(int argc, char *argv[]) {
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
                             u32 pk=0;
                             if(pk_flag==0){
-                                pk=bmp_hdr->bfSize-bmp_hdr->bfOffBits;
+                                pk=CLUS_SIZE(hdr)-bmp_hdr->bfOffBits;
                                 pk%=bmp_row;
                             }
                             else{
                                 pk=pk+CLUS_SIZE(hdr);
                                 pk%=bmp_row;
                             }
-                            
+
                             pk_flag=1;
 
 
