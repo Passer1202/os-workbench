@@ -57,7 +57,7 @@ int main() {
 //#define EASY 0
 
 
-pthread_mutex_t mutex;
+
 
 enum CLUS_CLASS{
     CLUS_DENT=0,
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
     }
     setbuf(stdout, NULL);
 
-    pthread_mutex_init(&mutex, NULL);
+    //pthread_mutex_init(&mutex, NULL);
 
     assert(sizeof(struct fat32hdr) == 512);
     assert(sizeof(struct fat32dent) == 32);
@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 
         if(bmp_hdr->bfType == 0x4d42){
             //clus_type[clus_index]=CLUS_BMP_HEAD;
-             clus_type[clus_index]=CLUS_BMP_DATA;
+             clus_type[clus_index]=CLUS_BMP_HEAD;
             //assert(0);
         }
         else{
@@ -185,17 +185,17 @@ int main(int argc, char *argv[]) {
             else{
                 clus_type[clus_index]=CLUS_BMP_DATA;
 
-                //for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
+                for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
                 //遍历当前簇的每个目录项
-                    //struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
+                    struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
                     //判断是否是短目录项（.BMP)
-                    //if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
-                        //if(pd->DIR_NTRes==0){
-                        //    clus_type[clus_index]=CLUS_DENT;
-                        //    break;
-                        //}
-                    //}
-                //}
+                    if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
+                        if(pd->DIR_NTRes==0){
+                            clus_type[clus_index]=CLUS_DENT;
+                            break;
+                        }
+                    }
+                }
             }
 
         }
