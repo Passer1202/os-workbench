@@ -95,9 +95,10 @@ int main(int argc, char *argv[]) {
         //遍历data区的每个簇
         uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
         //memcpy(cluses, (void *)pc, CLUS_SIZE(hdr));
-        
-        if(cluses[0]=='B'&&cluses[1]=='M'){
-            //clus_type[clus_index]=CLUS_BMP_HEAD;
+        struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(pc);
+
+        if(bmp_hdr->bfType == 0x4d42){
+            clus_type[clus_index]=CLUS_BMP_HEAD;
             assert(0);
         }
         else{
@@ -108,7 +109,7 @@ int main(int argc, char *argv[]) {
                     unuse_flag++;
                 }
                 else if(cluses[i]=='B'&&cluses[i+1]=='M'&&cluses[i+2]=='P'){
-                    dent_flag++;
+                    //dent_flag++;
                     assert(0);
                 }
             }
