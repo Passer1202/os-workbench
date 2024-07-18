@@ -119,7 +119,7 @@ int main(int argc, char *argv[]) {
         clus_index++;
     }
 
-    assert(0);
+    //assert(0);
     //1. find the (short) directory entry
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    
+                    assert(0);
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
