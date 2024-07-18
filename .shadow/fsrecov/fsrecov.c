@@ -238,6 +238,7 @@ int main(int argc, char *argv[]) {
                         int pk_flag=0;
 
                         //assert(0);
+                        u32 pk=0;
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_s
@@ -248,7 +249,7 @@ int main(int argc, char *argv[]) {
 
                             //assert(0);
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
-                            u32 pk=0;
+                            
                             if(pk_flag==0){
                                 for(int ii=0;ii<CLUS_SIZE(hdr)-bmp_hdr->bfOffBits;ii++){
                                     pk++;
