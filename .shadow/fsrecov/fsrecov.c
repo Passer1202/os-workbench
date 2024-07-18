@@ -236,10 +236,10 @@ int main(int argc, char *argv[]) {
 
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
 
-                            u8* next_clu= bmp_current +  CLUS_SIZE(hdr);
+                            u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
 
                             u32 min_rgb=0;
-                            uintptr_t no=next_clu-data_start;
+                            uintptr_t no=(uintptr_t)next_clu-data_start;
                             no/=CLUS_SIZE(hdr);
                             no+=2;
                             //(struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)))
