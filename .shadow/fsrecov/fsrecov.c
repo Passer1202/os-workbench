@@ -284,12 +284,14 @@ int main(int argc, char *argv[]) {
 
                                     int invalid_flag=0;
 
+                                    u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
+
                                     for(int k=0;k<bmp_row;k++){
-                                        if(((uintptr_t)next_clu+k<bmp_wid) && (*(next_clu+bmp_wid-k)!=0)){
+                                        if(((uintptr_t)tmp_clu+k<bmp_wid) && (*(tmp_clu+bmp_wid-k)!=0)){
                                             invalid_flag=1;
                                             break;
                                         }
-                                        if(((uintptr_t)next_clu+k>=bmp_wid) && (*(next_clu)!=0)){
+                                        if(((uintptr_t)tmp_clu+k>=bmp_wid) && (*(tmp_clu)!=0)){
                                             invalid_flag=1;
                                             break;
                                         }
@@ -298,7 +300,7 @@ int main(int argc, char *argv[]) {
                                         continue;
                                     }
 
-                                    uintptr_t tmp_clu= data_start + (z-2) * CLUS_SIZE(hdr);
+                                    
                                     for(int k=0;k<bmp_row;k++){
                                         u8* rgb1=(u8*)tmp_clu+k;
                                         u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
