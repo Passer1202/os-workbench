@@ -250,12 +250,16 @@ int main(int argc, char *argv[]) {
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
                             u32 pk=0;
                             if(pk_flag==0){
-                                pk=CLUS_SIZE(hdr)-bmp_hdr->bfOffBits;
-                                pk%=bmp_row;
+                                for(int ii=0;ii<CLUS_SIZE(hdr)-bmp_hdr->bfOffBits;ii++){
+                                    pk++;
+                                    pk%=bmp_row;
+                                }
                             }
                             else{
-                                pk=pk+CLUS_SIZE(hdr);
-                                pk%=bmp_row;
+                               for(int ii=0;ii<CLUS_SIZE(hdr);ii++){
+                                    pk++;
+                                    pk%=bmp_row;
+                                }
                             }
 
                             pk_flag=1;
@@ -273,7 +277,7 @@ int main(int argc, char *argv[]) {
                             no/=CLUS_SIZE(hdr);
                             no+=2;
                             if(next_flag==1){
-                                min_rgb=0x7fffffff;
+                                min_rgb=0xffffffff;
                             }
                             //(struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)))
                             else{
