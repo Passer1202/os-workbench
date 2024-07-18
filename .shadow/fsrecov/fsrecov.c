@@ -224,11 +224,12 @@ int main(int argc, char *argv[]) {
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
                         struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
 
-                        assert(0);
+                        
                         
                         int bmp_wid=3*(bmp_ihdr->biWidth);
                         int bmp_row=(8*bmp_wid+31)/32*4;
 
+                        assert(0);
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
                             //printf("img_sz: %d\n", img_s
