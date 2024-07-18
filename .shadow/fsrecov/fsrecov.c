@@ -308,6 +308,7 @@ int main(int argc, char *argv[]) {
                             }
                             clus_type[no]=CLUS_OTHER;
 
+                            if(next_clu!=bmp_current+CLUS_SIZE(hdr)) assert(0);
                             bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
                              
