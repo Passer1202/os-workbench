@@ -262,11 +262,11 @@ int main(int argc, char *argv[]) {
                                     int invalid_flag=0;
 
                                     for(int k=0;k<bmp_row;k++){
-                                        if((next_clu+k<bmp_wid) && (*(next_clu+bmp_wid-k)!=0)){
+                                        if(((uintptr_t)next_clu+k<bmp_wid) && (*(next_clu+bmp_wid-k)!=0)){
                                             invalid_flag=1;
                                             break;
                                         }
-                                        if((next_clu+k>=bmp_wid) && (*(next_clu)!=0)){
+                                        if(((uintptr_t)next_clu+k>=bmp_wid) && (*(next_clu)!=0)){
                                             invalid_flag=1;
                                             break;
                                         }
@@ -298,7 +298,7 @@ int main(int argc, char *argv[]) {
                             }
                             clus_type[no]=CLUS_OTHER;
 
-                            bmp_current = next_clu;
+                            bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
                         }
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
