@@ -287,16 +287,17 @@ int main(int argc, char *argv[]) {
                                     u8* tmp_clu= (u8*)(data_start + (z-2) * CLUS_SIZE(hdr));
 
                                     for(uintptr_t k=0;k<bmp_row;k++){
-                                        if((k<bmp_wid) && (*(tmp_clu+bmp_wid-k)!=0)){
-                                            invalid_flag=1;
-                                            break;
-                                        }
+                                        //if((k<bmp_wid) && (*(tmp_clu+bmp_wid-k)!=0)){
+                                        //    invalid_flag=1;
+                                        //    break;
+                                        //}
                                         if((k>=bmp_wid) && (*(tmp_clu+k)!=0)){
                                             invalid_flag=1;
                                             break;
                                         }
                                     }
                                     if(invalid_flag==1){
+                                        clus_type[z]=CLUS_OTHER;
                                         continue;
                                     }
 
