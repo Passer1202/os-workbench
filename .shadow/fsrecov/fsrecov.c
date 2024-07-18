@@ -243,6 +243,10 @@ int main(int argc, char *argv[]) {
 
                             u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
 
+                            if(next_clu>=data_end){
+                                break;
+                            }
+
                             u32 min_rgb=0;
                             uintptr_t no=(uintptr_t)next_clu-data_start;
                             no/=CLUS_SIZE(hdr);
@@ -309,7 +313,6 @@ int main(int argc, char *argv[]) {
                              
                         }
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
-                            assert(0);
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
                             
                         }
