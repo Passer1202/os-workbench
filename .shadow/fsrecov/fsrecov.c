@@ -146,7 +146,7 @@ int main(int argc, char *argv[]) {
                     //printf("bmp_clu1st: %d\n", bmp_clu1st);
                     //assert(0);
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
-                    if(bmp_hdr->bfType != 0x4d42)continue;
+                    //if(bmp_hdr->bfType != 0x4d42) continue;
                     {//确定是bmp文件
                             //3.find long directory entry
                             //手册：长目录项倒着紧放在短目录项前面
