@@ -439,6 +439,8 @@ int main(int argc, char *argv[]) {
                                 no=x2.no;
                             }
 
+                            clus_type[no]=CLUS_OTHER;
+
                             bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
                              
