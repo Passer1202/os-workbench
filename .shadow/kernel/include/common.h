@@ -15,6 +15,12 @@
 #define INT_MIN 0x80000000
 #define INT_MAX 0x7fffffff
 
+typedef struct kmt_cpu_t{
+  //记录锁的嵌套层数和最外层的锁前中断与否
+  int intr;//记录中断是否开启
+  int ncli;//记录锁的嵌套层数
+}kcpu;
+
 //from xv6
 struct spinlock {
   int locked;       // Is the lock held?
@@ -30,6 +36,7 @@ enum TASK_STATUS
     BLOCKED=0,
     RUNNABLE,
     RUNNING,
+    IDLE,
 };
 
 //from thread-os

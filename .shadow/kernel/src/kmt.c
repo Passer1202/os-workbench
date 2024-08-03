@@ -8,12 +8,20 @@
 
 spinlock_t task_lock;
 
+kcpu cpu[CPU_MAX];//CPU信息
+
 task_t *current[CPU_MAX];//CPU当前任务指针
 
 task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 
 static void spin_init(spinlock_t *lk, const char *name){
+    
+    lk->name=name;
+
+    lk->locked=0;
+
+    lk->cpu_no=-1;
 
 }
 
@@ -42,19 +50,18 @@ static Context *kmt_schedule(Event ev,Context *ctx){
 static void current_init(){
 
     int cpu_cnt=cpu_count();
-
+    //最开始每个cpu上都是空闲任务
     for(int i=0;i<cpu_cnt;i++){
         
         current[i]=&cpu_idle[i];
-        current[i]->status=RUNNING;
+        current[i]->status=IDLE;//空闲
         current[i]->name="idle";
         current[i]->entry=NULL;
         current[i]->next=NULL;
         current[i]->context=kcontext(
-            (Area){current[i]->end, current[i]+1}, //+1？//from thread-os
+            (Area){current[i]->end, current[i]+1}, //from thread-os
             NULL, NULL
         );
-
     }
 
 }
@@ -65,7 +72,7 @@ static void kmt_init(){
     os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
     os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
 
-    //初始化current
+    //初始化每个cpu上的current
     current_init();
 
     //初始化锁
