@@ -21,7 +21,7 @@ struct spinlock {
 
   // For debugging:
   const char *name;        // Name of lock.
-  struct cpu *cpu;   // The cpu holding the lock.
+  int cpu_no;   // The cpu holding the lock.
 };
 
 //BLOCKED (在等待某个锁，此时不能被调度执行)；RUNNABLE (可被调度执行)
@@ -40,7 +40,7 @@ struct task
             int status;
             const char    *name;
             void          (*entry)(void *);
-            Context       context;
+            Context*       context;
             struct task    *next;
             char          end[0];
         };

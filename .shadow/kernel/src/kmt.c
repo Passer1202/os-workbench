@@ -8,9 +8,9 @@
 
 spinlock_t task_lock;
 
-static task_t *current[CPU_MAX];//CPU当前任务指针
+task_t *current[CPU_MAX];//CPU当前任务指针
 
-static task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
+task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 
 static void spin_init(spinlock_t *lk, const char *name){
@@ -50,8 +50,8 @@ static void current_init(){
         current[i]->name="idle";
         current[i]->entry=NULL;
         current[i]->next=NULL;
-        current[i]->context=*kcontext(
-            (Area){current[i]->end+1, current[i]+1}, //+1？//from thread-os
+        current[i]->context=kcontext(
+            (Area){current[i]->end, current[i]+1}, //+1？//from thread-os
             NULL, NULL
         );
 
