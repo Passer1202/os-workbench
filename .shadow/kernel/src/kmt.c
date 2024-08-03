@@ -17,7 +17,7 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 static void spin_init(spinlock_t *lk, const char *name){
     
-    lk->name=name;
+    strcpy(lk->name, name);
 
     lk->locked=0;
 

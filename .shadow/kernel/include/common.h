@@ -26,7 +26,7 @@ struct spinlock {
   int locked;       // Is the lock held?
 
   // For debugging:
-  const char *name;        // Name of lock.
+  char *name;        // Name of lock.
   int cpu_no;   // The cpu holding the lock.
 };
 
