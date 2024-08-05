@@ -75,3 +75,10 @@ struct semaphore
   //unsigned int next;
   //unsigned int end;
 };
+
+typedef struct item {
+    int seq;
+    int event;
+    handler_t handler;
+}item_t;
+
