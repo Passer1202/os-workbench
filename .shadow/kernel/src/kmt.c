@@ -28,12 +28,14 @@ static void spin_init(spinlock_t *lk, const char *name){
 }
 
 static void spin_lock(spinlock_t *lk){
-    //push_off(lk);
-    //if (holding(lk)) lockPanic(lk, "acquire! lock's name is %s, cur-cpu = %d\n", lk->name, cpu_current());
+
+    int cpu_now=cpu_current();
+    iset(false);//关闭中断
+    
     while (atomic_xchg(&lk->locked, 1))
         ;
     __sync_synchronize();
-    lk->cpu_no = cpu_current();
+    lk->cpu_no = cpu_now;
 }
 
 
