@@ -47,11 +47,33 @@ static void spin_lock(spinlock_t *lk){
         ;
     __sync_synchronize();
     lk->cpu_no = cpu_now;
-    
+
 }
 
 
 static void spin_unlock(spinlock_t *lk){
+    
+    //检查持有锁
+    int cpu_now=cpu_current();
+
+    int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
+    assert(check==1);
+
+    assert(ienabled()==0);//中断关闭
+
+    lk->cpu_no = -1;
+
+    __sync_synchronize();
+    atomic_xchg(&lk->locked, 0);
+
+    assert(cpu_info[cpu_now].ncli>0);//嵌套层数大于0
+
+    cpu_info[cpu_now].ncli--;//嵌套层数-1
+    if(cpu_info[cpu_now].ncli==0){
+        //恢复中断状态
+        if(cpu_info[cpu_now].intr)   
+            iset(true);
+    }
 
 }
 

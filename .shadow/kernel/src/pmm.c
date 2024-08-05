@@ -293,7 +293,9 @@ static void kmt_kfree(void* ptr){
     kfree(ptr);
 
     //恢复中断状态
-    iset(intr_flag);
+    if(intr_flag)
+        iset(true);
+    //iset(intr_flag);
 }
 
 
