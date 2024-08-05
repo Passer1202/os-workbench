@@ -62,8 +62,13 @@ struct semaphore
   int val;//信号量的值
   spinlock_t lock;
 
-  task_t *queue;//等待队列
-
+  //开始是用链表来实现的
+  //后来意识到NEXT的改变会和task的链表产生冲突
+  int qh;//队列头
+  int qt;//队列尾：下一个可用位置
+  int cnt_max;//队列中的任务最大数量
+  task_t *wait_queue[128];//等待队列
+  
   const char* name;
 
   //void * thread[NPROC];

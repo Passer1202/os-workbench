@@ -207,17 +207,51 @@ static void kmt_teardown(task_t *task){
 
 
 static void sem_init(sem_t *sem, const char *name, int value){
-
+    
+    sem->val=value;
+    spin_init(&sem->lock, name);
+    sem->name=name;
+    sem->qh=0;
+    sem->qt=0;
+    sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
 }
 
-
 static void sem_wait(sem_t *sem){
+
+    spin_lock(&task_lock);
+    spin_lock(&sem->lock);
+    int cpu_now=cpu_current();
+    int flag=0;
+    sem->val--;
+    if(sem->val<0){
+        flag=1;
+        current[cpu_now]->status=BLOCKED;//等待状态
+        
+        //入队
+        sem->wait_queue[sem->qt]=current[cpu_now];
+        sem->qt=(sem->qt+1)%(sem->cnt_max);
+        
+    }
+    spin_unlock(&sem->lock);
+    if(flag){
+        spin_unlock(&task_lock);
+        yield();
+    }
+    spin_unlock(&task_lock);
 
 }
 
 
 static void sem_signal(sem_t *sem){
-
+    spin_lock(&sem->lock);
+    sem->val++;
+    if(sem->val<=0){//有等待的任务
+        assert(sem->qh!=sem->qt);
+        task_t *task=sem->wait_queue[sem->qh];
+        sem->qh=(sem->qh+1)%(sem->cnt_max);
+        task->status=RUNNABLE;
+    }
+    spin_unlock(&sem->lock);
 }
 
 
