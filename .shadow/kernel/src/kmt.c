@@ -30,12 +30,24 @@ static void spin_init(spinlock_t *lk, const char *name){
 static void spin_lock(spinlock_t *lk){
 
     int cpu_now=cpu_current();
+
+    int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
-    
+
+    if(cpu_info[cpu_now].ncli==0){//记录最外层的中断状态
+        cpu_info[cpu_now].intr=intr;
+    }
+    cpu_info[cpu_now].ncli++;//嵌套层数+1
+
+    //防御性编程：避免死锁
+    int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
+    assert(check==0);
+
     while (atomic_xchg(&lk->locked, 1))
         ;
     __sync_synchronize();
     lk->cpu_no = cpu_now;
+    
 }
 
 
