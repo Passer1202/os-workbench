@@ -70,8 +70,6 @@ static void os_irq(int seq,int event,handler_t handler){
 
 }
 
-
-
 MODULE_DEF(os) = {
     .init = os_init,
     .run  = os_run,
