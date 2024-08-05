@@ -2,6 +2,8 @@
 #include <buddy.h>
 #include <plock.h>
 
+//L2:=在线程安全的基础上实现中断安全
+
 //修改jyy的速通版本，为每个cpu分配领地可有概率ac
 //继续修改，将一把大锁分配给每个cpu,会导致分配出错
 //问题所在：每个cpu的内存空间太小了
@@ -261,6 +263,41 @@ static void kfree(void *ptr) {
    
 }
 
+//实现中断安全的kalloc和kfree
+//那就关掉中断
+
+static void* kmt_kalloc(size_t size){
+
+    //保存中断状态
+    bool intr_flag=ienabled();
+
+    //关中断
+    iset(false);
+
+    void* ret=kalloc(size);
+
+    //恢复中断状态
+    iset(intr_flag);
+
+    return ret;
+}
+
+static void kmt_kfree(void* ptr){
+
+    //保存中断状态
+    bool intr_flag=ienabled();
+
+    //关中断
+    iset(false);
+
+    kfree(ptr);
+
+    //恢复中断状态
+    if(intr_flag)
+        iset(true);
+    //iset(intr_flag);
+}
+
 
 
 // 框架代码中的 pmm_init (在 AbstractMachine 中运行)
@@ -290,58 +327,8 @@ static void pmm_init() {
     
 }
 
-
-void* alloc(int sz){
-    
-    uintptr_t a=(uintptr_t)kalloc(sz);
-
-
-    uintptr_t align=a & -a ;
-
-    //atomic{
-    //acquire_lock(&heap_lock);
-    //printf("CPU #%d : Alloc %d -> %p align = %d\n", cpu_current(),sz, a, align);
-    //release_lock(&heap_lock);
-//}
-
-    assert(a&&align>=sz);
-    return (void*)a;
-}
-
-
-void test_pmm() {
-   
-    alloc(1);
-    //void* p[4096];
-    //int max=64<<10;
-   // max-=(4<<10);
-    //max/=16;
-    //for(int i=0;i<max;i++){
-    //    p[i]=alloc(16);
-    //}
-    //for(int i=1;i<max;i++){
-    //    if(i%2==0)
-    //    kfree(p[i]);
-    //}
-    alloc(100);
-    void* p=alloc(100);
-    
-    kfree(p);
-    //printf("PMM: test passed\n");
-    alloc(32);
-    alloc(16777216);
-    alloc(4096);
-    ////alloc(4096);
-    //alloc(4096);
-    //alloc(4096);
-   // alloc(5000);
-    //atomic{
-    //printf("PMM: test passed\n");
-    //}
-}
-
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
-    .alloc = kalloc,
-    .free  = kfree,
+    .alloc = kmt_kalloc,
+    .free  = kmt_kfree,
 };
