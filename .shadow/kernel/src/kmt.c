@@ -1,5 +1,5 @@
 #include<os.h>
-#include<common.h>
+
 
 
 //实验要求：实现 Kernel Multi-threading

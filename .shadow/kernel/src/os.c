@@ -1,5 +1,4 @@
-#include <common.h>
-
+#include <os.h>
 
 static inline task_t *task_alloc() { return pmm->alloc(sizeof(task_t)); }
 
