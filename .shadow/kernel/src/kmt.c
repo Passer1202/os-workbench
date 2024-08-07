@@ -175,7 +175,7 @@ static void kmt_init(){
     //注册中断处理函数
     //printf("%d\n",INT_MAX);
     //assert(0);
-    assert(INT_MIN<INT_MAX);
+    //assert(INT_MIN<INT_MAX);
     os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
     os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
 

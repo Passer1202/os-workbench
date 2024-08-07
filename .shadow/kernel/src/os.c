@@ -188,7 +188,7 @@ static void os_irq(int seq,int event,handler_t handler){
   //bubble_sort
   for(int i=0;i<item_cnt;i++){
     for(int j=0;j<item_cnt;j++){
-      if (items[i].seq > items[j].seq) {
+      if (items[i].seq < items[j].seq) {
         item_t temp=items[i];
         items[i]=items[j];
         items[j]=temp;        
