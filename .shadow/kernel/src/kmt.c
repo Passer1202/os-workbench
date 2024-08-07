@@ -264,8 +264,8 @@ static void sem_wait(sem_t *sem){
         //assert(ienabled()==true);
         //printf("wait name:%s\n",current[cpu_now]->name);
         yield();
-        printf("wait name:%s\n",current[cpu_now]->name);
-        assert(0);
+        //printf("wait name:%s\n",current[cpu_now]->name);
+        //assert(0);
     }
     //assert(0);
 }
