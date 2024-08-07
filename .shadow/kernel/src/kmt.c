@@ -77,7 +77,7 @@ static void spin_unlock(spinlock_t *lk){
 
 }
 
-static int xxxx=0;
+//static int xxxx=0;
 
 
 static Context *kmt_context_save(Event ev, Context *ctx){
@@ -85,7 +85,7 @@ static Context *kmt_context_save(Event ev, Context *ctx){
     spin_lock(&task_lock);
     //printf("xxxx: %d\n",xxxx);
     //xxxx++;
-    assert(xxxx%2==1);
+    //assert(xxxx%2==1);
 
     assert(ienabled()==0);//中断关闭
 
@@ -112,7 +112,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     //x++;
     //xxxx++;
     //printf("xxxx: %d\n",xxxx);
-    assert(xxxx%2==0);
+    //assert(xxxx%2==0);
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
