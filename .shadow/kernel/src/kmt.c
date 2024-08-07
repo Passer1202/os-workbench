@@ -206,13 +206,14 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     }
     else{
         task->next=task_head;
+        printf("name %s\n",task_head->name);
         task_head=task;
     }
-    if(i==1) {
-        printf("name %s\n",task_head->name);
+    //if(i==1) {
+    //    printf("name %s\n",task_head->name);
         //printf("next %s\n",task_head->next->name);
-        assert(0);
-    }
+    //    assert(0);
+    //}
     //printf("head_name:%s\n",task_head->name);
     assert(task_head!=NULL);
 
