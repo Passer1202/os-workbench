@@ -176,8 +176,8 @@ static void kmt_init(){
     //printf("%d\n",INT_MAX);
     //assert(0);
     //assert(INT_MIN<INT_MAX);
-    os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
-    os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
+    os->on_irq(INT_MAX, EVENT_NULL, kmt_context_save);
+    os->on_irq(INT_MIN, EVENT_NULL, kmt_schedule);
 
     //初始化每个cpu上的current
     current_init();
