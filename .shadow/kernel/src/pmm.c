@@ -279,7 +279,7 @@ static void* kmt_kalloc(size_t size){
     //恢复中断状态
     if(intr_flag)
         iset(true);
-        
+
     return ret;
 }
 
@@ -325,6 +325,9 @@ static void pmm_init() {
     //h_ptr=heap.start;
     buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
+
+    printf("alloc1 at %p \n",kmt_kalloc(25));
+    printf("alloc2 at%p \n",kmt_kalloc(25));
     
 }
 
