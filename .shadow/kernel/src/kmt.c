@@ -244,6 +244,7 @@ static void sem_wait(sem_t *sem){
     sem->val--;
     if(sem->val<0){
         flag=1;
+        assert(current[cpu_now]->status!=IDLE);//等待状态
         current[cpu_now]->status=BLOCKED;//等待状态
         
         //入队
