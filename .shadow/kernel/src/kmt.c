@@ -281,8 +281,8 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
-    spin_lock(&task_lock);
-    //spin_lock(&sem->lock);
+    //spin_lock(&task_lock);
+    spin_lock(&sem->lock);
     
     sem->val++;
     
