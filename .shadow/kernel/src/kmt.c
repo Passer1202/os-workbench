@@ -135,7 +135,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     assert(next!=NULL);
 
     //切换任务，修改任务的状态
-    printf("task: %s\n",next->name);
+    //printf("task: %s\n",next->name);
     current[cpu_now]=next;
     if(current[cpu_now]->status!=IDLE){
         current[cpu_now]->status=RUNNING;
@@ -254,7 +254,7 @@ static void sem_wait(sem_t *sem){
     spin_unlock(&sem->lock);
     spin_unlock(&task_lock);
     if(flag){
-        assert(0);
+        //assert(0);
         yield();
     }
 
@@ -268,6 +268,7 @@ static void sem_signal(sem_t *sem){
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
+        printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
