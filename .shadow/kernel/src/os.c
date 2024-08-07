@@ -76,7 +76,7 @@ sem_t empty, fill;
 void producer(void *arg) {
     while (1) {
         P(&empty);
-        //putch('(');
+        putch('(');
         V(&fill);
     }
 }
@@ -118,7 +118,7 @@ static void os_init() {
 
 #ifdef TEST_3
     kmt->sem_init(&empty, "empty", 1);  // 缓冲区大小为 5
-    kmt->sem_init(&fill, "fill", 0);
+    kmt->sem_init(&fill, "fill", 1);
 
     //for (int i = 0; i < 4; i++)  // 4 个生产者
         kmt->create(task_alloc(), "producer", producer, NULL);
