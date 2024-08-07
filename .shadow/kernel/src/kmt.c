@@ -119,6 +119,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     if(next==NULL){
         next=task_head;
         assert(task_head!=NULL);
+        assert(next!=NULL);
         //assert(0);
         //if(next!=NULL)printf("name:%s\n",next->name);
     }
