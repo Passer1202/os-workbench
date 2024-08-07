@@ -256,9 +256,9 @@ static void sem_wait(sem_t *sem){
     if(flag){
         //assert(0);
         //assert(ienabled()==true);
-        printf("wait name:%s\n",current[cpu_now]->name);
+        //printf("wait name:%s\n",current[cpu_now]->name);
         yield();
-        printf("wait name:%s\n",current[cpu_now]->name);
+        //printf("wait name:%s\n",current[cpu_now]->name);
         //assert(0);
     }
     //assert(0);
@@ -266,7 +266,9 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
+    spin_lock(&task_lock);
     spin_lock(&sem->lock);
+    
     sem->val++;
     
     if(sem->val<=0){//有等待的任务
@@ -278,6 +280,7 @@ static void sem_signal(sem_t *sem){
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
+    spin_unlock(&task_lock);
 }
 
 
