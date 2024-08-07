@@ -265,7 +265,7 @@ static void kfree(void *ptr) {
 
 //实现中断安全的kalloc和kfree
 //那就关掉中断
-/*
+
 static void* kmt_kalloc(size_t size){
 
     //保存中断状态
@@ -282,7 +282,7 @@ static void* kmt_kalloc(size_t size){
 
     return ret;
 }
-*/
+
 static void kmt_kfree(void* ptr){
 
     //保存中断状态
@@ -334,6 +334,6 @@ static void pmm_init() {
 
 MODULE_DEF(pmm) = {
     .init  = pmm_init,
-    .alloc = kalloc,
+    .alloc = kmt_kalloc,
     .free  = kmt_kfree,
 };
