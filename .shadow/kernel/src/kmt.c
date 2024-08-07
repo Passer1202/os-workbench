@@ -118,10 +118,10 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     
     if(next==NULL){
         next=task_head;
-        assert(task_head!=NULL);
-        assert(next->name!=NULL);
+        //assert(task_head!=NULL);
+        //assert(next->name!=NULL);
         //assert(0);
-        if(next!=NULL)printf("name:%s\n",next->name);
+        //if(next!=NULL)printf("name:%s\n",next->name);
     }
     //找到下一个RUNNABLE任务
     while(next!=NULL){
@@ -205,6 +205,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task->next=task_head;
         task_head=task;
     }
+    printf("head_name:%s\n",task_head->name);
     assert(task_head!=NULL);
 
     spin_unlock(&task_lock);
