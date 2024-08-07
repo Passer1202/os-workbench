@@ -118,6 +118,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     
     if(next==NULL){
         next=task_head;
+        assert(0);
         if(next!=NULL)printf("name:%s\n",next->name);
     }
     //找到下一个RUNNABLE任务
