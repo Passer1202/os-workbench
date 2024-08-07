@@ -81,6 +81,7 @@ void producer(void *arg) {
     }
 }
 void consumer(void *arg) {
+    assert(0);
     while (1) {
         P(&fill);
         putch(')');
@@ -146,9 +147,7 @@ static void os_init() {
     //    putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
     iset(true);
-    yield();
-
-    assert(0);
+    //yield();
     while (1) ;
   }
 #endif
