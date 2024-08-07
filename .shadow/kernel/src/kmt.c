@@ -200,6 +200,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 
     //将任务插入任务链表(头插法)
     if(task_head==NULL){
+        assert(0);
         task_head=task;
         task->next=NULL;
     }
