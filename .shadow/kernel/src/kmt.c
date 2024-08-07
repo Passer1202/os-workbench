@@ -173,8 +173,8 @@ static void current_init(){
 static void kmt_init(){
 
     //注册中断处理函数
-    os->on_irq(INT_MAX, EVENT_NULL, kmt_context_save);
-    os->on_irq(INT_MIN, EVENT_NULL, kmt_schedule);
+    os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
+    os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
 
     //初始化每个cpu上的current
     current_init();
