@@ -104,6 +104,8 @@ static Context *kmt_context_save(Event ev, Context *ctx){
 static Context *kmt_schedule(Event ev,Context *ctx){
     spin_lock(&task_lock);//一把大锁保平安
 
+    assert(0);
+
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
