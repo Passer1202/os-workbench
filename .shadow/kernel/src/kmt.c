@@ -186,7 +186,7 @@ static void kmt_init(){
 static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg), void *arg){
 
     spin_lock(&task_lock);
-    spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     //初始化任务
     static int i=0;
 
@@ -206,9 +206,15 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task_head->next=NULL;
     }
     else{
+        printf("task name :%s\n",task->name);
         task->next=task_head;
+        printf("task next name :%s\n",task->next);
+        printf("task_head name :%s\n",task_head->name);
         //printf("name %s\n",task_head->name);
         task_head=task;
+        printf("task_head name :%s\n",task_head->name);
+        printf("task next name :%s\n",task_head->next);
+        printf("task_head next name :%s\n",task->next);
     }
     //printf("name %s\n",task_head->name);
     //if(i==1) {
