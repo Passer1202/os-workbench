@@ -277,8 +277,9 @@ static void* kmt_kalloc(size_t size){
     void* ret=kalloc(size);
 
     //恢复中断状态
-    iset(intr_flag);
-
+    if(intr_flag)
+        iset(true);
+        
     return ret;
 }
 
