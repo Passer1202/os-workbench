@@ -256,7 +256,7 @@ static void sem_wait(sem_t *sem){
     if(flag){
         //assert(0);
         yield();
-        assert(0);
+        //assert(0);
     }
     //assert(0);
 }
