@@ -77,14 +77,14 @@ void producer(void *arg) {
     while (1) {
         P(&empty);
         putch('(');
-        //V(&fill);
+        V(&fill);
     }
 }
 void consumer(void *arg) {
     while (1) {
-        //P(&fill);
-        //putch(')');
-        //V(&empty);
+        P(&fill);
+        putch(')');
+        V(&empty);
     }
 }
 
