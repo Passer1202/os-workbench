@@ -187,9 +187,11 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 
     spin_lock(&task_lock);
     //初始化任务
+    static int i=0;
+
     task->status=RUNNABLE;
     task->name=name;
-    //printf("create %s\n",task->name);
+    printf("create %s %d \n",task->name,++i);
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
@@ -205,7 +207,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task->next=task_head;
         task_head=task;
     }
-    printf("head_name:%s\n",task_head->name);
+    //printf("head_name:%s\n",task_head->name);
     assert(task_head!=NULL);
 
     spin_unlock(&task_lock);
