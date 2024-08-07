@@ -3,16 +3,6 @@
 static inline task_t *task_alloc() { return pmm->alloc(sizeof(task_t)); }
 
 
-
-void print(void *arg) {
-    char *c = (char *)arg;
-    while (1) {
-        putch(*c);
-        for (int i = 0; i < 100000; i++)
-            ;
-    }
-}
-
 static void os_init() {
     pmm->init();
     kmt->init();
