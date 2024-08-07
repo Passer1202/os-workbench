@@ -47,8 +47,8 @@ struct task
             int status;
             const char    *name;
             void          (*entry)(void *);
-            Context*       context;
             struct task    *next;
+            Context*       context;
             char          end[0];
         };
 
