@@ -326,9 +326,9 @@ static void pmm_init() {
     buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
 
-    //printf("%d\n",sizeof(task_t));
-    printf("alloc1 at %p \n",sizeof(task_t));
-    printf("alloc2 at %p \n",sizeof(task_t));
+    printf("%d\n",sizeof(task_t));
+    printf("alloc1 at %p \n",kmt_kalloc(sizeof(task_t)));
+    printf("alloc2 at %p \n",kmt_kalloc(sizeof(task_t)));
     //kmt_kfree();
     //printf("alloc2 at%p \n",kmt_kalloc(25));
     
