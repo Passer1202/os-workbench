@@ -1,5 +1,96 @@
 #include <os.h>
 
+static inline task_t *task_alloc() { return pmm->alloc(sizeof(task_t)); }
+//目前来看alloc存在问题
+
+// 测试一
+//#define TEST_1
+void print(void *arg) {
+    char *c = (char *)arg;
+    while (1) {
+        putch(*c);
+        for (int i = 0; i < 100000; i++)
+            ;
+    }
+}
+// 测试二
+ //#define TEST_2
+static spinlock_t lk1;
+static spinlock_t lk2;
+void lock_test(void *arg) {
+    int *intr = (int *)arg;
+    // intr = 0, 关中断, ienabled() = false
+    // intr = 1， 开中断, ienabled() = false
+    // ABAB 形的锁测试
+    if (!*intr)
+        iset(false);
+    else
+        iset(true);
+    kmt->spin_lock(&lk1);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_lock(&lk2);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_unlock(&lk1);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_unlock(&lk2);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() != *intr, "中断恢复错误！");
+    printf("pass test for ABAB lock, 锁的初始状态是：[%d]\n", *intr);
+    if (!*intr)
+        iset(false);
+    else
+        iset(true);
+    kmt->spin_lock(&lk1);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_lock(&lk2);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_unlock(&lk1);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() == true, "不应该开中断！");
+    kmt->spin_unlock(&lk2);
+    for (int i = 0; i < 100000; i++)
+        ;
+    panic_on(ienabled() != *intr, "中断恢复错误！");
+    printf("pass test for ABBA lock, 锁的初始状态是：[%d]\n", *intr);
+    iset(true);
+    while (1)
+        ;
+}
+
+//#define TEST_3
+#define P kmt->sem_wait
+#define V kmt->sem_signal
+sem_t empty, fill;
+void producer(void *arg) {
+    while (1) {
+        P(&empty);
+        putch('(');
+        V(&fill);
+    }
+}
+void consumer(void *arg) {
+    
+    while (1) {
+        
+        P(&fill);
+        //assert(0);
+        putch(')');
+        V(&empty);
+    }
+}
+
 
 
 
