@@ -104,8 +104,8 @@ static Context *kmt_context_save(Event ev, Context *ctx){
 static Context *kmt_schedule(Event ev,Context *ctx){
     spin_lock(&task_lock);//一把大锁保平安
 
-    static int x=0;
-    printf("%d\n",x);
+    //static int x=0;
+    //printf("%d\n",x);
     //x++;
     assert(ienabled()==0);//中断关闭
 
@@ -115,8 +115,10 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     //若当前是IDLE，其next为NULL
     task_t *next=current[cpu_now]->next;
 
+    
     if(next==NULL){
         next=task_head;
+        if(next!=NULL)printf("name:%s\n",next->name);
     }
     //找到下一个RUNNABLE任务
     while(next!=NULL){
