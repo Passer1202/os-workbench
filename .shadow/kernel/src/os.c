@@ -4,7 +4,7 @@ static inline task_t *task_alloc() { return pmm->alloc(sizeof(task_t)); }
 
 
 // 测试一
-#define TEST_1
+//#define TEST_1
 void print(void *arg) {
     char *c = (char *)arg;
     while (1) {
@@ -14,7 +14,7 @@ void print(void *arg) {
     }
 }
 // 测试二
-// #define TEST_2
+ #define TEST_2
 static spinlock_t lk1;
 static spinlock_t lk2;
 void lock_test(void *arg) {
