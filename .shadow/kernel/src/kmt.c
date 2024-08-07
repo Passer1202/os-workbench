@@ -105,7 +105,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     spin_lock(&task_lock);//一把大锁保平安
 
     static int x=0;
-    printf("%d",x);
+    printf("%d\n",x);
     x++;
     assert(ienabled()==0);//中断关闭
 
@@ -205,7 +205,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 
 static void kmt_teardown(task_t *task){
     //按理说走不到这
-    assert(0);
+    //assert(0);
     panic_on(1, "not implemented");
 }
 
