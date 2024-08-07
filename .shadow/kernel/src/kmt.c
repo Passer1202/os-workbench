@@ -208,9 +208,9 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task->next=task_head;
         task_head=task;
     }
-    if(i==2) {
+    if(i==1) {
         printf("name %s\n",task_head->name);
-        printf("next %s\n",task_head->next->name);
+        //printf("next %s\n",task_head->next->name);
         assert(0);
     }
     //printf("head_name:%s\n",task_head->name);
