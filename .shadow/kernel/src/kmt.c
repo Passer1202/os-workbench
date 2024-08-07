@@ -135,6 +135,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     assert(next!=NULL);
 
     //切换任务，修改任务的状态
+    printf("task: %s\n",next->name);
     current[cpu_now]=next;
     if(current[cpu_now]->status!=IDLE){
         current[cpu_now]->status=RUNNING;
@@ -186,7 +187,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     
     task->status=RUNNABLE;
     task->name=name;
-    printf("taskname: %s\n",task->name);
+    //printf("taskname: %s\n",task->name);
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
@@ -207,9 +208,9 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task_head=task;
 
     }
-    printf("task_head name: %s\n",task_head->name);
-    if(task_head->next!=NULL)printf("task_head next name: %s\n",task_head->next->name);
-    else{printf("null\n");}
+    //printf("task_head name: %s\n",task_head->name);
+    //if(task_head->next!=NULL)printf("task_head next name: %s\n",task_head->next->name);
+    //else{printf("null\n");}
 
     assert(task_head!=NULL);
 
