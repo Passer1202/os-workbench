@@ -193,12 +193,15 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     if(i==2)
     {    if(task_head!=NULL)
             {printf("task_head name :%s\n",task_head->name);}
+        else{
+            assert(0);
+        }
     }
     //printf("i: %d\n",i);
     //assert(i<=2);
     task->status=RUNNABLE;
     task->name=name;
-    printf("create %s %d \n",task->name,++i);
+    //printf("create %s %d \n",task->name,++i);
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
