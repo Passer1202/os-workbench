@@ -269,16 +269,16 @@ static void kfree(void *ptr) {
 static void* kmt_kalloc(size_t size){
 
     //保存中断状态
-    bool intr_flag=ienabled();
+    //bool intr_flag=ienabled();
 
     //关中断
-    iset(false);
+    //iset(false);
 
     void* ret=kalloc(size);
 
     //恢复中断状态
-    if(intr_flag)
-        iset(true);
+    //if(intr_flag)
+    //    iset(true);
 
     return ret;
 }
