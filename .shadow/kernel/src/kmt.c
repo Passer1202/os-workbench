@@ -265,9 +265,9 @@ static void sem_wait(sem_t *sem){
 static void sem_signal(sem_t *sem){
     spin_lock(&sem->lock);
     sem->val++;
-    int flag=0;
+    
     if(sem->val<=0){//有等待的任务
-        flag=1;
+        
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
@@ -275,9 +275,6 @@ static void sem_signal(sem_t *sem){
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
-    if(flag){
-        yield();
-    }
 }
 
 
