@@ -271,7 +271,7 @@ static void sem_signal(sem_t *sem){
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
-        printf("signal name:%s\n",task->name);
+        //printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
