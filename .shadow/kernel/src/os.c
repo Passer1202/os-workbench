@@ -14,7 +14,7 @@ void print(void *arg) {
     }
 }
 // 测试二
- #define TEST_2
+ //#define TEST_2
 static spinlock_t lk1;
 static spinlock_t lk2;
 void lock_test(void *arg) {
@@ -69,7 +69,7 @@ void lock_test(void *arg) {
         ;
 }
 
-// #define TEST_3
+ #define TEST_3
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 sem_t empty, fill;
