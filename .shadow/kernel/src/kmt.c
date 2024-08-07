@@ -233,11 +233,11 @@ static void sem_wait(sem_t *sem){
         
     }
     spin_unlock(&sem->lock);
+    spin_unlock(&task_lock);
     if(flag){
-        spin_unlock(&task_lock);
+        
         yield();
     }
-    spin_unlock(&task_lock);
 
 }
 
