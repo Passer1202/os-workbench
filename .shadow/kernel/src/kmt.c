@@ -189,7 +189,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     //初始化任务
     task->status=RUNNABLE;
     task->name=name;
-    printf("create %s",task->name);
+    printf("create %s\n",task->name);
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
