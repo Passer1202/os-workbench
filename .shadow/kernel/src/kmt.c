@@ -106,7 +106,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
 
     static int x=0;
     printf("%d\n",x);
-    x++;
+    //x++;
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
@@ -123,6 +123,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
         if(next->status==RUNNABLE){
             break;//找到了
         }
+        printf("name:%s\n",next->name);
         next=next->next;
     }
     //没有找到RUNNABLE任务，则返回IDLE任务
