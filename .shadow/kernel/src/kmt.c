@@ -200,6 +200,8 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         (Area){task->end, task+1}, //from thread-os
         entry, arg
     );
+    if(task_head!=NULL)
+    printf("task_head name :%s\n",task_head->name);
 
     //将任务插入任务链表(头插法)
     if(task_head==NULL){
