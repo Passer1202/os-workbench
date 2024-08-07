@@ -190,7 +190,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     //初始化任务
     static int i=0;
     i++;
-    if(i==1)
+    if(i==2)
     {    if(task_head!=NULL)
             {printf("task_head name :%s\n",task_head->name);}
     }
@@ -230,7 +230,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         //printf("next %s\n",task_head->next->name);
     //    assert(0);
     //}
-    printf("head_name:%s\n",task_head->name);
+    //printf("head_name:%s\n",task_head->name);
     assert(task_head!=NULL);
 
     spin_unlock(&task_lock);
