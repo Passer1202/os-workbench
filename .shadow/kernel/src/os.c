@@ -40,12 +40,13 @@ static Context *os_trap(Event ev, Context *ctx) {
     Context *next = NULL;
 
     printf("item_cnt: %d\n",item_cnt);
-    assert(0);
+    //assert(0);
     for (int i=0;i<item_cnt;i++) {
         if (items[i].event == EVENT_NULL || items[i].event == ev.event) {
             Context *r = items[i].handler(ev, ctx);
             panic_on(r && next, "return to multiple contexts");
             if (r) next = r;
+            else assert(0);
         }
     }
     panic_on(!next, "return to NULL context");
