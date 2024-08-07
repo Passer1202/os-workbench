@@ -46,7 +46,6 @@ static Context *os_trap(Event ev, Context *ctx) {
             Context *r = items[i].handler(ev, ctx);
             panic_on(r && next, "return to multiple contexts");
             if (r) next = r;
-            else assert(0);
         }
     }
     panic_on(!next, "return to NULL context");

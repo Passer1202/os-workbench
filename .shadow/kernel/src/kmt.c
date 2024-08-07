@@ -137,7 +137,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     }
 
     spin_unlock(&task_lock);
-    return NULL;
+    return current[cpu_now]->context;
 }
 
 static void current_init(){
