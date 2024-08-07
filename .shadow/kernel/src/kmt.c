@@ -200,7 +200,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 
     //将任务插入任务链表(头插法)
     if(task_head==NULL){
-        assert(0);
+        //assert(0);
         task_head=task;
         task->next=NULL;
     }
@@ -210,7 +210,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     }
     if(i==2) {
         printf("name %s\n",task_head->name);
-        printf("next %s\n",task->next->name);
+        printf("next %s\n",task_head->next->name);
         assert(0);
     }
     //printf("head_name:%s\n",task_head->name);
