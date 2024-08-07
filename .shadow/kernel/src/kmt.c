@@ -77,12 +77,14 @@ static void spin_unlock(spinlock_t *lk){
 
 }
 
-
+static int xxxx=0;
 
 
 static Context *kmt_context_save(Event ev, Context *ctx){
     
     spin_lock(&task_lock);
+    xxxx++;
+    assert(xxxx%2==1);
 
     assert(ienabled()==0);//中断关闭
 
@@ -107,6 +109,8 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     //static int x=0;
     //printf("%d\n",x);
     //x++;
+     xxxx++;
+    assert(xxxx%2==0);
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
@@ -242,10 +246,10 @@ static void sem_wait(sem_t *sem){
     int cpu_now=cpu_current();
     int flag=0;
     sem->val--;
-    int check=0;
+    //int check=0;
     if(sem->val<0){
         flag=1;
-        check= current[cpu_now]->status;
+        //check= current[cpu_now]->status;
         current[cpu_now]->status=BLOCKED;//等待状态
         
         //入队
@@ -260,11 +264,11 @@ static void sem_wait(sem_t *sem){
         //assert(ienabled()==true);
 
         
-        printf("wait name:%s\n",current[cpu_now]->name);
+        //printf("wait name:%s\n",current[cpu_now]->name);
         yield();
         
-        printf("wait name:%s\n",current[cpu_now]->name);
-        assert(check== current[cpu_now]->status);
+        //printf("wait name:%s\n",current[cpu_now]->name);
+        //assert(check== current[cpu_now]->status);
         //assert(0);
     }
     //assert(0);
