@@ -135,7 +135,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     assert(next!=NULL);
 
     //切换任务，修改任务的状态
-    printf("task: %s\n",next->name);
+    //printf("task: %s\n",next->name);
     current[cpu_now]=next;
     if(current[cpu_now]->status!=IDLE){
         current[cpu_now]->status=RUNNING;
