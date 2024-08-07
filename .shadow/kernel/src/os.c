@@ -83,8 +83,9 @@ void producer(void *arg) {
 void consumer(void *arg) {
     
     while (1) {
-        assert(0);
+        
         P(&fill);
+        assert(0);
         putch(')');
         V(&empty);
     }
