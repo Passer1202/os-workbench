@@ -84,7 +84,7 @@ void consumer(void *arg) {
     while (1) {
         P(&fill);
         putch(')');
-        V(&empty);
+        //V(&empty);
     }
 }
 
