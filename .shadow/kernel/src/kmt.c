@@ -6,7 +6,7 @@
 //本次实验的主要任务是实现 kmt 模块中的函数，
 //需要完成 struct task, struct spinlock, struct semaphore 的定义，并实现 kmt 的全部 API。
 
-spinlock_t task_lock;
+static spinlock_t task_lock;
 
 kcpu cpu_info[CPU_MAX];//CPU信息
 
@@ -118,6 +118,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     
     if(next==NULL){
         next=task_head;
+        assert(task_head!=NULL);
         //assert(0);
         //if(next!=NULL)printf("name:%s\n",next->name);
     }
