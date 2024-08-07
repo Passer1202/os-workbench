@@ -83,6 +83,7 @@ static int xxxx=0;
 static Context *kmt_context_save(Event ev, Context *ctx){
     
     spin_lock(&task_lock);
+    printf("xxxx: %d\n",xxxx);
     xxxx++;
     assert(xxxx%2==1);
 
@@ -109,7 +110,8 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     //static int x=0;
     //printf("%d\n",x);
     //x++;
-     xxxx++;
+    xxxx++;
+    printf("xxxx: %d\n",xxxx);
     assert(xxxx%2==0);
     assert(ienabled()==0);//中断关闭
 
