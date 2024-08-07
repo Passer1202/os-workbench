@@ -330,6 +330,7 @@ static void pmm_init() {
     printf("alloc1 at %p \n",kmt_kalloc(5000));
     printf("alloc2 at %p \n",kmt_kalloc(5000));
     printf("alloc2 at %p \n",kmt_kalloc(5000));
+    printf("alloc2 at %p \n",kmt_kalloc(5000));
     //kmt_kfree();
     //printf("alloc2 at%p \n",kmt_kalloc(25));
     
