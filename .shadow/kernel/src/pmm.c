@@ -135,6 +135,7 @@ static void *kalloc(size_t size) {
         //slowpath
         acquire_lock(&heap_lock);
         //TODO:buddy分配
+        sz=_64KB;
         uintptr_t ret=(uintptr_t)buddy_alloc(sz);
         release_lock(&heap_lock);
         return (void*)ret;
@@ -327,10 +328,10 @@ static void pmm_init() {
     printf("PMM: init done\n");
 
     //printf("%d\n",sizeof(task_t));
-    printf("alloc1 at %p \n",kmt_kalloc(5000));
-    printf("alloc2 at %p \n",kmt_kalloc(5000));
-    printf("alloc2 at %p \n",kmt_kalloc(5000));
-    printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //printf("alloc1 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
     //kmt_kfree();
     //printf("alloc2 at%p \n",kmt_kalloc(25));
     
