@@ -208,13 +208,13 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     else{
         printf("task name :%s\n",task->name);
         task->next=task_head;
-        printf("task next name :%s\n",task->next);
+        printf("task next name :%s\n",task->next->name);
         printf("task_head name :%s\n",task_head->name);
         //printf("name %s\n",task_head->name);
         task_head=task;
         printf("task_head name :%s\n",task_head->name);
-        printf("task next name :%s\n",task_head->next);
-        printf("task_head next name :%s\n",task->next);
+        printf("task next name :%s\n",task_head->next->name);
+        printf("task_head next name :%s\n",task->next->name);
     }
     //printf("name %s\n",task_head->name);
     //if(i==1) {
