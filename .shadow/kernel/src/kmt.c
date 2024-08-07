@@ -183,7 +183,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     spin_lock(&task_lock);
     //spin_lock(&task_lock);
     //初始化任务
-
+    printf("taskname: %s\n",task->name);
     task->status=RUNNABLE;
     task->name=name;
    
