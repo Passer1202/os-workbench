@@ -188,13 +188,10 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     spin_lock(&task_lock);
     //spin_lock(&task_lock);
     //初始化任务
-    static int i=0;
-    //printf("i: %d\n",i);
-    //
+
     task->status=RUNNABLE;
     task->name=name;
-    printf("create %s %d %p\n",task->name,++i,task);
-    //assert(i<=1);
+   
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
@@ -209,25 +206,14 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         task_head->next=NULL;
     }
     else{
-        //printf("task_head name :%s\n",task_head->name);
-        //printf("task name :%s\n",task->name);
+        
         
         task->next=task_head;
-        //printf("task next name :%s\n",task->next->name);
-        //printf("task_head name :%s\n",task_head->name);
-        //printf("name %s\n",task_head->name);
+
         task_head=task;
-        //printf("task_head name :%s\n",task_head->name);
-        //printf("task next name :%s\n",task_head->next->name);
-        //printf("task_head next name :%s\n",task->next->name);
+
     }
-    //printf("name %s\n",task_head->name);
-    //if(i==1) {
-    //    printf("name %s\n",task_head->name);
-        //printf("next %s\n",task_head->next->name);
-    //    assert(0);
-    //}
-    //printf("head_name:%s\n",task_head->name);
+
     assert(task_head!=NULL);
 
     spin_unlock(&task_lock);
