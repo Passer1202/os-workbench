@@ -118,17 +118,12 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     
     if(next==NULL){
         next=task_head;
-        //assert(task_head!=NULL);
-        //assert(next->name!=NULL);
-        //assert(0);
-        //if(next!=NULL)printf("name:%s\n",next->name);
     }
     //找到下一个RUNNABLE任务
     while(next!=NULL){
         if(next->status==RUNNABLE){
             break;//找到了
         }
-        printf("name:%s\n",next->name);
         next=next->next;
     }
     //没有找到RUNNABLE任务，则返回IDLE任务
