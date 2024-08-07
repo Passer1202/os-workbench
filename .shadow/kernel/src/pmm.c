@@ -328,8 +328,8 @@ static void pmm_init() {
     printf("PMM: init done\n");
 
     //printf("%d\n",sizeof(task_t));
-    //printf("alloc1 at %p \n",kmt_kalloc(5000));
-    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    printf("alloc1 at %p \n",kmt_kalloc(5000));
+    printf("alloc2 at %p \n",kmt_kalloc(5000));
     //printf("alloc2 at %p \n",kmt_kalloc(5000));
     //printf("alloc2 at %p \n",kmt_kalloc(5000));
     //kmt_kfree();
