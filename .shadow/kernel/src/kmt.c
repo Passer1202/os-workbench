@@ -103,7 +103,7 @@ static Context *kmt_context_save(Event ev, Context *ctx){
 
 static Context *kmt_schedule(Event ev,Context *ctx){
     spin_lock(&task_lock);//一把大锁保平安
-
+    spin_lock(&task_lock);//一把大锁保平安
     //static int x=0;
     //printf("%d\n",x);
     //x++;
@@ -209,7 +209,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
         //printf("name %s\n",task_head->name);
         task_head=task;
     }
-    printf("name %s\n",task_head->name);
+    //printf("name %s\n",task_head->name);
     //if(i==1) {
     //    printf("name %s\n",task_head->name);
         //printf("next %s\n",task_head->next->name);
