@@ -190,7 +190,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
     //初始化任务
     static int i=0;
     i++;
-    assert(i<=2);
+    printf("i: %d\n",i);
     task->status=RUNNABLE;
     task->name=name;
     printf("create %s %d \n",task->name,++i);
