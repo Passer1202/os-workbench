@@ -254,7 +254,7 @@ static void sem_wait(sem_t *sem){
     spin_unlock(&sem->lock);
     spin_unlock(&task_lock);
     if(flag){
-        
+        assert(0);
         yield();
     }
 
