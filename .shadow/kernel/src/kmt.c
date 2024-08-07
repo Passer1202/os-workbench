@@ -167,8 +167,8 @@ static void current_init(){
 static void kmt_init(){
 
     //注册中断处理函数
-    os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
-    os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
+    os->on_irq(0, EVENT_NULL, kmt_context_save);
+    os->on_irq(1, EVENT_NULL, kmt_schedule);
 
     //初始化每个cpu上的current
     current_init();
@@ -244,7 +244,7 @@ static void sem_wait(sem_t *sem){
     sem->val--;
     if(sem->val<0){
         flag=1;
-        assert(current[cpu_now]->status!=IDLE);//等待状态
+                                        //等待状态
         current[cpu_now]->status=BLOCKED;//等待状态
         
         //入队
