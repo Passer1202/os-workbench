@@ -4,7 +4,7 @@ static inline task_t *task_alloc() { return pmm->alloc(sizeof(task_t)); }
 
 
 // 测试一
-#define TEST_1
+//#define TEST_1
 void print(void *arg) {
     char *c = (char *)arg;
     while (1) {
@@ -95,6 +95,9 @@ void consumer(void *arg) {
 static void os_init() {
     pmm->init();
     kmt->init();
+
+    for(int i=0;i<3;i++)
+      printf("i:%p\n",task_alloc());
 
     // 测试一: 简单测试，中断"c","d"交替出现
 #ifdef TEST_1
