@@ -284,7 +284,7 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
-    //spin_lock(&task_lock);
+    spin_lock(&task_lock);
     spin_lock(&sem->lock);
     
     sem->val++;
@@ -298,7 +298,7 @@ static void sem_signal(sem_t *sem){
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
-    //spin_unlock(&task_lock);
+    spin_unlock(&task_lock);
 }
 
 
