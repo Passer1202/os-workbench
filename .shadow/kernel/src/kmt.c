@@ -233,18 +233,19 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 static void kmt_teardown(task_t *task){
     //按理说走不到这
     //assert(0);
-    panic_on(1, "not implemented");
+    //panic_on(1, "not implemented");
 }
 
 
 static void sem_init(sem_t *sem, const char *name, int value){
-    
+    spin_lock(&task_lock);
     sem->val=value;
     spin_init(&sem->lock, name);
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
     sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
+    spin_unlock(&task_lock);
 }
 
 static void sem_wait(sem_t *sem){
