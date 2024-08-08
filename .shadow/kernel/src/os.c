@@ -151,8 +151,10 @@ static void os_init() {
     //    putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
     iset(true);
-    //yield();
-    while (1) ;
+    yield();
+    while (1) {
+        yield();
+    };
   }
 #endif
 
