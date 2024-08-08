@@ -18,11 +18,6 @@ task_t *task_head;//任务链表头
 
 task_t *last[CPU_MAX];//CPU上次运行的任务
 
-static void idle(){
-    while(1){
-        yield();
-    }
-}
 
 
 static void spin_init(spinlock_t *lk, const char *name){
@@ -168,7 +163,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        current[i]->entry=idle;
+        //current[i]->entry=idle;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
@@ -249,7 +244,7 @@ static void sem_init(sem_t *sem, const char *name, int value){
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
-    sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
+    sem->cnt_max=256;//若改动此值，务必修改queue数组的大小
     spin_unlock(&task_lock);
 }
 

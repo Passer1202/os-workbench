@@ -68,7 +68,7 @@ struct semaphore
   int qh;//队列头
   int qt;//队列尾：下一个可用位置
   int cnt_max;//队列中的任务最大数量
-  task_t *wait_queue[128];//等待队列
+  task_t *wait_queue[256];//等待队列
   
   const char* name;
 

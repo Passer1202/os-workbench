@@ -153,7 +153,7 @@ static void os_init() {
     iset(true);
     yield();
     while (1) {
-        yield();
+        //yield();
     };
   }
 #endif
