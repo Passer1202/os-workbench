@@ -16,7 +16,6 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 task_t *task_head;//任务链表头
 
-task_t *last[CPU_MAX];//CPU上次运行的任务
 
 
 
@@ -31,6 +30,8 @@ static void spin_init(spinlock_t *lk, const char *name){
 }
 
 static void spin_lock(spinlock_t *lk){
+
+    
 
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
@@ -149,7 +150,6 @@ static Context *kmt_schedule(Event ev,Context *ctx){
         current[cpu_now]->status=RUNNING;
     }
 
-    last[cpu_now]=current[cpu_now];
     spin_unlock(&task_lock);
     return current[cpu_now]->context;
 }
@@ -159,7 +159,7 @@ static void current_init(){
     int cpu_cnt=cpu_count();
     //最开始每个cpu上都是空闲任务
     for(int i=0;i<cpu_cnt;i++){
-        last[i]=NULL;
+        
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
@@ -233,19 +233,18 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 static void kmt_teardown(task_t *task){
     //按理说走不到这
     //assert(0);
-    //panic_on(1, "not implemented");
+    panic_on(1, "not implemented");
 }
 
 
 static void sem_init(sem_t *sem, const char *name, int value){
-    //spin_lock(&task_lock);
+    
     sem->val=value;
     spin_init(&sem->lock, name);
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
     sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
-    //spin_unlock(&task_lock);
 }
 
 static void sem_wait(sem_t *sem){
@@ -263,7 +262,7 @@ static void sem_wait(sem_t *sem){
         
         //入队
         sem->wait_queue[sem->qt]=current[cpu_now];
-        sem->qt=((sem->qt+1)>(sem->cnt_max))?(sem->qt+1-sem->cnt_max):(sem->qt+1);
+        sem->qt=(sem->qt+1)%(sem->cnt_max);
         
     }
     spin_unlock(&sem->lock);
@@ -285,7 +284,7 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
-    spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     spin_lock(&sem->lock);
     
     sem->val++;
@@ -294,12 +293,12 @@ static void sem_signal(sem_t *sem){
         
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
-        sem->qh=((sem->qh+1)>(sem->cnt_max))?(sem->qh+1-sem->cnt_max):(sem->qh+1);
+        sem->qh=(sem->qh+1)%(sem->cnt_max);
         //printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
-    spin_unlock(&task_lock);
+    //spin_unlock(&task_lock);
 }
 
 
