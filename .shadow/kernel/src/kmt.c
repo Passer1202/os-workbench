@@ -16,6 +16,12 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 task_t *task_head;//任务链表头
 
+static void idle(){
+    while(1){
+        yield();
+    }
+}
+
 
 static void spin_init(spinlock_t *lk, const char *name){
 
@@ -160,7 +166,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        current[i]->entry=NULL;
+        current[i]->entry=idle;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
@@ -262,8 +268,8 @@ static void sem_wait(sem_t *sem){
         sem->qt=(sem->qt+1)%(sem->cnt_max);
         
     }
-    spin_unlock(&sem->lock);
-    //spin_unlock(&task_lock);
+    //spin_unlock(&sem->lock);
+    spin_unlock(&task_lock);
     if(flag){
         //assert(0);
         //assert(ienabled()==true);
@@ -288,7 +294,7 @@ static void sem_signal(sem_t *sem){
     
     if(sem->val<=0){//有等待的任务
         
-        //assert(sem->qh!=sem->qt);
+        assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
         //printf("signal name:%s\n",task->name);
