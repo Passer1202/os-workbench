@@ -9,11 +9,12 @@
 
 /********** kmt **********/
 
-#define STACK_SIZE 8192//栈大小
+#define STACK_SIZE 4096//栈大小
 
 
-#define INT_MIN 0x80000000
+
 #define INT_MAX 0x7fffffff
+#define INT_MIN (-INT_MAX-1)
 
 typedef struct kmt_cpu_t{
   //记录锁的嵌套层数和最外层的锁前中断与否
@@ -47,8 +48,8 @@ struct task
             int status;
             const char    *name;
             void          (*entry)(void *);
-            Context*       context;
             struct task    *next;
+            Context*       context;
             char          end[0];
         };
 

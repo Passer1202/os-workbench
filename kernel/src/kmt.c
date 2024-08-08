@@ -1,12 +1,12 @@
 #include<os.h>
-#include<common.h>
+
 
 
 //实验要求：实现 Kernel Multi-threading
 //本次实验的主要任务是实现 kmt 模块中的函数，
 //需要完成 struct task, struct spinlock, struct semaphore 的定义，并实现 kmt 的全部 API。
 
-spinlock_t task_lock;
+static spinlock_t task_lock;
 
 kcpu cpu_info[CPU_MAX];//CPU信息
 
@@ -15,6 +15,8 @@ task_t *current[CPU_MAX];//CPU当前任务指针
 task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 task_t *task_head;//任务链表头
+
+
 
 
 static void spin_init(spinlock_t *lk, const char *name){
@@ -29,10 +31,11 @@ static void spin_init(spinlock_t *lk, const char *name){
 
 static void spin_lock(spinlock_t *lk){
 
-    int cpu_now=cpu_current();
+    
 
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
+    int cpu_now=cpu_current();
 
     if(cpu_info[cpu_now].ncli==0){//记录最外层的中断状态
         cpu_info[cpu_now].intr=intr;
@@ -77,12 +80,15 @@ static void spin_unlock(spinlock_t *lk){
 
 }
 
-
+//static int xxxx=0;
 
 
 static Context *kmt_context_save(Event ev, Context *ctx){
     
     spin_lock(&task_lock);
+    //printf("xxxx: %d\n",xxxx);
+    //xxxx++;
+    //assert(xxxx%2==1);
 
     assert(ienabled()==0);//中断关闭
 
@@ -103,7 +109,13 @@ static Context *kmt_context_save(Event ev, Context *ctx){
 
 static Context *kmt_schedule(Event ev,Context *ctx){
     spin_lock(&task_lock);//一把大锁保平安
-
+    //spin_lock(&task_lock);//一把大锁保平安
+    //static int x=0;
+    //printf("%d\n",x);
+    //x++;
+    //xxxx++;
+    //printf("xxxx: %d\n",xxxx);
+    //assert(xxxx%2==0);
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
@@ -112,6 +124,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     //若当前是IDLE，其next为NULL
     task_t *next=current[cpu_now]->next;
 
+    
     if(next==NULL){
         next=task_head;
     }
@@ -131,13 +144,14 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     assert(next!=NULL);
 
     //切换任务，修改任务的状态
+    //printf("task: %s\n",next->name);
     current[cpu_now]=next;
     if(current[cpu_now]->status!=IDLE){
         current[cpu_now]->status=RUNNING;
     }
 
     spin_unlock(&task_lock);
-    return NULL;
+    return current[cpu_now]->context;
 }
 
 static void current_init(){
@@ -162,6 +176,9 @@ static void current_init(){
 static void kmt_init(){
 
     //注册中断处理函数
+    //printf("%d\n",INT_MAX);
+    //assert(0);
+    //assert(INT_MIN<INT_MAX);
     os->on_irq(INT_MIN, EVENT_NULL, kmt_context_save);
     os->on_irq(INT_MAX, EVENT_NULL, kmt_schedule);
 
@@ -177,24 +194,37 @@ static void kmt_init(){
 static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg), void *arg){
 
     spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     //初始化任务
+    
     task->status=RUNNABLE;
     task->name=name;
+    //printf("taskname: %s\n",task->name);
     task->entry=entry;
     task->context=kcontext(
         (Area){task->end, task+1}, //from thread-os
         entry, arg
     );
+    
 
     //将任务插入任务链表(头插法)
     if(task_head==NULL){
+        //assert(0);
         task_head=task;
-        task->next=NULL;
+        task_head->next=NULL;
     }
     else{
+        
         task->next=task_head;
+
         task_head=task;
+
     }
+    //printf("task_head name: %s\n",task_head->name);
+    //if(task_head->next!=NULL)printf("task_head next name: %s\n",task_head->next->name);
+    //else{printf("null\n");}
+
+    assert(task_head!=NULL);
 
     spin_unlock(&task_lock);
     return 0;
@@ -202,6 +232,7 @@ static int  kmt_create(task_t *task, const char *name, void (*entry)(void *arg),
 
 static void kmt_teardown(task_t *task){
     //按理说走不到这
+    //assert(0);
     panic_on(1, "not implemented");
 }
 
@@ -223,8 +254,10 @@ static void sem_wait(sem_t *sem){
     int cpu_now=cpu_current();
     int flag=0;
     sem->val--;
+    //int check=0;
     if(sem->val<0){
         flag=1;
+        //check= current[cpu_now]->status;
         current[cpu_now]->status=BLOCKED;//等待状态
         
         //入队
@@ -233,25 +266,39 @@ static void sem_wait(sem_t *sem){
         
     }
     spin_unlock(&sem->lock);
-    if(flag){
-        spin_unlock(&task_lock);
-        yield();
-    }
     spin_unlock(&task_lock);
+    if(flag){
+        //assert(0);
+        //assert(ienabled()==true);
 
+        
+        //printf("wait name:%s\n",current[cpu_now]->name);
+        yield();
+        
+        //printf("wait name:%s\n",current[cpu_now]->name);
+        //assert(check== current[cpu_now]->status);
+        //assert(0);
+    }
+    //assert(0);
 }
 
 
 static void sem_signal(sem_t *sem){
+    //spin_lock(&task_lock);
     spin_lock(&sem->lock);
+    
     sem->val++;
+    
     if(sem->val<=0){//有等待的任务
+        
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
+        //printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
+    //spin_unlock(&task_lock);
 }
 
 

@@ -135,6 +135,7 @@ static void *kalloc(size_t size) {
         //slowpath
         acquire_lock(&heap_lock);
         //TODO:buddy分配
+        sz=_64KB;
         uintptr_t ret=(uintptr_t)buddy_alloc(sz);
         release_lock(&heap_lock);
         return (void*)ret;
@@ -277,7 +278,8 @@ static void* kmt_kalloc(size_t size){
     void* ret=kalloc(size);
 
     //恢复中断状态
-    iset(intr_flag);
+    if(intr_flag)
+        iset(true);
 
     return ret;
 }
@@ -324,6 +326,14 @@ static void pmm_init() {
     //h_ptr=heap.start;
     buddy_init((uintptr_t)heap.start , (uintptr_t)heap.end);
     printf("PMM: init done\n");
+
+    //printf("%d\n",sizeof(task_t));
+    //printf("alloc1 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //printf("alloc2 at %p \n",kmt_kalloc(5000));
+    //kmt_kfree();
+    //printf("alloc2 at%p \n",kmt_kalloc(25));
     
 }
 
