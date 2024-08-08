@@ -18,7 +18,11 @@ task_t *task_head;//任务链表头
 
 task_t *last[CPU_MAX];//CPU上次运行的任务
 
-
+static void idle(){
+    while(1){
+        yield();
+    }
+}
 
 
 static void spin_init(spinlock_t *lk, const char *name){
@@ -130,7 +134,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     }
     //找到下一个RUNNABLE任务
     while(next!=NULL){
-        if(next->status==RUNNABLE&&next!=current[cpu_now]){
+        if(next->status==RUNNABLE){
             break;//找到了
         }
         next=next->next;
@@ -164,7 +168,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        current[i]->entry=NULL;
+        current[i]->entry=idle;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
