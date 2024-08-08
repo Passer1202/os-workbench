@@ -16,6 +16,8 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 task_t *task_head;//任务链表头
 
+task_t *last[CPU_MAX];//CPU上次运行的任务
+
 
 
 
@@ -30,8 +32,6 @@ static void spin_init(spinlock_t *lk, const char *name){
 }
 
 static void spin_lock(spinlock_t *lk){
-
-    
 
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
@@ -130,7 +130,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     }
     //找到下一个RUNNABLE任务
     while(next!=NULL){
-        if(next->status==RUNNABLE){
+        if(next->status==RUNNABLE&&next!=current[cpu_now]){
             break;//找到了
         }
         next=next->next;
@@ -150,6 +150,7 @@ static Context *kmt_schedule(Event ev,Context *ctx){
         current[cpu_now]->status=RUNNING;
     }
 
+    last[cpu_now]=current[cpu_now];
     spin_unlock(&task_lock);
     return current[cpu_now]->context;
 }
@@ -159,7 +160,7 @@ static void current_init(){
     int cpu_cnt=cpu_count();
     //最开始每个cpu上都是空闲任务
     for(int i=0;i<cpu_cnt;i++){
-        
+        last[i]=NULL;
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
