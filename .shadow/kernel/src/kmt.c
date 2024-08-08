@@ -262,8 +262,8 @@ static void sem_wait(sem_t *sem){
         sem->qt=(sem->qt+1)%(sem->cnt_max);
         
     }
-    //spin_unlock(&sem->lock);
-    spin_unlock(&task_lock);
+    spin_unlock(&sem->lock);
+    //spin_unlock(&task_lock);
     if(flag){
         //assert(0);
         //assert(ienabled()==true);
