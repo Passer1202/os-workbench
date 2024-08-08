@@ -238,14 +238,14 @@ static void kmt_teardown(task_t *task){
 
 
 static void sem_init(sem_t *sem, const char *name, int value){
-    spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     sem->val=value;
     spin_init(&sem->lock, name);
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
     sem->cnt_max=256;//若改动此值，务必修改queue数组的大小
-    spin_unlock(&task_lock);
+    //spin_unlock(&task_lock);
 }
 
 static void sem_wait(sem_t *sem){
@@ -263,7 +263,7 @@ static void sem_wait(sem_t *sem){
         
         //入队
         sem->wait_queue[sem->qt]=current[cpu_now];
-        sem->qt=(sem->qt+1)%(sem->cnt_max);
+        sem->qt=((sem->qt+1)>(sem->cnt_max))?(sem->qt+1-sem->cnt_max):(sem->qt+1);
         
     }
     spin_unlock(&sem->lock);
@@ -285,7 +285,7 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
-    spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     spin_lock(&sem->lock);
     
     sem->val++;
@@ -294,12 +294,12 @@ static void sem_signal(sem_t *sem){
         
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
-        sem->qh=(sem->qh+1)%(sem->cnt_max);
+        sem->qh=((sem->qh+1)>(sem->cnt_max))?(sem->qh+1-sem->cnt_max):(sem->qh+1);
         //printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
-    spin_unlock(&task_lock);
+    //spin_unlock(&task_lock);
 }
 
 
