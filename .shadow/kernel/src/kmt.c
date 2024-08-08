@@ -252,7 +252,7 @@ static void sem_init(sem_t *sem, const char *name, int value){
 
 static void sem_wait(sem_t *sem){
 
-    //spin_lock(&task_lock);
+    spin_lock(&task_lock);
     spin_lock(&sem->lock);
     int cpu_now=cpu_current();
     int flag=0;
@@ -268,7 +268,7 @@ static void sem_wait(sem_t *sem){
         sem->qt=(sem->qt+1)%(sem->cnt_max);
         
     }
-    //spin_unlock(&sem->lock);
+    spin_unlock(&sem->lock);
     spin_unlock(&task_lock);
     if(flag){
         //assert(0);
