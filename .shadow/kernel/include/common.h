@@ -9,7 +9,7 @@
 
 /********** kmt **********/
 
-#define STACK_SIZE 4096//栈大小
+#define STACK_SIZE 8192//栈大小
 
 
 
