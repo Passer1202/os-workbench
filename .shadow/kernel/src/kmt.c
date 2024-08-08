@@ -163,7 +163,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        //current[i]->entry=idle;
+        current[i]->entry=NULL;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
@@ -244,7 +244,7 @@ static void sem_init(sem_t *sem, const char *name, int value){
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
-    sem->cnt_max=256;//若改动此值，务必修改queue数组的大小
+    sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
     //spin_unlock(&task_lock);
 }
 
@@ -285,7 +285,7 @@ static void sem_wait(sem_t *sem){
 
 
 static void sem_signal(sem_t *sem){
-    //spin_lock(&task_lock);
+    spin_lock(&task_lock);
     spin_lock(&sem->lock);
     
     sem->val++;
@@ -299,7 +299,7 @@ static void sem_signal(sem_t *sem){
         task->status=RUNNABLE;
     }
     spin_unlock(&sem->lock);
-    //spin_unlock(&task_lock);
+    spin_unlock(&task_lock);
 }
 
 
