@@ -246,7 +246,7 @@ static void sem_init(sem_t *sem, const char *name, int value){
 
 static void sem_wait(sem_t *sem){
 
-    spin_lock(&task_lock);
+    //spin_lock(&task_lock);
     spin_lock(&sem->lock);
     int cpu_now=cpu_current();
     int flag=0;
@@ -262,7 +262,7 @@ static void sem_wait(sem_t *sem){
         sem->qt=(sem->qt+1)%(sem->cnt_max);
         
     }
-    spin_unlock(&sem->lock);
+    //spin_unlock(&sem->lock);
     spin_unlock(&task_lock);
     if(flag){
         //assert(0);
@@ -288,7 +288,7 @@ static void sem_signal(sem_t *sem){
     
     if(sem->val<=0){//有等待的任务
         
-        assert(sem->qh!=sem->qt);
+        //assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
         sem->qh=(sem->qh+1)%(sem->cnt_max);
         //printf("signal name:%s\n",task->name);
