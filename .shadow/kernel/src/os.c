@@ -79,7 +79,7 @@ void producer(void *arg) {
         P(&empty);
         putch('(');
         V(&fill);
-        //printf("task: producer , cpu_current: %d\n",cpu_current());
+        //printf("task: %s \n",->name);
 
     }
 }
