@@ -68,7 +68,7 @@ void lock_test(void *arg) {
     while (1)
         ;
 }
-//#define TEST_3
+#define TEST_3
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 sem_t empty, fill;
@@ -79,6 +79,8 @@ void producer(void *arg) {
         P(&empty);
         putch('(');
         V(&fill);
+        printf("task: producer , cpu_current: %d\n",cpu_current());
+
     }
 }
 void consumer(void *arg) {
@@ -89,6 +91,7 @@ void consumer(void *arg) {
         //assert(0);
         putch(')');
         V(&empty);
+        printf("task: consumer , cpu_current: %d\n",cpu_current());
     }
 }
 
@@ -124,9 +127,9 @@ static void os_init() {
     kmt->sem_init(&empty, "empty",1);  // 缓冲区大小为 5
     kmt->sem_init(&fill, "fill", 0);
 
-    for (int i = 0; i < 4; i++)  // 4 个生产者
+    //for (int i = 0; i < 4; i++)  // 4 个生产者
         kmt->create(task_alloc(), "producer", producer, NULL);
-    for (int i = 0; i < 5; i++)  // 5 个消费者
+    //for (int i = 0; i < 5; i++)  // 5 个消费者
         kmt->create(task_alloc(), "consumer", consumer, NULL);
 #endif
 
