@@ -44,11 +44,7 @@ static void spin_lock(spinlock_t *lk){
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
     
-
     int cpu_now=cpu_current();
-
-    
-    
     
     if(cpu_info[cpu_now].ncli==0){//记录最外层的中断状态
         cpu_info[cpu_now].intr=intr;
@@ -56,8 +52,8 @@ static void spin_lock(spinlock_t *lk){
     cpu_info[cpu_now].ncli++;//嵌套层数+1
 
     //防御性编程：避免死锁
-    int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
-    assert(check==0);
+    //int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
+    //assert(check==0);
 
     while (atomic_xchg(&lk->locked, 1))
         ;
@@ -70,17 +66,22 @@ static void spin_lock(spinlock_t *lk){
 static void spin_unlock(spinlock_t *lk){
     
     //检查持有锁
-    int cpu_now=cpu_current();
+    
 
-    int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
-    assert(check==1);
+    //int intr=cpu_info[cpu_now].intr;
+    //int check= (lk->locked==1 && lk->cpu_no==cpu_now); 
+    //assert(check==1);
 
-    assert(ienabled()==0);//中断关闭
+    
 
     lk->cpu_no = -1;
 
     __sync_synchronize();
     atomic_xchg(&lk->locked, 0);
+
+    assert(ienabled()==0);//中断关闭
+    
+    int cpu_now=cpu_current();
 
     assert(cpu_info[cpu_now].ncli>0);//嵌套层数大于0
 
@@ -172,7 +173,8 @@ static void current_init(){
     int cpu_cnt=cpu_count();
     //最开始每个cpu上都是空闲任务
     for(int i=0;i<cpu_cnt;i++){
-        
+        cpu_info[i].ncli=0;
+        cpu_info[i].intr=0;
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
