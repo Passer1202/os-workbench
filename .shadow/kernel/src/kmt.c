@@ -17,12 +17,12 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 task_t *task_head;//任务链表头
 
 
-static void idle (){
+//static void idle (){
     //iset(true);
-    while(1){
-        yield();
-    };
-}
+//    while(1){
+//        yield();
+//    };
+//}
 
 
 
@@ -80,7 +80,7 @@ static void spin_unlock(spinlock_t *lk){
     atomic_xchg(&lk->locked, 0);
 
     assert(ienabled()==0);//中断关闭
-    
+
     int cpu_now=cpu_current();
 
     assert(cpu_info[cpu_now].ncli>0);//嵌套层数大于0
@@ -178,7 +178,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        current[i]->entry=idle;
+        current[i]->entry=NULL;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
