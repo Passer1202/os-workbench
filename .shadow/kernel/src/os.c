@@ -68,7 +68,7 @@ void lock_test(void *arg) {
     while (1)
         ;
 }
-#define TEST_3
+//#define TEST_3
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 sem_t empty, fill;
