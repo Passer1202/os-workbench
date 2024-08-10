@@ -38,6 +38,7 @@ enum TASK_STATUS
     RUNNABLE,
     RUNNING,
     IDLE,
+    ZOMBIE,//冷却
 };
 
 //from thread-os
