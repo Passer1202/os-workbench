@@ -268,7 +268,12 @@ static void sem_wait(sem_t *sem){
         
         //入队
         sem->wait_queue[sem->qt]=current[cpu_now];
-        sem->qt=(sem->qt+1)%(sem->cnt_max);
+        if(sem->qt+1>=sem->cnt_max){
+            sem->qt=sem->qt+1-sem->cnt_max;
+        }
+        else{
+            sem->qt=sem->qt+1;
+        }
         
     }
     spin_unlock(&sem->lock);
@@ -299,7 +304,12 @@ static void sem_signal(sem_t *sem){
         
         assert(sem->qh!=sem->qt);
         task_t *task=sem->wait_queue[sem->qh];
-        sem->qh=(sem->qh+1)%(sem->cnt_max);
+        if(sem->qh+1>=sem->cnt_max){
+            sem->qh=sem->qh+1-sem->cnt_max;
+        }
+        else{
+            sem->qh=sem->qh+1;
+        }
         //printf("signal name:%s\n",task->name);
         task->status=RUNNABLE;
     }
