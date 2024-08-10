@@ -17,6 +17,14 @@ task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 task_t *task_head;//任务链表头
 
 
+static void idle (){
+    iset(true);
+    while(1){
+        yield();
+    };
+}
+
+
 
 
 static void spin_init(spinlock_t *lk, const char *name){
@@ -166,7 +174,7 @@ static void current_init(){
         current[i]=&cpu_idle[i];
         current[i]->status=IDLE;//空闲
         current[i]->name="idle";
-        current[i]->entry=NULL;
+        current[i]->entry=idle;
         current[i]->next=NULL;
         current[i]->context=kcontext(
             (Area){current[i]->end, current[i]+1}, //from thread-os
