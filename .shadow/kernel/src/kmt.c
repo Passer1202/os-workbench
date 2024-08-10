@@ -31,11 +31,13 @@ static void spin_init(spinlock_t *lk, const char *name){
 
 static void spin_lock(spinlock_t *lk){
 
-    int cpu_now=cpu_current();
     
+
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
     
+
+    int cpu_now=cpu_current();
     
     
     if(cpu_info[cpu_now].ncli==0){//记录最外层的中断状态
@@ -240,12 +242,15 @@ static void kmt_teardown(task_t *task){
 
 static void sem_init(sem_t *sem, const char *name, int value){
     
+    spin_lock(&task_lock);
     sem->val=value;
     spin_init(&sem->lock, name);
     sem->name=name;
     sem->qh=0;
     sem->qt=0;
     sem->cnt_max=128;//若改动此值，务必修改queue数组的大小
+    spin_unlock(&task_lock);
+
 }
 
 static void sem_wait(sem_t *sem){
