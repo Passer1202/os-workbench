@@ -133,6 +133,7 @@ static void *kalloc(size_t size) {
         //slowpath
         acquire_lock(&heap_lock);
         //TODO:buddy分配
+        if(sz<_64KB)sz=_64KB;
         uintptr_t ret=(uintptr_t)buddy_alloc(sz);
         release_lock(&heap_lock);
         return (void*)ret;
