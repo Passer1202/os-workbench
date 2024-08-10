@@ -74,7 +74,7 @@ void lock_test(void *arg) {
 sem_t empty, fill;
 void producer(void *arg) {
     while (1) {
-        printf("cpu_current: %d\n",cpu_current());
+        //printf("cpu_current: %d\n",cpu_current());
 
         P(&empty);
         putch('(');
@@ -86,7 +86,7 @@ void producer(void *arg) {
 void consumer(void *arg) {
     
     while (1) {
-        printf("cpu_current: %d\n",cpu_current());
+        //printf("cpu_current: %d\n",cpu_current());
         P(&fill);
         //assert(0);
         putch(')');
