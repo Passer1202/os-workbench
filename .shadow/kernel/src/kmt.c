@@ -39,11 +39,13 @@ static void spin_init(spinlock_t *lk, const char *name){
 
 static void spin_lock(spinlock_t *lk){
 
-    int cpu_now=cpu_current();
+    
 
     int intr=ienabled();//记录中断是否开启
     iset(false);//关闭中断
     
+
+    int cpu_now=cpu_current();
 
     
     
