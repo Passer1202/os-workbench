@@ -150,14 +150,14 @@ static void os_init() {
     //    putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
     iset(true);
-    yield();
+    //yield();
     while (1){
-        yield();
+        //yield();
     } ;
   }
 #endif
 
-#define ITEM_MAX 128
+#define ITEM_MAX 256
 static item_t items[ITEM_MAX];
 static int item_cnt = 0;
 
