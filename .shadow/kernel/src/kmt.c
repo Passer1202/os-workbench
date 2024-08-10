@@ -12,6 +12,8 @@ kcpu cpu_info[CPU_MAX];//CPU信息
 
 task_t *current[CPU_MAX];//CPU当前任务指针
 
+task_t *last[CPU_MAX];//CPU上一个任务指针
+
 task_t cpu_idle[CPU_MAX]={};//CPU空闲任务
 
 task_t *task_head;//任务链表头
@@ -111,8 +113,13 @@ static Context *kmt_context_save(Event ev, Context *ctx){
     assert(current[cpu_now]!=NULL);
     
     //只要当前任务不被BLOCKED且非IDLE，将其改为RUNNABLE
-    if (current[cpu_now]->status != BLOCKED && current[cpu_now]->status != IDLE) 
-        current[cpu_now]->status = RUNNABLE;
+    if (current[cpu_now]->status == RUNNING ) 
+        current[cpu_now]->status = ZOMBIE;
+
+    if(last[cpu_now]!=NULL && last[cpu_now]->status==ZOMBIE){
+        last[cpu_now]->status=RUNNABLE;
+    }
+    last[cpu_now]=NULL;
     
     current[cpu_now]->context = ctx;//保存当前上下文
 
@@ -133,6 +140,8 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     assert(ienabled()==0);//中断关闭
 
     int cpu_now=cpu_current();
+
+    last[cpu_now]=current[cpu_now];
 
     //遍历任务链表，找到下一个RUNNABLE任务
     //若当前是IDLE，其next为NULL
@@ -163,6 +172,8 @@ static Context *kmt_schedule(Event ev,Context *ctx){
     if(current[cpu_now]->status!=IDLE){
         current[cpu_now]->status=RUNNING;
     }
+
+    
 
     spin_unlock(&task_lock);
     return current[cpu_now]->context;
