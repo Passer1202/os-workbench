@@ -68,7 +68,7 @@ void lock_test(void *arg) {
     while (1)
         ;
 }
-#define TEST_3
+//#define TEST_3
 #define P kmt->sem_wait
 #define V kmt->sem_signal
 sem_t empty, fill;
@@ -158,9 +158,9 @@ static void os_init() {
     //    putch(*s == '*' ? '0' + cpu_current() : *s);
     //}
     iset(true);
-    //yield();
+    yield();
     while (1){
-        //yield();
+        yield();
     } ;
   }
 #endif
