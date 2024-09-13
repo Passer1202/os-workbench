@@ -6,7 +6,73 @@
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include "fat32.h"
+
+
+
+
+
+
+/*
+// 假设这些全局变量和数据结构已被定义和初始化
+u8 *clus_type;
+u8 *data_start;
+u8 *bmp_current;
+u32 min_rgb;
+int pk;
+void *next_clu;
+int no;
+
+
+
+void *thread_func(void *arg) {
+    int *range = (int *)arg;
+    process_range(range[0], range[1]);
+    return NULL;
+}
+
+int main() {
+    pthread_t thread1, thread2;
+    int range1[2] = {2, CLUS_INDEX / 2};
+    int range2[2] = {CLUS_INDEX / 2, CLUS_INDEX};
+
+    
+
+    pthread_create(&thread1, NULL, thread_func, range1);
+    pthread_create(&thread2, NULL, thread_func, range2);
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+
+    pthread_mutex_destroy(&mutex);
+
+    // 打印或使用结果
+    printf("Min RGB: %u, Next Cluster: %p, No: %d\n", min_rgb, next_clu, no);
+
+    return 0;
+}
+*/
+
+//#define EASY 0
+
+
+
+
+enum CLUS_CLASS{
+    CLUS_DENT=0,
+    CLUS_UNUSE,
+    CLUS_BMP_DATA,
+    CLUS_BMP_HEAD,
+    CLUS_OTHER,
+};
+
+#define CLUS_CNT 100000
+#define CLUS_SZ 8192
+
+int clus_type[CLUS_CNT];
+
+int cluses[CLUS_SZ];
 
 
 struct fat32hdr *hdr;
@@ -29,7 +95,24 @@ struct fat32hdr *hdr;
 
 #define REST_SIZE(hdr) ((CLUS_SIZE(hdr)-sizeof(struct bmp_file_header)-sizeof(struct bmp_info_header)))//簇除去两个头文后剩余空间
 
+
+struct poss{
+    int start;
+    int end;
+    u32 min_rgb;
+    uintptr_t data_start;
+    uintptr_t bmp_current;
+    struct fat32hdr* hdr;
+    u32 pk;
+    u32 bmp_wid;
+    u32 bmp_row;
+    u8 *next_clu;
+    uintptr_t no;
+};
+
 void *mmap_disk(const char *fname);
+
+void process_range(struct poss* x);
 
 int main(int argc, char *argv[]) {
 
@@ -38,6 +121,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     setbuf(stdout, NULL);
+
+    //pthread_mutex_init(&mutex, NULL);
 
     assert(sizeof(struct fat32hdr) == 512);
     assert(sizeof(struct fat32dent) == 32);
@@ -64,9 +149,65 @@ int main(int argc, char *argv[]) {
     uintptr_t data_end = (uintptr_t)hdr + SEC_CNT(hdr) * SEC_SIZE(hdr);
 
 
+    
+
+
+
+    //先分类每个簇
+    int clus_index=2;
+
+    for(int i=0;i<data_clu_cnt;i++){
+        //遍历data区的每个簇
+        uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
+        memcpy(cluses, (void *)pc, CLUS_SIZE(hdr));
+        struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(pc);
+
+        if(bmp_hdr->bfType == 0x4d42&&bmp_hdr->bfReserved1==0&&bmp_hdr->bfReserved2==0&&bmp_hdr->bfOffBits==54){
+            //clus_type[clus_index]=CLUS_BMP_DATA;
+            //assert(0);
+            clus_type[clus_index]=CLUS_BMP_HEAD;
+            //assert(0);
+        }
+        else{
+            
+            int unuse_flag=0;
+            for(int i=0;i<CLUS_SIZE(hdr)-2;i++){
+                if(cluses[i]==0x00){
+                    unuse_flag++;
+                }
+                else{
+                    break;
+                
+                }
+            }
+            if(unuse_flag==CLUS_SIZE(hdr)-2){
+            clus_type[clus_index]=CLUS_UNUSE;
+            }
+            else{
+                clus_type[clus_index]=CLUS_BMP_DATA;
+
+                for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
+                //遍历当前簇的每个目录项
+                    struct fat32dent *pd=(struct fat32dent *)(pc+j*sizeof(struct fat32dent));//当前目录项的指针
+                    //判断是否是短目录项（.BMP)
+                    if(pd->DIR_Name[8]=='B' && pd->DIR_Name[9]=='M' && pd->DIR_Name[10]=='P'){
+                        if(pd->DIR_NTRes==0){
+                            clus_type[clus_index]=CLUS_DENT;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+        clus_index++;
+    }
+
+    //assert(0);
     //1. find the (short) directory entry
     for(int i=0;i<data_clu_cnt;i++){
         //遍历data区的每个簇
+        //if(clus_type[i]!=CLUS_DENT) continue;
         uintptr_t pc = data_start + i * CLUS_SIZE(hdr);//当前簇的起始地址指针
         for(int j=0;j<(CLUS_SIZE(hdr)/sizeof(struct fat32dent));j++){
             //遍历当前簇的每个目录项
@@ -85,6 +226,7 @@ int main(int argc, char *argv[]) {
                     //printf("bmp_clu1st: %d\n", bmp_clu1st);
                     //assert(0);
                     struct bmp_file_header *bmp_hdr = (struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)));
+                    //if(bmp_hdr->bfType != 0x4d42) continue;
                     {//确定是bmp文件
                             //3.find long directory entry
                             //手册：长目录项倒着紧放在短目录项前面
@@ -138,7 +280,7 @@ int main(int argc, char *argv[]) {
                     
                     //恢复文件
 
-                    
+                    //assert(0);
                     char tmp_path[256]="/tmp/DICM/";
                     strcat(tmp_path, name);
                     remove(tmp_path);//删除文件若已有，避免出现同名文件
@@ -161,26 +303,154 @@ int main(int argc, char *argv[]) {
                     if(bmp_sz<=CLUS_SIZE(hdr)){
                         //assert(0);
                        fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
+
                     }else{
                         //该文件占了多个簇
                         //continue;
                         //printf("rest size: %d\n", (int)REST_SIZE(hdr));
+                        struct bmp_info_header *bmp_ihdr = (struct bmp_info_header *)(bmp_hdr + 1);
+
+                        assert(bmp_ihdr->biSize == 40);
+                        
+                        u32 bmp_wid=3*(bmp_ihdr->biWidth);
+                        u32 bmp_row=(8*bmp_wid+31)/32*4;
+
+                        int pk_flag=0;
+
+                        //assert(0);
+                        u32 pk=0;
                         while(bmp_sz >= CLUS_SIZE(hdr)){
                             //printf("name: %s\n", name);
-                            //printf("img_sz: %d\n", img_sz);
-                            //printf("img_current: %u\n", (u32)img_current);
-                            //printf("CLUS_SIZE(hdr): %d\n", CLUS_SIZE(hdr));
-                            if(bmp_current>=data_end&&(void *)bmp_current!=NULL){
+                            //printf("img_sz: %d\n", img_s
+
+                            if(bmp_current>=data_end){//&&(void *)bmp_current!=NULL){
                                 break;
                             }
+
+                            //assert(0);
                             fwrite((void *)bmp_current, CLUS_SIZE(hdr), 1, bmp_tmp_file);
+                            
+                            if(pk_flag==0){
+                                pk+=(CLUS_SIZE(hdr)-bmp_hdr->bfOffBits);
+                                pk%=bmp_row;
+                                
+                            }
+                            else{
+                               pk+=CLUS_SIZE(hdr);
+                               pk%=bmp_row;
+                            }
 
-                            bmp_current += CLUS_SIZE(hdr);
+                            pk_flag=1;
+
+
+                            u8* next_clu= (u8*)bmp_current +  CLUS_SIZE(hdr);
+
+                            int next_flag=0;
+                            if((uintptr_t)next_clu>=data_end){
+                                next_flag=1;
+                            }
+
+                            u32 min_rgb=0;
+                            uintptr_t no=(uintptr_t)next_clu-data_start;
+                            no/=CLUS_SIZE(hdr);
+                            no+=2;
+
+                            if(next_flag==1){
+                                min_rgb=0xffffffff;
+                            }
+                            //(struct bmp_file_header *)(data_start + (bmp_clu1st * CLUS_SIZE(hdr)))
+                            else{
+                                for(int k=0;k<bmp_row;k++){
+                                    u8* rgb1=next_clu+k;
+                                    u8* rgb2=(u8*)bmp_current+CLUS_SIZE(hdr)-bmp_row+k;
+                                    if(*rgb1>*rgb2){
+                                        min_rgb=min_rgb+(*rgb1-*rgb2);
+                                    }
+                                    else{
+                                        min_rgb=min_rgb+(*rgb2-*rgb1);
+                                    }
+                                }
+                            }
+                            
+                            
+
+                            // printf("index: %d\n",clus_index);
+                            //创建两个线程，一个线程跑一半的循环
+                          /*
+                          
+                        struct poss{
+                            int start;
+                            int end;
+                            u32 min_rgb;
+                            uintptr_t data_start;
+                            uintptr_t bmp_current;
+                            struct fat32hdr* hdr;
+                            u32 pk;
+                            u32 bmp_wid;
+                            u32 bmp_row;
+                            u8 *next_clu;
+                            uintptr_t no;
+                        };
+
+                          */
+                            struct poss x1;
+                            x1.start=2;
+                            x1.end=clus_index/2;
+                            x1.min_rgb=min_rgb;
+                            x1.data_start=data_start;
+                            x1.bmp_current=(uintptr_t)bmp_current;
+                            x1.hdr=hdr;
+                            x1.pk=pk;
+                            x1.bmp_wid=bmp_wid;
+                            x1.bmp_row=bmp_row;
+                            x1.next_clu=next_clu;
+                            x1.no=no;
+
+
+                            struct poss x2;
+                            x2.start=clus_index/2;
+                            x2.end=clus_index;
+                            x2.min_rgb=min_rgb;
+                            x2.data_start=data_start;
+                            x2.bmp_current=(uintptr_t)bmp_current;
+                            x2.hdr=hdr;
+                            x2.pk=pk;
+                            x2.bmp_wid=bmp_wid;
+                            x2.bmp_row=bmp_row;
+                            x2.next_clu=next_clu;
+                            x2.no=no;
+
+                            pthread_t thread1, thread2;
+
+                            pthread_create(&thread1, NULL, (void*)process_range, &x1);
+
+                            pthread_create(&thread2, NULL, (void*)process_range, &x2);
+
+                            pthread_join(thread1, NULL);
+
+                            pthread_join(thread2, NULL);
+
+                            if(x1.min_rgb<x2.min_rgb){
+                                min_rgb=x1.min_rgb;
+                                next_clu=x1.next_clu;
+                                no=x1.no;
+                            }
+                            else{
+                                min_rgb=x2.min_rgb;
+                                next_clu=x2.next_clu;
+                                no=x2.no;
+                            }
+
+                            //clus_type[no]=CLUS_OTHER;
+
+                            bmp_current = (uintptr_t)next_clu;
                             bmp_sz -= CLUS_SIZE(hdr);
-
+                             
                         }
+                        
                         if((void *)bmp_current!=NULL &&bmp_current<data_end&&bmp_sz > 0){
                             fwrite((void *)bmp_current, bmp_sz, 1, bmp_tmp_file);
+                            
                         }
                     }
                     fclose(bmp_tmp_file);
@@ -219,6 +489,44 @@ int main(int argc, char *argv[]) {
     //unmap disk
     munmap(hdr, hdr->BPB_TotSec32 * hdr->BPB_BytsPerSec);
 
+}
+
+void process_range(struct poss* x) {
+
+    for (int z = x->start; z < x->end; z++) {
+        if (clus_type[z] == CLUS_BMP_DATA) {
+            u32 tmp_min_rgb = 0;
+            u8 *tmp_clu = (u8 *)(x->data_start + (z - 2) * CLUS_SIZE(hdr));
+
+            if ((x->pk < x->bmp_wid) && (*(tmp_clu + x->bmp_wid - x->pk) != 0)) {
+                continue;
+            }
+            if ((x->pk >= x->bmp_wid) && (*(tmp_clu) != 0)) {
+                continue;
+            }
+
+            for (int k = 0; k < x->bmp_row; k++) {
+                u8 *rgb1 = (u8 *)tmp_clu + k;
+                u8 *rgb2 = (u8 *)x->bmp_current + CLUS_SIZE(hdr) - x->bmp_row + k;
+                if (*rgb1 > *rgb2) {
+                    tmp_min_rgb += (*rgb1 - *rgb2);
+                } else {
+                    tmp_min_rgb += (*rgb2 - *rgb1);
+                }
+                if (tmp_min_rgb > x->min_rgb) {
+                    break;
+                }
+            }
+
+            //pthread_mutex_lock(&mutex);
+            if (tmp_min_rgb < x->min_rgb) {
+                x->min_rgb = tmp_min_rgb;
+                x->next_clu = (void *)tmp_clu;
+                x->no = z;
+            }
+            //pthread_mutex_unlock(&mutex);
+        }
+    }
 }
 
 //referenced from jyy
